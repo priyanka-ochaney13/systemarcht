@@ -4,6 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.routers import api_gateway
 from app.routers.lambda_function import router as lambda_router
 from app.routers.architecture import router as architecture_router
+from app.routers.s3 import router as s3_router
 import logging
 
 logging.basicConfig(level=logging.INFO)
@@ -25,13 +26,14 @@ app.add_middleware(
 app.include_router(api_gateway.router)
 app.include_router(lambda_router)
 app.include_router(architecture_router)
+app.include_router(s3_router)
 
 @app.get("/")
 def root():
     return {
         "service": "AWS Pricing Calculator",
         "version": "1.0.0",
-        "services": ["api_gateway", "lambda", "architecture"]
+        "services": ["api_gateway", "lambda", "architecture", "s3"]
     }
 
 @app.get("/health")

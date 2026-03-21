@@ -54,6 +54,11 @@ LAMBDA_LIMITS = _lambda_config["limits"]
 LAMBDA_ARCHITECTURES = _lambda_config["architectures"]
 LAMBDA_FALLBACK_PRICING = _lambda_config["fallback_pricing"]
 
+# S3 configuration (from config)
+_s3_config = _CONFIG.get("s3", {})
+S3_STORAGE_CLASSES = _s3_config.get("storage_classes", ["standard", "intelligent_tiering", "glacier", "deep_archive"])
+S3_FALLBACK_PRICING = _s3_config.get("fallback_pricing", {})
+
 def get_service_config(service: str) -> Dict[str, Any]:
     """Get configuration for a specific service"""
     return _CONFIG.get(service, {})
