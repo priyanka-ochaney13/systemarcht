@@ -89,36 +89,65 @@ export const useServiceConfigStore = create((set) => ({
     delete_requests: 1000,
     outbound_transfer_gb: 50,
   },
+
+  dynamoDBConfig: {
+    region: 'us-east-1',
+    storage_gb: 100,
+    avg_item_size_kb: 4.0,
+    on_demand_enabled: false,
+    on_demand_reads_per_month: 0,
+    on_demand_writes_per_month: 0,
+    provisioned_enabled: false,
+    provisioned_read_capacity_units: 0,
+    provisioned_write_capacity_units: 0,
+    backup_enabled: false,
+    pitr_enabled: false,
+    backup_storage_gb: 0,
+    restore_data_size_gb: 0,
+  },
   
   updateAPIGatewayConfig: (config) => set({ apiGatewayConfig: config }),
   updateLambdaConfig: (config) => set({ lambdaConfig: config }),
   updateS3Config: (config) => set({ s3Config: config }),
+  updateDynamoDBConfig: (config) => set({ dynamoDBConfig: config }),
 }));
 
 export const usePricingStore = create((set) => ({
   apiGatewayCost: null,
   lambdaCost: null,
   s3Cost: null,
+  dynamoDBCost: null,
   totalCost: 0,
   
   setAPIGatewayCost: (cost) => set((state) => ({
     apiGatewayCost: cost,
     totalCost: (cost?.breakdown?.total_cost || 0) + 
                (state.lambdaCost?.breakdown?.total_cost || 0) + 
-               (state.s3Cost?.breakdown?.total_cost || 0),
+               (state.s3Cost?.breakdown?.total_cost || 0) +
+               (state.dynamoDBCost?.breakdown?.total_cost || 0),
   })),
   
   setLambdaCost: (cost) => set((state) => ({
     lambdaCost: cost,
     totalCost: (state.apiGatewayCost?.breakdown?.total_cost || 0) + 
                (cost?.breakdown?.total_cost || 0) + 
-               (state.s3Cost?.breakdown?.total_cost || 0),
+               (state.s3Cost?.breakdown?.total_cost || 0) +
+               (state.dynamoDBCost?.breakdown?.total_cost || 0),
   })),
   
   setS3Cost: (cost) => set((state) => ({
     s3Cost: cost,
     totalCost: (state.apiGatewayCost?.breakdown?.total_cost || 0) + 
                (state.lambdaCost?.breakdown?.total_cost || 0) + 
+               (cost?.breakdown?.total_cost || 0) +
+               (state.dynamoDBCost?.breakdown?.total_cost || 0),
+  })),
+
+  setDynamoDBCost: (cost) => set((state) => ({
+    dynamoDBCost: cost,
+    totalCost: (state.apiGatewayCost?.breakdown?.total_cost || 0) + 
+               (state.lambdaCost?.breakdown?.total_cost || 0) + 
+               (state.s3Cost?.breakdown?.total_cost || 0) +
                (cost?.breakdown?.total_cost || 0),
   })),
   
@@ -126,6 +155,7 @@ export const usePricingStore = create((set) => ({
     apiGatewayCost: null,
     lambdaCost: null,
     s3Cost: null,
+    dynamoDBCost: null,
     totalCost: 0,
   }),
 }));

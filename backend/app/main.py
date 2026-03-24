@@ -5,7 +5,8 @@ from app.routers import api_gateway
 from app.routers.lambda_function import router as lambda_router
 from app.routers.architecture import router as architecture_router
 from app.routers.s3 import router as s3_router
-#from app.routers.dynamodb import router as dynamodb_router
+from app.routers.dynamodb import router as dynamodb_router
+from app.routers.elb import router as elb_router
 import logging
 
 logging.basicConfig(level=logging.INFO)
@@ -28,14 +29,15 @@ app.include_router(api_gateway.router)
 app.include_router(lambda_router)
 app.include_router(architecture_router)
 app.include_router(s3_router)
-#app.include_router(dynamodb_router)
+app.include_router(dynamodb_router)
+app.include_router(elb_router)
 
 @app.get("/")
 def root():
     return {
         "service": "AWS Pricing Calculator",
         "version": "1.0.0",
-        "services": ["api_gateway", "lambda", "architecture", "s3"] #add dynamo when implemented
+        "services": ["api_gateway", "lambda", "architecture", "s3", "dynamodb", "elb"]
     }
 
 @app.get("/health")

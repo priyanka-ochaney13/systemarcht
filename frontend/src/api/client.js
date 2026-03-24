@@ -25,6 +25,16 @@ export const calculateS3Cost = async (params) => {
   return response.data;
 };
 
+export const calculateDynamoDBCost = async (params) => {
+  const response = await apiClient.post('/dynamodb/calculate', params);
+  return response.data;
+};
+
+export const getDynamoDBRegions = async () => {
+  const response = await apiClient.get('/dynamodb/regions');
+  return response.data;
+};
+
 // Architecture APIs
 export const saveArchitecture = async (architecture) => {
   try {
