@@ -8,7 +8,10 @@ class S3StorageBreakdown(BaseModel):
     """Storage cost breakdown"""
     standard_storage_cost: float = Field(0.0, description="Cost for standard storage")
     intelligent_tiering_cost: float = Field(0.0, description="Cost for intelligent tiering")
-    glacier_storage_cost: float = Field(0.0, description="Cost for glacier storage")
+    standard_ia_storage_cost: float = Field(0.0, description="Cost for standard IA storage")
+    one_zone_ia_storage_cost: float = Field(0.0, description="Cost for one zone IA storage")
+    glacier_instant_storage_cost: float = Field(0.0, description="Cost for glacier instant storage")
+    glacier_flexible_storage_cost: float = Field(0.0, description="Cost for glacier flexible storage")
     deep_archive_storage_cost: float = Field(0.0, description="Cost for deep archive storage")
 
 
@@ -48,7 +51,10 @@ class S3Request(BaseCalculateRequest):
     storage_class: Literal[
         "standard",
         "intelligent_tiering",
-        "glacier",
+        "standard_ia",
+        "one_zone_ia",
+        "glacier_instant",
+        "glacier_flexible",
         "deep_archive"
     ] = Field(
         default="standard",

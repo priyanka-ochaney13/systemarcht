@@ -1,4 +1,7 @@
 """Architecture routes"""
+import json
+import os
+from typing import List
 from fastapi import APIRouter, HTTPException
 from app.models.architecture import (
     ArchitectureRequest,
@@ -8,6 +11,46 @@ from app.services.architecture.calculator import ArchitectureCalculator
 
 router = APIRouter(prefix="/api/architecture", tags=["Architecture"])
 calculator = ArchitectureCalculator()
+
+DATA_FILE = "data/architectures.json"
+
+def _get_architectures():
+    if not os.path.exists(DATA_FILE):
+        return []
+    with open(DATA_FILE, "r") as f:
+        try:
+            return json.load(f)
+        except json.JSONDecodeError:
+            return []
+
+def _save_architecture(architecture: ArchitectureRequest):
+    architectures = _get_architectures()
+    architecture_dict = architecture.dict()
+    updated = False
+    for i, a in enumerate(architectures):
+        if a.get("name") == architecture.name:
+            architectures[i] = architecture_dict
+            updated = True
+            break
+    if not updated:
+        architectures.append(architecture_dict)
+    os.makedirs(os.path.dirname(DATA_FILE), exist_ok=True)
+    with open(DATA_FILE, "w") as f:
+        json.dump(architectures, f, indent=2)
+    return architecture
+
+@router.get("", response_model=List[ArchitectureRequest])
+def list_architectures():
+    """List saved architectures"""
+    return _get_architectures()
+
+@router.post("", response_model=ArchitectureRequest)
+def save_architecture(architecture: ArchitectureRequest):
+    """Save an architecture"""
+    try:
+        return _save_architecture(architecture)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 @router.post("/calculate", response_model=ArchitectureCostResponse)

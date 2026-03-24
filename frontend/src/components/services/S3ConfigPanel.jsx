@@ -49,7 +49,30 @@ export const S3ConfigPanel = ({ onClose }) => {
   const handleCalculate = async () => {
     setLoading(true);
     try {
-      const result = await calculateS3Cost(localConfig);
+      // Map frontend field names to backend API field names
+      const storageClassMap = {
+        'S3 Standard': 'standard',
+        'S3 Intelligent-Tiering': 'intelligent_tiering',
+        'S3 Standard-IA': 'standard_ia',
+        'S3 One Zone-IA': 'one_zone_ia',
+        'S3 Glacier Instant': 'glacier_instant',
+        'S3 Glacier Flexible': 'glacier_flexible',
+        'S3 Deep Archive': 'deep_archive',
+      };
+
+      const apiParams = {
+        region: localConfig.region,
+        storage_gb: Number(localConfig.storage_gb) || 0,
+        storage_class: storageClassMap[localConfig.storage_class] || 'standard',
+        put_requests_per_month: Number(localConfig.put_requests) || 0,
+        get_requests_per_month: Number(localConfig.get_requests) || 0,
+        delete_requests_per_month: Number(localConfig.delete_requests) || 0,
+        outbound_transfer_gb: Number(localConfig.outbound_transfer_gb) || 0,
+        intra_region_transfer_gb: Number(localConfig.intra_region_transfer_gb) || 0,
+        include_free_tier: true,
+      };
+
+      const result = await calculateS3Cost(apiParams);
       setCost(result);
       setS3Cost(result);
       updateConfig(localConfig);
@@ -118,8 +141,8 @@ export const S3ConfigPanel = ({ onClose }) => {
           </label>
           <input
             type="number"
-            value={localConfig.storage_gb}
-            onChange={(e) => handleChange('storage_gb', parseFloat(e.target.value))}
+            value={localConfig.storage_gb || ''}
+            onChange={(e) => handleChange('storage_gb', e.target.value === '' ? '' : parseFloat(e.target.value))}
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-yellow-500"
           />
           <p className="text-xs text-gray-500 mt-1">💡 Billed on average daily storage</p>
@@ -132,8 +155,8 @@ export const S3ConfigPanel = ({ onClose }) => {
           </label>
           <input
             type="number"
-            value={localConfig.put_requests}
-            onChange={(e) => handleChange('put_requests', parseInt(e.target.value))}
+            value={localConfig.put_requests || ''}
+            onChange={(e) => handleChange('put_requests', e.target.value === '' ? '' : parseInt(e.target.value))}
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-yellow-500"
           />
           <p className="text-xs text-gray-500 mt-1">💡 Upload/Write operations</p>
@@ -146,8 +169,8 @@ export const S3ConfigPanel = ({ onClose }) => {
           </label>
           <input
             type="number"
-            value={localConfig.get_requests}
-            onChange={(e) => handleChange('get_requests', parseInt(e.target.value))}
+            value={localConfig.get_requests || ''}
+            onChange={(e) => handleChange('get_requests', e.target.value === '' ? '' : parseInt(e.target.value))}
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-yellow-500"
           />
           <p className="text-xs text-gray-500 mt-1">💡 Download/Read operations</p>
@@ -160,8 +183,8 @@ export const S3ConfigPanel = ({ onClose }) => {
           </label>
           <input
             type="number"
-            value={localConfig.delete_requests}
-            onChange={(e) => handleChange('delete_requests', parseInt(e.target.value))}
+            value={localConfig.delete_requests || ''}
+            onChange={(e) => handleChange('delete_requests', e.target.value === '' ? '' : parseInt(e.target.value))}
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-yellow-500"
           />
         </div>
@@ -173,8 +196,8 @@ export const S3ConfigPanel = ({ onClose }) => {
           </label>
           <input
             type="number"
-            value={localConfig.outbound_transfer_gb}
-            onChange={(e) => handleChange('outbound_transfer_gb', parseFloat(e.target.value))}
+            value={localConfig.outbound_transfer_gb || ''}
+            onChange={(e) => handleChange('outbound_transfer_gb', e.target.value === '' ? '' : parseFloat(e.target.value))}
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-yellow-500"
           />
           <p className="text-xs text-gray-500 mt-1">⚠️ First 1 GB/month FREE</p>

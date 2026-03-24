@@ -48,8 +48,11 @@ class S3Pricing(PricingLoader):
             if region not in self.index:
                 self.index[region] = {
                     "standard_storage": None,
-                    "intelligent_tiering": None,
-                    "glacier_storage": None,
+                    "intelligent_tiering_storage": None,
+                    "standard_ia_storage": None,
+                    "one_zone_ia_storage": None,
+                    "glacier_instant_storage": None,
+                    "glacier_flexible_storage": None,
                     "deep_archive_storage": None,
                     "put_requests": None,
                     "get_requests": None,
@@ -65,9 +68,15 @@ class S3Pricing(PricingLoader):
             if "TimedStorage-Standard" in usagetype:
                 self.index[region]["standard_storage"] = self._extract_tiers(sku, terms)
             elif "TimedStorage-IntelligentTiering" in usagetype:
-                self.index[region]["intelligent_tiering"] = self._extract_tiers(sku, terms)
+                self.index[region]["intelligent_tiering_storage"] = self._extract_tiers(sku, terms)
+            elif "TimedStorage-SIA" in usagetype:
+                self.index[region]["standard_ia_storage"] = self._extract_tiers(sku, terms)
+            elif "TimedStorage-ZIA" in usagetype:
+                self.index[region]["one_zone_ia_storage"] = self._extract_tiers(sku, terms)
+            elif "TimedStorage-GlacierInstantRetrieval" in usagetype:
+                self.index[region]["glacier_instant_storage"] = self._extract_tiers(sku, terms)
             elif "TimedStorage-GlacierStaging" in usagetype or "TimedStorage-Glacier" in usagetype:
-                self.index[region]["glacier_storage"] = self._extract_tiers(sku, terms)
+                self.index[region]["glacier_flexible_storage"] = self._extract_tiers(sku, terms)
             elif "TimedStorage-DeepArchive" in usagetype:
                 self.index[region]["deep_archive_storage"] = self._extract_tiers(sku, terms)
             

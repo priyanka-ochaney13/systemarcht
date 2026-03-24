@@ -94,8 +94,14 @@ class S3Calculator(BaseCalculator):
             breakdown.standard_storage_cost = round(cost, 2)
         elif storage_class == "intelligent_tiering":
             breakdown.intelligent_tiering_cost = round(cost, 2)
-        elif storage_class == "glacier":
-            breakdown.glacier_storage_cost = round(cost, 2)
+        elif storage_class == "standard_ia":
+            breakdown.standard_ia_storage_cost = round(cost, 2)
+        elif storage_class == "one_zone_ia":
+            breakdown.one_zone_ia_storage_cost = round(cost, 2)
+        elif storage_class == "glacier_instant":
+            breakdown.glacier_instant_storage_cost = round(cost, 2)
+        elif storage_class == "glacier_flexible":
+            breakdown.glacier_flexible_storage_cost = round(cost, 2)
         elif storage_class == "deep_archive":
             breakdown.deep_archive_storage_cost = round(cost, 2)
         

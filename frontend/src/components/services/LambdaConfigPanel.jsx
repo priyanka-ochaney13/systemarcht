@@ -53,7 +53,21 @@ export const LambdaConfigPanel = ({ onClose }) => {
   const handleCalculate = async () => {
     setLoading(true);
     try {
-      const result = await calculateLambdaCost(localConfig);
+      // Map frontend field names to backend API field names
+      const apiParams = {
+        region: localConfig.region,
+        architecture: localConfig.architecture,
+        requests_per_month: localConfig.requests_per_month || 0,
+        duration_ms: localConfig.average_duration_ms || 128,
+        memory_mb: localConfig.allocated_memory_mb || 128,
+        ephemeral_storage_mb: localConfig.ephemeral_storage_mb || 512,
+        provisioned_concurrency: localConfig.provisioned_concurrency?.enabled
+          ? localConfig.provisioned_concurrency.count || 0
+          : 0,
+        include_free_tier: localConfig.include_free_tier ?? true,
+      };
+
+      const result = await calculateLambdaCost(apiParams);
       setCost(result);
       setLambdaCost(result);
       updateConfig(localConfig);
