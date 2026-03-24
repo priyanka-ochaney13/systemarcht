@@ -6,6 +6,8 @@ import { APIGatewayConfigPanel } from '@/components/services/APIGatewayConfigPan
 import { LambdaConfigPanel } from '@/components/services/LambdaConfigPanel';
 import { S3ConfigPanel } from '@/components/services/S3ConfigPanel';
 import { CognitoConfigPanel } from '@/components/services/CognitoConfigPanel';
+import { DynamoDBConfigPanel } from '@/components/services/DynamoDBConfigPanel';
+import { ELBConfigPanel } from '@/components/services/ELBConfigPanel';
 import { usePricingStore } from '@/store';
 import Link from 'next/link';
 import { ChevronLeft } from 'lucide-react';
@@ -26,6 +28,10 @@ export default function PlaygroundPage() {
       setOpenConfigPanel('s3');
     } else if (serviceType === 'cognito') {
       setOpenConfigPanel('cognito');
+    } else if (serviceType === 'dynamodb') {
+      setOpenConfigPanel('dynamodb');
+    } else if (serviceType === 'elb') {
+      setOpenConfigPanel('elb');
     }
   };
 
@@ -76,6 +82,12 @@ export default function PlaygroundPage() {
               {openConfigPanel === 'cognito' && (
                 <CognitoConfigPanel onClose={() => setOpenConfigPanel(null)} />
               )}
+              {openConfigPanel === 'dynamodb' && (
+                <DynamoDBConfigPanel onClose={() => setOpenConfigPanel(null)} />
+              )}
+              {openConfigPanel === 'elb' && (
+                <ELBConfigPanel onClose={() => setOpenConfigPanel(null)} />
+              )}
             </div>
           </div>
         )}
@@ -83,3 +95,4 @@ export default function PlaygroundPage() {
     </div>
   );
 }
+
