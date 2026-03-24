@@ -25,6 +25,11 @@ export const calculateS3Cost = async (params) => {
   return response.data;
 };
 
+export const calculateCognitoCost = async (params) => {
+  const response = await apiClient.post('/cognito/calculate', params);
+  return response.data;
+};
+
 // Architecture APIs
 export const saveArchitecture = async (architecture) => {
   try {

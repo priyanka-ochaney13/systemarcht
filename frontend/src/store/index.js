@@ -89,36 +89,65 @@ export const useServiceConfigStore = create((set) => ({
     delete_requests: 1000,
     outbound_transfer_gb: 50,
   },
+
+  cognitoConfig: {
+    region: 'ap-south-1',
+    mau: 1000000,
+    signups_per_month: 10000,
+    signins_per_month: 100000,
+    token_refreshes_per_month: 50000,
+    mfa_enabled: false,
+    mfa_type: 'sms',
+    mfa_percentage: 30,
+    advanced_security_enabled: false,
+    risk_evaluated_logins: 100000,
+    custom_domain_enabled: false,
+    email_customization_enabled: false,
+    monthly_emails: 50000,
+  },
   
   updateAPIGatewayConfig: (config) => set({ apiGatewayConfig: config }),
   updateLambdaConfig: (config) => set({ lambdaConfig: config }),
   updateS3Config: (config) => set({ s3Config: config }),
+  updateCognitoConfig: (config) => set({ cognitoConfig: config }),
 }));
 
 export const usePricingStore = create((set) => ({
   apiGatewayCost: null,
   lambdaCost: null,
   s3Cost: null,
+  cognitoCost: null,
   totalCost: 0,
   
   setAPIGatewayCost: (cost) => set((state) => ({
     apiGatewayCost: cost,
     totalCost: (cost?.breakdown?.total_cost || 0) + 
                (state.lambdaCost?.breakdown?.total_cost || 0) + 
-               (state.s3Cost?.breakdown?.total_cost || 0),
+               (state.s3Cost?.breakdown?.total_cost || 0) +
+               (state.cognitoCost?.breakdown?.total_cost || 0),
   })),
   
   setLambdaCost: (cost) => set((state) => ({
     lambdaCost: cost,
     totalCost: (state.apiGatewayCost?.breakdown?.total_cost || 0) + 
                (cost?.breakdown?.total_cost || 0) + 
-               (state.s3Cost?.breakdown?.total_cost || 0),
+               (state.s3Cost?.breakdown?.total_cost || 0) +
+               (state.cognitoCost?.breakdown?.total_cost || 0),
   })),
   
   setS3Cost: (cost) => set((state) => ({
     s3Cost: cost,
     totalCost: (state.apiGatewayCost?.breakdown?.total_cost || 0) + 
                (state.lambdaCost?.breakdown?.total_cost || 0) + 
+               (cost?.breakdown?.total_cost || 0) +
+               (state.cognitoCost?.breakdown?.total_cost || 0),
+  })),
+
+  setCognitoCost: (cost) => set((state) => ({
+    cognitoCost: cost,
+    totalCost: (state.apiGatewayCost?.breakdown?.total_cost || 0) + 
+               (state.lambdaCost?.breakdown?.total_cost || 0) + 
+               (state.s3Cost?.breakdown?.total_cost || 0) +
                (cost?.breakdown?.total_cost || 0),
   })),
   
@@ -126,6 +155,7 @@ export const usePricingStore = create((set) => ({
     apiGatewayCost: null,
     lambdaCost: null,
     s3Cost: null,
+    cognitoCost: null,
     totalCost: 0,
   }),
 }));

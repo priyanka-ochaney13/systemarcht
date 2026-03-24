@@ -5,6 +5,7 @@ import { PlaygroundCanvas } from '@/components/playground/PlaygroundCanvas';
 import { APIGatewayConfigPanel } from '@/components/services/APIGatewayConfigPanel';
 import { LambdaConfigPanel } from '@/components/services/LambdaConfigPanel';
 import { S3ConfigPanel } from '@/components/services/S3ConfigPanel';
+import { CognitoConfigPanel } from '@/components/services/CognitoConfigPanel';
 import { usePricingStore } from '@/store';
 import Link from 'next/link';
 import { ChevronLeft } from 'lucide-react';
@@ -23,6 +24,8 @@ export default function PlaygroundPage() {
       setOpenConfigPanel('lambda');
     } else if (serviceType === 's3') {
       setOpenConfigPanel('s3');
+    } else if (serviceType === 'cognito') {
+      setOpenConfigPanel('cognito');
     }
   };
 
@@ -69,6 +72,9 @@ export default function PlaygroundPage() {
               )}
               {openConfigPanel === 's3' && (
                 <S3ConfigPanel onClose={() => setOpenConfigPanel(null)} />
+              )}
+              {openConfigPanel === 'cognito' && (
+                <CognitoConfigPanel onClose={() => setOpenConfigPanel(null)} />
               )}
             </div>
           </div>
