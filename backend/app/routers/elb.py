@@ -22,13 +22,13 @@ def calculate_elb_cost(request: ELBRequest):
 @router.get("/regions")
 def get_elb_regions():
     """Get available regions for ELB"""
-    return {"regions": sorted(calculator.pricing.get_available_regions())}
+    return sorted(calculator.pricing.get_available_regions())
 
 
 @router.get("/lb-types")
 def get_lb_types():
     """Get supported load balancer types and their features"""
-    return {"lb_types": ELB_LB_TYPES}
+    return ELB_LB_TYPES
 
 
 @router.get("/pricing-info")

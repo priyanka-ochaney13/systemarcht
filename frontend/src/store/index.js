@@ -105,11 +105,22 @@ export const useServiceConfigStore = create((set) => ({
     backup_storage_gb: 0,
     restore_data_size_gb: 0,
   },
+
+  elbConfig: {
+    region: 'us-east-1',
+    lb_type: 'application',
+    hours_per_month: 730,
+    lcu_count: 0,
+    reserved_lcu_count: 0,
+    trust_store_hours: 0,
+    data_processed_gb: 0,
+  },
   
   updateAPIGatewayConfig: (config) => set({ apiGatewayConfig: config }),
   updateLambdaConfig: (config) => set({ lambdaConfig: config }),
   updateS3Config: (config) => set({ s3Config: config }),
   updateDynamoDBConfig: (config) => set({ dynamoDBConfig: config }),
+  updateELBConfig: (config) => set({ elbConfig: config }),
 }));
 
 export const usePricingStore = create((set) => ({
@@ -117,6 +128,7 @@ export const usePricingStore = create((set) => ({
   lambdaCost: null,
   s3Cost: null,
   dynamoDBCost: null,
+  elbCost: null,
   totalCost: 0,
   
   setAPIGatewayCost: (cost) => set((state) => ({
@@ -124,7 +136,8 @@ export const usePricingStore = create((set) => ({
     totalCost: (cost?.breakdown?.total_cost || 0) + 
                (state.lambdaCost?.breakdown?.total_cost || 0) + 
                (state.s3Cost?.breakdown?.total_cost || 0) +
-               (state.dynamoDBCost?.breakdown?.total_cost || 0),
+               (state.dynamoDBCost?.breakdown?.total_cost || 0) +
+               (state.elbCost?.breakdown?.total_cost || 0),
   })),
   
   setLambdaCost: (cost) => set((state) => ({
@@ -132,7 +145,8 @@ export const usePricingStore = create((set) => ({
     totalCost: (state.apiGatewayCost?.breakdown?.total_cost || 0) + 
                (cost?.breakdown?.total_cost || 0) + 
                (state.s3Cost?.breakdown?.total_cost || 0) +
-               (state.dynamoDBCost?.breakdown?.total_cost || 0),
+               (state.dynamoDBCost?.breakdown?.total_cost || 0) +
+               (state.elbCost?.breakdown?.total_cost || 0),
   })),
   
   setS3Cost: (cost) => set((state) => ({
@@ -140,7 +154,8 @@ export const usePricingStore = create((set) => ({
     totalCost: (state.apiGatewayCost?.breakdown?.total_cost || 0) + 
                (state.lambdaCost?.breakdown?.total_cost || 0) + 
                (cost?.breakdown?.total_cost || 0) +
-               (state.dynamoDBCost?.breakdown?.total_cost || 0),
+               (state.dynamoDBCost?.breakdown?.total_cost || 0) +
+               (state.elbCost?.breakdown?.total_cost || 0),
   })),
 
   setDynamoDBCost: (cost) => set((state) => ({
@@ -148,6 +163,16 @@ export const usePricingStore = create((set) => ({
     totalCost: (state.apiGatewayCost?.breakdown?.total_cost || 0) + 
                (state.lambdaCost?.breakdown?.total_cost || 0) + 
                (state.s3Cost?.breakdown?.total_cost || 0) +
+               (cost?.breakdown?.total_cost || 0) +
+               (state.elbCost?.breakdown?.total_cost || 0),
+  })),
+
+  setELBCost: (cost) => set((state) => ({
+    elbCost: cost,
+    totalCost: (state.apiGatewayCost?.breakdown?.total_cost || 0) + 
+               (state.lambdaCost?.breakdown?.total_cost || 0) + 
+               (state.s3Cost?.breakdown?.total_cost || 0) +
+               (state.dynamoDBCost?.breakdown?.total_cost || 0) +
                (cost?.breakdown?.total_cost || 0),
   })),
   
@@ -156,6 +181,7 @@ export const usePricingStore = create((set) => ({
     lambdaCost: null,
     s3Cost: null,
     dynamoDBCost: null,
+    elbCost: null,
     totalCost: 0,
   }),
 }));

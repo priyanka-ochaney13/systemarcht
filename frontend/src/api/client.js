@@ -35,6 +35,21 @@ export const getDynamoDBRegions = async () => {
   return response.data;
 };
 
+export const calculateELBCost = async (params) => {
+  const response = await apiClient.post('/elb/calculate', params);
+  return response.data;
+};
+
+export const getELBRegions = async () => {
+  const response = await apiClient.get('/elb/regions');
+  return response.data;
+};
+
+export const getELBTypes = async () => {
+  const response = await apiClient.get('/elb/lb-types');
+  return response.data;
+};
+
 // Architecture APIs
 export const saveArchitecture = async (architecture) => {
   try {
