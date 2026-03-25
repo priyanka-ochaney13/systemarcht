@@ -1,6 +1,5 @@
 # Large pricing data files
 pricing_data/
-
 # Python
 __pycache__/
 *.py[cod]
@@ -33,6 +32,7 @@ ENV/
 env.bak/
 venv.bak/
 myenv/
+myenv
 
 # IDEs
 .vscode/
