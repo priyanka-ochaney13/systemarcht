@@ -114,6 +114,24 @@ export const PlaygroundCanvas = ({ onNodeSelect }) => {
         >
           + S3
         </button>
+        <button
+          onClick={() => handleAddNode('cognito')}
+          className="px-3 py-2 text-sm bg-yellow-500 hover:bg-yellow-600 text-white rounded-md transition"
+        >
+          + Cognito
+        </button>
+        <button
+          onClick={() => handleAddNode('dynamodb')}
+          className="px-3 py-2 text-sm bg-yellow-500 hover:bg-yellow-600 text-white rounded-md transition"
+        >
+          + DynamoDB
+        </button>
+        <button
+          onClick={() => handleAddNode('elb')}
+          className="px-3 py-2 text-sm bg-yellow-500 hover:bg-yellow-600 text-white rounded-md transition"
+        >
+          + ELB
+        </button>
         <div className="flex-1" />
         <button
           onClick={handleDeleteSelected}

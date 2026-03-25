@@ -242,12 +242,12 @@ export const LambdaConfigPanel = ({ onClose }) => {
               </div>
               <div className="flex justify-between text-gray-700">
                 <span>Duration:</span>
-                <span className="font-medium">${cost.breakdown.duration_cost.toFixed(4)}</span>
+                <span className="font-medium">${cost.breakdown.compute_cost.toFixed(4)}</span>
               </div>
-              {cost.breakdown.provisioned_cost > 0 && (
+              {cost.breakdown.provisioned_concurrency_cost > 0 && (
                 <div className="flex justify-between text-gray-700">
                   <span>Provisioned:</span>
-                  <span className="font-medium">${cost.breakdown.provisioned_cost.toFixed(2)}</span>
+                  <span className="font-medium">${cost.breakdown.provisioned_concurrency_cost.toFixed(2)}</span>
                 </div>
               )}
             </div>

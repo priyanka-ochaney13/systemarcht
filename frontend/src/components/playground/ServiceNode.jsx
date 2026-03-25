@@ -1,11 +1,12 @@
 import React from 'react';
 import { Handle, Position } from 'reactflow';
-import { Cloud, Zap, Database } from 'lucide-react';
+import { Cloud, Zap, Database, Lock } from 'lucide-react';
 
 const SERVICE_ICONS = {
   api_gateway: Cloud,
   lambda: Zap,
   s3: Database,
+  cognito: Lock,
 };
 
 export const ServiceNode = ({ data, isConnecting, isSelected }) => {
