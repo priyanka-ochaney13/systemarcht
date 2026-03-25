@@ -161,8 +161,8 @@ export const LambdaConfigPanel = ({ onClose }) => {
           </label>
           <input
             type="number"
-            value={localConfig.average_duration_ms}
-            onChange={(e) => handleChange('average_duration_ms', parseInt(e.target.value))}
+            value={localConfig.average_duration_ms || 0}
+            onChange={(e) => handleChange('average_duration_ms', parseInt(e.target.value) || 0)}
             min="1"
             max="900000"
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-yellow-500"
