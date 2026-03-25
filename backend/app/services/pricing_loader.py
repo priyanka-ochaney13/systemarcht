@@ -33,27 +33,16 @@ class PricingLoader:
         pricing_file = Path(__file__).parent.parent.parent / "pricing_data" / f"{self.service_name}.json"
         
         if not pricing_file.exists():
-            logger.error(f"Pricing file not found: {pricing_file}")
             raise FileNotFoundError(f"Pricing file not found: {pricing_file}")
         
-        try:
-            logger.info(f"Loading {self.service_name} pricing data from {pricing_file}")
-            
-            with open(pricing_file, 'r', encoding='utf-8') as f:
-                self.pricing_data = json.load(f)
-            
-            if not isinstance(self.pricing_data, dict):
-                raise ValueError(f"Invalid pricing data format: expected dict, got {type(self.pricing_data).__name__}")
-            
-            logger.info(f"Building {self.service_name} pricing index...")
-            self._build_index()
-            logger.info(f"{self.service_name} pricing index built successfully")
-        except json.JSONDecodeError as e:
-            logger.error(f"Failed to parse JSON from {pricing_file}: {e}")
-            raise ValueError(f"Invalid JSON in pricing file: {e}")
-        except Exception as e:
-            logger.error(f"Failed to load pricing data for {self.service_name}: {e}")
-            raise
+        logger.info(f"Loading {self.service_name} pricing data from {pricing_file}")
+        
+        with open(pricing_file, 'r', encoding='utf-8') as f:
+            self.pricing_data = json.load(f)
+        
+        logger.info(f"Building {self.service_name} pricing index...")
+        self._build_index()
+        logger.info(f"{self.service_name} pricing index built")
     
     def _build_index(self):
         """Build pricing index - to be implemented by service-specific logic"""

@@ -5,7 +5,7 @@ from app.models.base import BaseCostBreakdown
 
 
 # Supported service types (extend as you add more services)
-ServiceType = Literal["lambda", "api_gateway", "s3", "dynamodb", "elb"]
+ServiceType = Literal["lambda", "api_gateway"]
 
 
 class ServiceNode(BaseModel):

@@ -32,7 +32,6 @@ env/
 ENV/
 env.bak/
 venv.bak/
-myenv
 
 # IDEs
 .vscode/
