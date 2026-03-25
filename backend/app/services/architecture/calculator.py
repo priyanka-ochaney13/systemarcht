@@ -11,6 +11,9 @@ from app.models.architecture import (
 )
 from app.models.lambda_function import LambdaRequest
 from app.models.api_gateway import APIGatewayRequest
+from app.models.s3 import S3Request
+from app.models.dynamodb import DynamoDBRequest
+from app.models.elb import ELBRequest
 from app.services.lambda_service.calculator import LambdaCalculator
 from app.services.api_gateway.calculator import APIGatewayCalculator
 from app.services.architecture.data_transfer_pricing import DataTransferPricing
@@ -25,9 +28,16 @@ class ArchitectureCalculator:
     
     def __init__(self):
         # Registry of service calculators
+        from app.services.s3.calculator import S3Calculator
+        from app.services.dynamodb.calculator import DynamoDBCalculator
+        from app.services.elb.calculator import ELBCalculator
+        
         self._calculators: Dict[str, BaseCalculator] = {
             "lambda": LambdaCalculator(),
             "api_gateway": APIGatewayCalculator(),
+            "s3": S3Calculator(),
+            "dynamodb": DynamoDBCalculator(),
+            "elb": ELBCalculator(),
         }
         
         # Data transfer pricing
@@ -175,6 +185,58 @@ class ArchitectureCalculator:
                     "api_cost": round(api_cost, 2),
                     "cache_cost": round(cache_cost, 2),
                     "details": details
+                }
+            )
+        
+        elif node.service_type == "s3":
+            service_request = S3Request(**config)
+            result = calculator.calculate(service_request)
+            return ServiceCostDetail(
+                node_id=node.id,
+                name=node.name,
+                service_type=node.service_type,
+                region=config.get("region", "ap-south-1"),
+                cost=result.breakdown.total_cost,
+                breakdown={
+                    "storage_cost": result.breakdown.storage_cost,
+                    "request_cost": result.breakdown.request_cost,
+                    "transfer_cost": result.breakdown.transfer_cost,
+                }
+            )
+        
+        elif node.service_type == "dynamodb":
+            service_request = DynamoDBRequest(**config)
+            result = calculator.calculate(service_request)
+            return ServiceCostDetail(
+                node_id=node.id,
+                name=node.name,
+                service_type=node.service_type,
+                region=config.get("region", "us-east-1"),
+                cost=result.breakdown.total_cost,
+                breakdown={
+                    "storage_cost": result.breakdown.storage_cost,
+                    "on_demand_read_cost": result.breakdown.on_demand_read_cost,
+                    "on_demand_write_cost": result.breakdown.on_demand_write_cost,
+                    "provisioned_read_cost": result.breakdown.provisioned_read_cost,
+                    "provisioned_write_cost": result.breakdown.provisioned_write_cost,
+                    "pitr_cost": result.breakdown.pitr_cost,
+                    "backup_cost": result.breakdown.backup_storage_cost,
+                }
+            )
+        
+        elif node.service_type == "elb":
+            service_request = ELBRequest(**config)
+            result = calculator.calculate(service_request)
+            return ServiceCostDetail(
+                node_id=node.id,
+                name=node.name,
+                service_type=node.service_type,
+                region=config.get("region", "us-east-1"),
+                cost=result.breakdown.total_cost,
+                breakdown={
+                    "hourly_cost": result.breakdown.hourly_cost,
+                    "lcu_cost": result.breakdown.lcu_cost if hasattr(result.breakdown, 'lcu_cost') else 0,
+                    "data_processing_cost": result.breakdown.data_processing_cost if hasattr(result.breakdown, 'data_processing_cost') else 0,
                 }
             )
         
