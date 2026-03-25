@@ -1,0 +1,1 @@
+export { ElasticBeanstalkConfigPanel } from './ElasticBeanstalkConfigPanel';

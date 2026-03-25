@@ -94,60 +94,79 @@ export const PlaygroundCanvas = ({ onNodeSelect }) => {
   return (
     <div className="w-full h-full flex flex-col bg-white">
       {/* Toolbar */}
-      <div className="bg-gray-50 border-b border-gray-200 p-4 flex items-center gap-2 flex-wrap">
-        <span className="text-sm font-medium text-gray-700">Add Service:</span>
-        <button
-          onClick={() => handleAddNode('api_gateway')}
-          className="px-3 py-2 text-sm bg-yellow-500 hover:bg-yellow-600 text-white rounded-md transition"
-        >
-          + API Gateway
-        </button>
-        <button
-          onClick={() => handleAddNode('lambda')}
-          className="px-3 py-2 text-sm bg-yellow-500 hover:bg-yellow-600 text-white rounded-md transition"
-        >
-          + Lambda
-        </button>
-        <button
-          onClick={() => handleAddNode('s3')}
-          className="px-3 py-2 text-sm bg-yellow-500 hover:bg-yellow-600 text-white rounded-md transition"
-        >
-          + S3
-        </button>
-        <button
-          onClick={() => handleAddNode('cognito')}
-          className="px-3 py-2 text-sm bg-yellow-500 hover:bg-yellow-600 text-white rounded-md transition"
-        >
-          + Cognito
-        </button>
-        <button
-          onClick={() => handleAddNode('dynamodb')}
-          className="px-3 py-2 text-sm bg-yellow-500 hover:bg-yellow-600 text-white rounded-md transition"
-        >
-          + DynamoDB
-        </button>
-        <button
-          onClick={() => handleAddNode('elb')}
-          className="px-3 py-2 text-sm bg-yellow-500 hover:bg-yellow-600 text-white rounded-md transition"
-        >
-          + ELB
-        </button>
-        <div className="flex-1" />
-        <button
-          onClick={handleDeleteSelected}
-          disabled={!selectedNodeId}
-          className="px-3 py-2 text-sm bg-red-500 hover:bg-red-600 text-white rounded-md transition disabled:opacity-50 flex items-center gap-1"
-        >
-          <Trash2 className="w-4 h-4" />
-          Delete
-        </button>
-        <button
-          onClick={handleClear}
-          className="px-3 py-2 text-sm bg-gray-400 hover:bg-gray-500 text-white rounded-md transition flex items-center gap-1"
-        >
-          <RotateCw className="w-4 h-4" />
-          Clear
-        </button>
+      <div className="bg-gray-50 border-b border-gray-200 p-4">
+        <div className="flex items-center gap-2 flex-wrap">
+          <span className="text-sm font-medium text-gray-700 mr-2">Add Service:</span>
+          
+          {/* Service buttons grouped */}
+          <div className="flex flex-wrap gap-2">
+            <button
+              onClick={() => handleAddNode('api_gateway')}
+              className="px-3 py-2 text-sm bg-yellow-500 hover:bg-yellow-600 text-white rounded-md transition whitespace-nowrap"
+            >
+              + API Gateway
+            </button>
+            <button
+              onClick={() => handleAddNode('lambda')}
+              className="px-3 py-2 text-sm bg-yellow-500 hover:bg-yellow-600 text-white rounded-md transition whitespace-nowrap"
+            >
+              + Lambda
+            </button>
+            <button
+              onClick={() => handleAddNode('s3')}
+              className="px-3 py-2 text-sm bg-yellow-500 hover:bg-yellow-600 text-white rounded-md transition whitespace-nowrap"
+            >
+              + S3
+            </button>
+            <button
+              onClick={() => handleAddNode('cognito')}
+              className="px-3 py-2 text-sm bg-yellow-500 hover:bg-yellow-600 text-white rounded-md transition whitespace-nowrap"
+            >
+              + Cognito
+            </button>
+            <button
+              onClick={() => handleAddNode('dynamodb')}
+              className="px-3 py-2 text-sm bg-yellow-500 hover:bg-yellow-600 text-white rounded-md transition whitespace-nowrap"
+            >
+              + DynamoDB
+            </button>
+            <button
+              onClick={() => handleAddNode('elb')}
+              className="px-3 py-2 text-sm bg-yellow-500 hover:bg-yellow-600 text-white rounded-md transition whitespace-nowrap"
+            >
+              + ELB
+            </button>
+            <button
+              onClick={() => handleAddNode('elastic_beanstalk')}
+              className="px-3 py-2 text-sm bg-orange-500 hover:bg-orange-600 text-white rounded-md transition whitespace-nowrap font-semibold"
+              title="Click to add Elastic Beanstalk to your architecture"
+            >
+              + Elastic Beanstalk
+            </button>
+          </div>
+          
+          {/* Action buttons on the right */}
+          <div className="flex-1" />
+          <div className="flex gap-2">
+            <button
+              onClick={handleDeleteSelected}
+              disabled={!selectedNodeId}
+              className="px-3 py-2 text-sm bg-red-500 hover:bg-red-600 text-white rounded-md transition disabled:opacity-50 flex items-center gap-1 whitespace-nowrap"
+              title="Delete selected service"
+            >
+              <Trash2 className="w-4 h-4" />
+              Delete
+            </button>
+            <button
+              onClick={handleClear}
+              className="px-3 py-2 text-sm bg-gray-400 hover:bg-gray-500 text-white rounded-md transition flex items-center gap-1 whitespace-nowrap"
+              title="Clear entire architecture"
+            >
+              <RotateCw className="w-4 h-4" />
+              Clear
+            </button>
+          </div>
+        </div>
       </div>
 
       {/* Canvas */}

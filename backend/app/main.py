@@ -8,6 +8,7 @@ from app.routers.s3 import router as s3_router
 from app.routers.cognito import router as cognito_router
 from app.routers.dynamodb import router as dynamodb_router
 from app.routers.elb import router as elb_router
+from app.routers.elastic_beanstalk import router as elastic_beanstalk_router
 import logging
 
 logging.basicConfig(level=logging.INFO)
@@ -33,13 +34,14 @@ app.include_router(s3_router)
 app.include_router(cognito_router)
 app.include_router(dynamodb_router)
 app.include_router(elb_router)
+app.include_router(elastic_beanstalk_router)
 
 @app.get("/")
 def root():
     return {
         "service": "AWS Pricing Calculator",
         "version": "1.0.0",
-        "services": ["api_gateway", "lambda", "architecture", "s3", "cognito", "dynamodb", "elb"]
+        "services": ["api_gateway", "lambda", "architecture", "s3", "cognito", "dynamodb", "elb", "elastic_beanstalk"]
     }
 
 @app.get("/health")

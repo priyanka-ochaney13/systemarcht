@@ -55,6 +55,16 @@ export const getELBTypes = async () => {
   return response.data;
 };
 
+export const calculateElasticBeanstalkCost = async (params) => {
+  const response = await apiClient.post('/elastic-beanstalk/calculate', params);
+  return response.data;
+};
+
+export const getInstanceTypes = async (region) => {
+  const response = await apiClient.get(`/elastic-beanstalk/instance-types?region=${region}`);
+  return response.data;
+};
+
 // Architecture APIs
 export const saveArchitecture = async (architecture) => {
   try {

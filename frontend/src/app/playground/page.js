@@ -8,6 +8,7 @@ import { S3ConfigPanel } from '@/components/services/S3ConfigPanel';
 import { CognitoConfigPanel } from '@/components/services/CognitoConfigPanel';
 import { DynamoDBConfigPanel } from '@/components/services/DynamoDBConfigPanel';
 import { ELBConfigPanel } from '@/components/services/ELBConfigPanel';
+import { ElasticBeanstalkConfigPanel } from '@/components/services/ElasticBeanstalkConfigPanel';
 import { usePricingStore } from '@/store';
 import Link from 'next/link';
 import { ChevronLeft } from 'lucide-react';
@@ -32,6 +33,8 @@ export default function PlaygroundPage() {
       setOpenConfigPanel('dynamodb');
     } else if (serviceType === 'elb') {
       setOpenConfigPanel('elb');
+    } else if (serviceType === 'elastic_beanstalk') {
+      setOpenConfigPanel('elastic_beanstalk');
     }
   };
 
@@ -87,6 +90,9 @@ export default function PlaygroundPage() {
               )}
               {openConfigPanel === 'elb' && (
                 <ELBConfigPanel onClose={() => setOpenConfigPanel(null)} />
+              )}
+              {openConfigPanel === 'elastic_beanstalk' && (
+                <ElasticBeanstalkConfigPanel onClose={() => setOpenConfigPanel(null)} />
               )}
             </div>
           </div>

@@ -132,6 +132,24 @@ export const useServiceConfigStore = create((set) => ({
     email_customization_enabled: false,
     monthly_emails: 50000,
   },
+
+  elasticBeanstalkConfig: {
+    region: 'ap-south-1',
+    environment_type: 'single',
+    instance_type: 't3.small',
+    instance_count: 1,
+    enable_load_balancer: false,
+    cross_zone_enabled: false,
+    enable_auto_scaling: false,
+    min_instances: 1,
+    max_instances: 10,
+    target_cpu_utilization: 70,
+    storage_gb: 30,
+    volume_type: 'gp3',
+    enable_enhanced_monitoring: false,
+    data_transfer_gb: 10,
+    include_free_tier: false,
+  },
   
   updateAPIGatewayConfig: (config) => set({ apiGatewayConfig: config }),
   updateLambdaConfig: (config) => set({ lambdaConfig: config }),
@@ -139,6 +157,7 @@ export const useServiceConfigStore = create((set) => ({
   updateCognitoConfig: (config) => set({ cognitoConfig: config }),
   updateDynamoDBConfig: (config) => set({ dynamoDBConfig: config }),
   updateELBConfig: (config) => set({ elbConfig: config }),
+  updateElasticBeanstalkConfig: (config) => set({ elasticBeanstalkConfig: config }),
 }));
 
 export const usePricingStore = create((set) => ({
@@ -148,6 +167,7 @@ export const usePricingStore = create((set) => ({
   cognitoCost: null,
   dynamoDBCost: null,
   elbCost: null,
+  elasticBeanstalkCost: null,
   totalCost: 0,
   
   setAPIGatewayCost: (cost) => set((state) => ({
@@ -157,7 +177,8 @@ export const usePricingStore = create((set) => ({
                (state.s3Cost?.breakdown?.total_cost || 0) +
                (state.cognitoCost?.breakdown?.total_cost || 0) +
                (state.dynamoDBCost?.breakdown?.total_cost || 0) +
-               (state.elbCost?.breakdown?.total_cost || 0),
+               (state.elbCost?.breakdown?.total_cost || 0) +
+               (state.elasticBeanstalkCost?.breakdown?.total_cost || 0),
   })),
   
   setLambdaCost: (cost) => set((state) => ({
@@ -167,7 +188,8 @@ export const usePricingStore = create((set) => ({
                (state.s3Cost?.breakdown?.total_cost || 0) +
                (state.cognitoCost?.breakdown?.total_cost || 0) +
                (state.dynamoDBCost?.breakdown?.total_cost || 0) +
-               (state.elbCost?.breakdown?.total_cost || 0),
+               (state.elbCost?.breakdown?.total_cost || 0) +
+               (state.elasticBeanstalkCost?.breakdown?.total_cost || 0),
   })),
   
   setS3Cost: (cost) => set((state) => ({
@@ -175,7 +197,10 @@ export const usePricingStore = create((set) => ({
     totalCost: (state.apiGatewayCost?.breakdown?.total_cost || 0) + 
                (state.lambdaCost?.breakdown?.total_cost || 0) + 
                (cost?.breakdown?.total_cost || 0) +
-               (state.cognitoCost?.breakdown?.total_cost || 0),
+               (state.cognitoCost?.breakdown?.total_cost || 0) +
+               (state.dynamoDBCost?.breakdown?.total_cost || 0) +
+               (state.elbCost?.breakdown?.total_cost || 0) +
+               (state.elasticBeanstalkCost?.breakdown?.total_cost || 0),
   })),
 
   setCognitoCost: (cost) => set((state) => ({
@@ -185,7 +210,8 @@ export const usePricingStore = create((set) => ({
                (state.s3Cost?.breakdown?.total_cost || 0) +
                (cost?.breakdown?.total_cost || 0) +
                (state.dynamoDBCost?.breakdown?.total_cost || 0) +
-               (state.elbCost?.breakdown?.total_cost || 0),
+               (state.elbCost?.breakdown?.total_cost || 0) +
+               (state.elasticBeanstalkCost?.breakdown?.total_cost || 0),
   })),
 
   setDynamoDBCost: (cost) => set((state) => ({
@@ -193,8 +219,9 @@ export const usePricingStore = create((set) => ({
     totalCost: (state.apiGatewayCost?.breakdown?.total_cost || 0) + 
                (state.lambdaCost?.breakdown?.total_cost || 0) + 
                (state.s3Cost?.breakdown?.total_cost || 0) +
-               (cost?.breakdown?.total_cost || 0) +
-               (state.elbCost?.breakdown?.total_cost || 0),
+               (state.dynamoDBCost?.breakdown?.total_cost || 0) +
+               (state.elbCost?.breakdown?.total_cost || 0) +
+               (state.elasticBeanstalkCost?.breakdown?.total_cost || 0),
   })),
 
   setELBCost: (cost) => set((state) => ({
@@ -203,6 +230,18 @@ export const usePricingStore = create((set) => ({
                (state.lambdaCost?.breakdown?.total_cost || 0) + 
                (state.s3Cost?.breakdown?.total_cost || 0) +
                (state.dynamoDBCost?.breakdown?.total_cost || 0) +
+               (cost?.breakdown?.total_cost || 0) +
+               (state.elasticBeanstalkCost?.breakdown?.total_cost || 0),
+  })),
+
+  setElasticBeanstalkCost: (cost) => set((state) => ({
+    elasticBeanstalkCost: cost,
+    totalCost: (state.apiGatewayCost?.breakdown?.total_cost || 0) + 
+               (state.lambdaCost?.breakdown?.total_cost || 0) + 
+               (state.s3Cost?.breakdown?.total_cost || 0) +
+               (state.cognitoCost?.breakdown?.total_cost || 0) +
+               (state.dynamoDBCost?.breakdown?.total_cost || 0) +
+               (state.elbCost?.breakdown?.total_cost || 0) +
                (cost?.breakdown?.total_cost || 0),
   })),
   
@@ -213,6 +252,7 @@ export const usePricingStore = create((set) => ({
     cognitoCost: null,
     dynamoDBCost: null,
     elbCost: null,
+    elasticBeanstalkCost: null,
     totalCost: 0,
   }),
 }));

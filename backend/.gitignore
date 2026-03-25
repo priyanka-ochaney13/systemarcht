@@ -1,4 +1,5 @@
 # Large pricing data files
+pricing_data/
 
 # Python
 __pycache__/
