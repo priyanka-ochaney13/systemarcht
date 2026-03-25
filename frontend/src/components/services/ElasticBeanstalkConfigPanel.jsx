@@ -87,6 +87,7 @@ export const ElasticBeanstalkConfigPanel = ({ onClose }) => {
     // Constraints for load balancer
     if (field === 'enable_load_balancer' && !value) {
       newConfig.cross_zone_enabled = false;
+      newConfig.enable_auto_scaling = false; // Auto-scaling requires load balancer
     }
 
     // Instance count constraints
@@ -300,6 +301,7 @@ export const ElasticBeanstalkConfigPanel = ({ onClose }) => {
                   checked={localConfig.enable_load_balancer}
                   onChange={(e) => handleChange('enable_load_balancer', e.target.checked)}
                   disabled={localConfig.environment_type === 'single'}
+                  className="h-4 w-4 rounded border-gray-300 focus:ring-2 focus:ring-orange-500 disabled:opacity-50 disabled:cursor-not-allowed"
                 />
                 <span className="text-sm">Enable Application Load Balancer (+$16/month)</span>
               </label>
@@ -310,6 +312,7 @@ export const ElasticBeanstalkConfigPanel = ({ onClose }) => {
                     type="checkbox"
                     checked={localConfig.cross_zone_enabled}
                     onChange={(e) => handleChange('cross_zone_enabled', e.target.checked)}
+                    className="h-4 w-4 rounded border-gray-300 focus:ring-2 focus:ring-orange-500"
                   />
                   <span className="text-sm">Cross-Zone Load Balancing (+$3.65/month)</span>
                 </label>
@@ -320,9 +323,10 @@ export const ElasticBeanstalkConfigPanel = ({ onClose }) => {
                   type="checkbox"
                   checked={localConfig.enable_auto_scaling}
                   onChange={(e) => handleChange('enable_auto_scaling', e.target.checked)}
-                  disabled={localConfig.environment_type === 'single'}
+                  disabled={localConfig.environment_type === 'single' || !localConfig.enable_load_balancer}
+                  className="h-4 w-4 rounded border-gray-300 focus:ring-2 focus:ring-orange-500 disabled:opacity-50 disabled:cursor-not-allowed"
                 />
-                <span className="text-sm">Enable Auto-Scaling</span>
+                <span className="text-sm">Enable Auto-Scaling (requires Load Balancer)</span>
               </label>
 
               {localConfig.enable_auto_scaling && (
@@ -409,6 +413,7 @@ export const ElasticBeanstalkConfigPanel = ({ onClose }) => {
                   type="checkbox"
                   checked={localConfig.enable_enhanced_monitoring}
                   onChange={(e) => handleChange('enable_enhanced_monitoring', e.target.checked)}
+                  className="h-4 w-4 rounded border-gray-300 focus:ring-2 focus:ring-orange-500"
                 />
                 <span className="text-sm">Enhanced Monitoring ($0.35/instance)</span>
               </label>
@@ -446,6 +451,7 @@ export const ElasticBeanstalkConfigPanel = ({ onClose }) => {
                   type="checkbox"
                   checked={localConfig.include_free_tier}
                   onChange={(e) => handleChange('include_free_tier', e.target.checked)}
+                  className="h-4 w-4 rounded border-gray-300 focus:ring-2 focus:ring-orange-500"
                 />
                 <span className="text-sm">Include 12-month AWS Free Tier</span>
               </label>
