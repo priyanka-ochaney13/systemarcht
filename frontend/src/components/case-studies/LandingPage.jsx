@@ -1,6 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
-import { Zap, Layout, Gauge, Lightbulb, ArrowRight } from 'lucide-react';
+import { Zap, Layout, Gauge, Lightbulb, ArrowRight, MessageSquare } from 'lucide-react';
 
 export const LandingPage = () => {
   return (
@@ -125,6 +125,12 @@ export const LandingPage = () => {
             <a href="#patterns" className="text-gray-700 hover:text-yellow-600 transition">
               Patterns
             </a>
+            <Link href="/chatbot">
+              <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-gray-900 hover:bg-zinc-800 text-amber-400 text-sm font-medium border border-zinc-700 transition">
+                <MessageSquare className="w-3.5 h-3.5" />
+                ArchBot
+              </button>
+            </Link>
           </div>
         </div>
       </nav>
@@ -155,6 +161,12 @@ export const LandingPage = () => {
                 <ArrowRight className="w-5 h-5" />
               </button>
             </Link>
+            <Link href="/chatbot">
+              <button className="px-8 py-4 bg-transparent hover:bg-zinc-800 text-amber-400 font-semibold rounded-lg transition text-lg flex items-center gap-2 justify-center md:justify-start border border-amber-500/40 hover:border-amber-400 hover:shadow-2xl transform hover:scale-105">
+                <MessageSquare className="w-5 h-5" />
+                Ask ArchBot
+              </button>
+            </Link>
           </div>
         </div>
       </section>
@@ -163,7 +175,7 @@ export const LandingPage = () => {
       <section id="features" className="py-20 px-4 bg-gray-50">
         <div className="max-w-6xl mx-auto">
           <h2 className="text-3xl font-bold text-gray-900 text-center mb-16">Why SystemArcht?</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {[
               {
                 icon: Layout,
@@ -180,11 +192,38 @@ export const LandingPage = () => {
                 title: 'Learn Patterns',
                 description: 'Study 5 core system design patterns used by companies like Netflix, Uber, and Instagram',
               },
+              {
+                icon: MessageSquare,
+                title: 'ArchBot — Cost AI',
+                description: 'Chat with your AI assistant to get instant cost breakdowns and optimization tips for your architecture',
+                link: '/chatbot',
+                highlight: true,
+              },
             ].map((feature, idx) => (
-              <div key={idx} className="bg-white p-8 rounded-lg shadow-md hover:shadow-lg transition animate-feature-card transform hover:-translate-y-1 duration-300">
-                <feature.icon className="w-12 h-12 mb-4" style={{ color: '#FF9900' }} />
+              <div
+                key={idx}
+                className={`bg-white p-8 rounded-lg shadow-md hover:shadow-lg transition animate-feature-card transform hover:-translate-y-1 duration-300 ${
+                  feature.highlight ? 'border-2 border-amber-400/40 relative overflow-hidden' : ''
+                }`}
+              >
+                {feature.highlight && (
+                  <span className="absolute top-3 right-3 text-[10px] font-bold text-amber-600 bg-amber-50 border border-amber-200 px-1.5 py-0.5 rounded-full uppercase tracking-wider">
+                    New
+                  </span>
+                )}
+                <feature.icon
+                  className="w-12 h-12 mb-4"
+                  style={{ color: feature.highlight ? '#F59E0B' : '#FF9900' }}
+                />
                 <h3 className="text-xl font-bold text-gray-900 mb-3">{feature.title}</h3>
-                <p className="text-gray-600">{feature.description}</p>
+                <p className="text-gray-600 mb-4">{feature.description}</p>
+                {feature.link && (
+                  <Link href={feature.link}>
+                    <span className="text-sm font-semibold text-amber-600 hover:text-amber-700 flex items-center gap-1 transition">
+                      Try ArchBot <ArrowRight className="w-3.5 h-3.5" />
+                    </span>
+                  </Link>
+                )}
               </div>
             ))}
           </div>

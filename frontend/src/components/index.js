@@ -6,3 +6,4 @@ export { ServiceNode } from './playground/ServiceNode';
 export { APIGatewayConfigPanel } from './services/APIGatewayConfigPanel';
 export { LambdaConfigPanel } from './services/LambdaConfigPanel';
 export { S3ConfigPanel } from './services/S3ConfigPanel';
+export { ArchitectChatbot, ChatMessage, TypingIndicator } from './chatbot';
