@@ -73,7 +73,7 @@ All pricing calculation logic is documented in **[FORMULAE.md](./FORMULAE.md)** 
 
 - **[FORMULAE.md](./FORMULAE.md)** - Complete pricing calculation formulas and logic
 - **[guide/](./guide/)** - Additional documentation and user guides
-- **[demo.mp4](./demo.mp4)** - Visual demonstration of features
+- **[demo](https://drive.google.com/file/d/135yi-1-oqn24I5IpGFindn2OjHdlB5gT/view?usp=sharing)** - Visual demonstration of features
 
 ## Roadmap & Improvements
 
