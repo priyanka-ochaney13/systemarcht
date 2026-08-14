@@ -60,12 +60,14 @@ All pricing calculation logic is documented in **[FORMULAE.md](./FORMULAE.md)** 
 1. **Backend Setup:**
    ```bash
    cd backend
+   uvicorn app.main:app --reload
    # Follow backend-specific instructions
    ```
 
 2. **Frontend Setup:**
    ```bash
    cd frontend
+   npm run dev
    # Follow frontend-specific instructions
    ```
 
