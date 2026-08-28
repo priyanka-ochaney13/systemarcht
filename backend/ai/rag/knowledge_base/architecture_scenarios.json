@@ -1,0 +1,20 @@
+[
+  {
+    "doc_id": "scenario-photo-sharing",
+    "title": "Photo sharing at high scale",
+    "content": "For photo sharing with 100K+ users, route metadata API calls through API Gateway, process uploads with Lambda, store objects in S3, and persist metadata in DynamoDB.",
+    "tags": ["photo-sharing", "high-scale", "lambda", "s3", "dynamodb"]
+  },
+  {
+    "doc_id": "scenario-booking-system",
+    "title": "Booking workload with transactional constraints",
+    "content": "Use API Gateway and EC2 application services when workload is steady and transaction-heavy. Prefer RDS for relational consistency requirements in bookings and inventory.",
+    "tags": ["booking", "rds", "ec2", "transactions", "steady"]
+  },
+  {
+    "doc_id": "scenario-realtime-analytics",
+    "title": "Realtime analytics ingestion",
+    "content": "Realtime ingestion can start with API Gateway and Lambda, writing event summaries to DynamoDB and raw payloads to S3 for downstream analytics and archival.",
+    "tags": ["realtime", "analytics", "lambda", "dynamodb", "s3"]
+  }
+]

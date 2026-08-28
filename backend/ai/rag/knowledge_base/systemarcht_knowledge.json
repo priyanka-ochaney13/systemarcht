@@ -1,0 +1,32 @@
+[
+  {
+    "doc_id": "pattern-event-driven",
+    "title": "Event-driven microservices pattern",
+    "content": "Use API Gateway for HTTP ingress, Lambda for compute, DynamoDB for metadata, and S3 for object storage. This pattern is strong for bursty traffic and async workflows.",
+    "tags": ["event", "serverless", "api", "upload", "bursty"]
+  },
+  {
+    "doc_id": "pattern-constant-high-load",
+    "title": "Constant high-load compute guidance",
+    "content": "For sustained high throughput and predictable request volume, EC2 can be more economical than Lambda. Keep API Gateway for API control and combine EC2 with RDS or DynamoDB based on consistency needs.",
+    "tags": ["high-load", "constant", "ec2", "cost", "throughput"]
+  },
+  {
+    "doc_id": "service-s3",
+    "title": "S3 service guidance",
+    "content": "S3 is preferred for large unstructured object storage. Presigned upload URLs reduce API and compute load. Use lifecycle rules for storage optimization.",
+    "tags": ["s3", "object-storage", "images", "files"]
+  },
+  {
+    "doc_id": "service-database-choice",
+    "title": "DynamoDB vs RDS",
+    "content": "Use DynamoDB for key-value access patterns, horizontal scale, and serverless operations. Use RDS for relational data and strong transactional constraints.",
+    "tags": ["dynamodb", "rds", "database", "consistency", "transactions"]
+  },
+  {
+    "doc_id": "cost-awareness",
+    "title": "Cost-aware architecture guidance",
+    "content": "When budget limits are strict, prioritize managed serverless services for low baseline traffic and shift to provisioned capacity models when workload is continuously high.",
+    "tags": ["budget", "cost", "optimization", "workload"]
+  }
+]
