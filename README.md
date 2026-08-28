@@ -77,6 +77,43 @@ All pricing calculation logic is documented in **[FORMULAE.md](./FORMULAE.md)** 
 - **[guide/](./guide/)** - Additional documentation and user guides
 - **[demo](https://drive.google.com/file/d/135yi-1-oqn24I5IpGFindn2OjHdlB5gT/view?usp=sharing)** - Visual demonstration of features
 
+## Module 1: Qwen Architecture Generation (Prompt + Structured Output + RAG/Tools)
+
+Module 1 now includes a single-model pipeline in the backend:
+
+```text
+Prompt -> Retrieval (small KB) -> Tool hints -> Qwen -> Structured JSON
+```
+
+### Environment variables
+
+- `QWEN_BASE_URL` (default: `http://localhost:11434/v1`)
+- `QWEN_MODEL` (default: `qwen3:8b`)
+- `QWEN_API_KEY` (optional; for hosted OpenAI-compatible Qwen endpoints)
+- `QWEN_TIMEOUT_SECONDS` (default: `60`)
+
+### Python usage
+
+Run from the `backend` directory:
+
+```python
+from ai.qwen import generate_architecture
+
+result = generate_architecture("Design a photo sharing application for 100,000 users.")
+print(result.model_dump())
+```
+
+### API usage
+
+`POST /api/ai/architecture/generate`
+
+```json
+{
+  "task": "generate_architecture",
+  "prompt": "Design a photo sharing application for 100,000 users."
+}
+```
+
 ## Roadmap & Improvements
 
 This project is continuously evolving with planned improvements including:
