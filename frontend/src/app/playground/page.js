@@ -9,6 +9,10 @@ import { CognitoConfigPanel } from '@/components/services/CognitoConfigPanel';
 import { DynamoDBConfigPanel } from '@/components/services/DynamoDBConfigPanel';
 import { ELBConfigPanel } from '@/components/services/ELBConfigPanel';
 import { ElasticBeanstalkConfigPanel } from '@/components/services/ElasticBeanstalkConfigPanel';
+import { CloudWatchConfigPanel } from '@/components/services/CloudWatchConfigPanel';
+import { CloudFrontConfigPanel } from '@/components/services/CloudFrontConfigPanel';
+import { ElastiCacheConfigPanel } from '@/components/services/ElastiCacheConfigPanel';
+import { SQSConfigPanel } from '@/components/services/SQSConfigPanel';
 import { ArchitectChatbot } from '@/components/chatbot';
 import { usePricingStore } from '@/store';
 import Link from 'next/link';
@@ -20,7 +24,7 @@ export default function PlaygroundPage() {
   const [showChatbot, setShowChatbot] = useState(false);
   const totalCost = usePricingStore(s => s.totalCost);
 
-  const handleNodeSelect = (node) => {
+    const handleNodeSelect = (node) => {
     setSelectedNodeId(node.id);
     const serviceType = node.data.serviceType;
     if (serviceType === 'api_gateway') {
@@ -35,8 +39,16 @@ export default function PlaygroundPage() {
       setOpenConfigPanel('dynamodb');
     } else if (serviceType === 'elb') {
       setOpenConfigPanel('elb');
-    }else if (serviceType === 'elastic_beanstalk') {
+    } else if (serviceType === 'elastic_beanstalk') {
       setOpenConfigPanel('elastic_beanstalk');
+    } else if (serviceType === 'cloudwatch') {
+      setOpenConfigPanel('cloudwatch');
+    } else if (serviceType === 'cloudfront') {
+      setOpenConfigPanel('cloudfront');
+    } else if (serviceType === 'elasticache') {
+      setOpenConfigPanel('elasticache');
+    } else if (serviceType === 'sqs') {
+      setOpenConfigPanel('sqs');
     }
   };
 
@@ -129,6 +141,18 @@ export default function PlaygroundPage() {
               )}
               {openConfigPanel === 'elastic_beanstalk' && (
                 <ElasticBeanstalkConfigPanel onClose={() => setOpenConfigPanel(null)} />
+              )}
+                            {openConfigPanel === 'cloudwatch' && (
+                <CloudWatchConfigPanel onClose={() => setOpenConfigPanel(null)} />
+              )}
+              {openConfigPanel === 'cloudfront' && (
+                <CloudFrontConfigPanel onClose={() => setOpenConfigPanel(null)} />
+              )}
+              {openConfigPanel === 'elasticache' && (
+                <ElastiCacheConfigPanel onClose={() => setOpenConfigPanel(null)} />
+              )}
+              {openConfigPanel === 'sqs' && (
+                <SQSConfigPanel onClose={() => setOpenConfigPanel(null)} />
               )}
             </div>
           </div>

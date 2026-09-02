@@ -5,4 +5,7 @@ export { CognitoConfigPanel } from './CognitoConfigPanel';
 export { DynamoDBConfigPanel } from './DynamoDBConfigPanel';
 export { ELBConfigPanel } from './ELBConfigPanel';
 export { ElasticBeanstalkConfigPanel } from './ElasticBeanstalkConfigPanel';
-
+export { CloudWatchConfigPanel } from './CloudWatchConfigPanel';
+export { CloudFrontConfigPanel } from './CloudFrontConfigPanel';
+export { ElastiCacheConfigPanel } from './ElastiCacheConfigPanel';
+export { SQSConfigPanel } from './SQSConfigPanel';

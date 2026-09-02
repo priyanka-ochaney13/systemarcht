@@ -10,6 +10,10 @@ from app.routers.cognito import router as cognito_router
 from app.routers.dynamodb import router as dynamodb_router
 from app.routers.elastic_beanstalk import router as elastic_beanstalk_router
 from app.routers.elb import router as elb_router
+from app.routers.cloudwatch import router as cloudwatch_router
+from app.routers.cloudfront import router as cloudfront_router
+from app.routers.elasticache import router as elasticache_router
+from app.routers.sqs import router as sqs_router
 import logging
 
 logging.basicConfig(level=logging.INFO)
@@ -37,6 +41,10 @@ app.include_router(cognito_router)
 app.include_router(dynamodb_router)
 app.include_router(elastic_beanstalk_router)
 app.include_router(elb_router)
+app.include_router(cloudwatch_router)
+app.include_router(cloudfront_router)
+app.include_router(elasticache_router)
+app.include_router(sqs_router)
 
 @app.get("/")
 def root():
@@ -53,6 +61,10 @@ def root():
             "dynamodb",
             "elb",
             "elastic_beanstalk",
+            "cloudwatch",
+            "cloudfront",
+            "elasticache",
+            "sqs",
         ],
     }
 

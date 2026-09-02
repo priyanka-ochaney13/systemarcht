@@ -9,15 +9,23 @@ export const SERVICE_TYPES = {
   EC2: 'ec2',
   RDS: 'rds',
   DYNAMODB: 'dynamodb',
+  CLOUDWATCH: 'cloudwatch',
+  CLOUDFRONT: 'cloudfront',
+  ELASTICACHE: 'elasticache',
+  SQS: 'sqs',
 };
 
 export const SERVICE_COLORS = {
   api_gateway: '#FF9900',
   lambda: '#FF9900',
-  s3: '#FF9900',
+  s3: '#569A31',
   ec2: '#FF9900',
   rds: '#FF9900',
-  dynamodb: '#FF9900',
+  dynamodb: '#FF4444',
+  cloudwatch: '#E7157B',
+  cloudfront: '#8C4FFF',
+  elasticache: '#C925D1',
+  sqs: '#FF4F8B',
 };
 
 export const SERVICE_ICONS = {
@@ -27,6 +35,10 @@ export const SERVICE_ICONS = {
   ec2: 'Server',
   rds: 'Database',
   dynamodb: 'Database',
+  cloudwatch: 'Activity',
+  cloudfront: 'Globe2',
+  elasticache: 'Zap',
+  sqs: 'ListOrdered',
 };
 
 export const REGIONS = {

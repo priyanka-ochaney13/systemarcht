@@ -150,6 +150,45 @@ export const useServiceConfigStore = create((set) => ({
     data_transfer_gb: 10,
     include_free_tier: false,
   },
+    cloudWatchConfig: {
+    region: 'ap-south-1',
+    custom_metrics: 50,
+    standard_alarms: 10,
+    high_res_alarms: 0,
+    logs_ingested_gb: 10,
+    logs_storage_gb: 50,
+    dashboards: 2,
+    api_requests_per_month: 1000000,
+    include_free_tier: true,
+  },
+
+  cloudFrontConfig: {
+    region: 'IN', // CloudFront price group, not AWS region
+    data_transfer_out_gb: 1000,
+    https_requests: 5000000,
+    http_requests: 100000,
+    invalidation_paths: 100,
+    include_free_tier: true,
+  },
+
+  elastiCacheConfig: {
+    region: 'ap-south-1',
+    engine: 'redis',
+    node_type: 'cache.t3.micro',
+    number_of_nodes: 1,
+    hours_per_month: 730,
+    backup_storage_gb: 0,
+    include_free_tier: true,
+  },
+
+  sqsConfig: {
+    region: 'ap-south-1',
+    queue_type: 'standard',
+    requests_per_month: 1000000,
+    avg_payload_size_kb: 1,
+    data_transfer_out_gb: 0,
+    include_free_tier: true,
+  },
   
   updateAPIGatewayConfig: (config) => set({ apiGatewayConfig: config }),
   updateLambdaConfig: (config) => set({ lambdaConfig: config }),
@@ -158,6 +197,10 @@ export const useServiceConfigStore = create((set) => ({
   updateDynamoDBConfig: (config) => set({ dynamoDBConfig: config }),
   updateELBConfig: (config) => set({ elbConfig: config }),
   updateElasticBeanstalkConfig: (config) => set({ elasticBeanstalkConfig: config }),
+  updateCloudWatchConfig: (config) => set({ cloudWatchConfig: config }),
+  updateCloudFrontConfig: (config) => set({ cloudFrontConfig: config }),
+  updateElastiCacheConfig: (config) => set({ elastiCacheConfig: config }),
+  updateSQSConfig: (config) => set({ sqsConfig: config }),
 }));
 
 export const usePricingStore = create((set) => ({
@@ -168,83 +211,177 @@ export const usePricingStore = create((set) => ({
   dynamoDBCost: null,
   elbCost: null,
   elasticBeanstalkCost: null,
+  cloudWatchCost: null,
+  cloudFrontCost: null,
+  elastiCacheCost: null,
+  sqsCost: null,
   totalCost: 0,
-  
+
   setAPIGatewayCost: (cost) => set((state) => ({
     apiGatewayCost: cost,
-    totalCost: (cost?.breakdown?.total_cost || 0) + 
-               (state.lambdaCost?.breakdown?.total_cost || 0) + 
+    totalCost: (cost?.breakdown?.total_cost || 0) +
+               (state.lambdaCost?.breakdown?.total_cost || 0) +
                (state.s3Cost?.breakdown?.total_cost || 0) +
                (state.cognitoCost?.breakdown?.total_cost || 0) +
                (state.dynamoDBCost?.breakdown?.total_cost || 0) +
                (state.elbCost?.breakdown?.total_cost || 0) +
-               (state.elasticBeanstalkCost?.breakdown?.total_cost || 0),
+               (state.elasticBeanstalkCost?.breakdown?.total_cost || 0) +
+               (state.cloudWatchCost?.breakdown?.total_cost || 0) +
+               (state.cloudFrontCost?.breakdown?.total_cost || 0) +
+               (state.elastiCacheCost?.breakdown?.total_cost || 0) +
+               (state.sqsCost?.breakdown?.total_cost || 0),
   })),
-  
+
   setLambdaCost: (cost) => set((state) => ({
     lambdaCost: cost,
-    totalCost: (state.apiGatewayCost?.breakdown?.total_cost || 0) + 
-               (cost?.breakdown?.total_cost || 0) + 
+    totalCost: (state.apiGatewayCost?.breakdown?.total_cost || 0) +
+               (cost?.breakdown?.total_cost || 0) +
                (state.s3Cost?.breakdown?.total_cost || 0) +
                (state.cognitoCost?.breakdown?.total_cost || 0) +
                (state.dynamoDBCost?.breakdown?.total_cost || 0) +
                (state.elbCost?.breakdown?.total_cost || 0) +
-               (state.elasticBeanstalkCost?.breakdown?.total_cost || 0),
+               (state.elasticBeanstalkCost?.breakdown?.total_cost || 0) +
+               (state.cloudWatchCost?.breakdown?.total_cost || 0) +
+               (state.cloudFrontCost?.breakdown?.total_cost || 0) +
+               (state.elastiCacheCost?.breakdown?.total_cost || 0) +
+               (state.sqsCost?.breakdown?.total_cost || 0),
   })),
-  
+
   setS3Cost: (cost) => set((state) => ({
     s3Cost: cost,
-    totalCost: (state.apiGatewayCost?.breakdown?.total_cost || 0) + 
-               (state.lambdaCost?.breakdown?.total_cost || 0) + 
+    totalCost: (state.apiGatewayCost?.breakdown?.total_cost || 0) +
+               (state.lambdaCost?.breakdown?.total_cost || 0) +
                (cost?.breakdown?.total_cost || 0) +
                (state.cognitoCost?.breakdown?.total_cost || 0) +
                (state.dynamoDBCost?.breakdown?.total_cost || 0) +
                (state.elbCost?.breakdown?.total_cost || 0) +
-               (state.elasticBeanstalkCost?.breakdown?.total_cost || 0),
+               (state.elasticBeanstalkCost?.breakdown?.total_cost || 0) +
+               (state.cloudWatchCost?.breakdown?.total_cost || 0) +
+               (state.cloudFrontCost?.breakdown?.total_cost || 0) +
+               (state.elastiCacheCost?.breakdown?.total_cost || 0) +
+               (state.sqsCost?.breakdown?.total_cost || 0),
   })),
 
   setCognitoCost: (cost) => set((state) => ({
     cognitoCost: cost,
-    totalCost: (state.apiGatewayCost?.breakdown?.total_cost || 0) + 
-               (state.lambdaCost?.breakdown?.total_cost || 0) + 
+    totalCost: (state.apiGatewayCost?.breakdown?.total_cost || 0) +
+               (state.lambdaCost?.breakdown?.total_cost || 0) +
                (state.s3Cost?.breakdown?.total_cost || 0) +
                (cost?.breakdown?.total_cost || 0) +
                (state.dynamoDBCost?.breakdown?.total_cost || 0) +
                (state.elbCost?.breakdown?.total_cost || 0) +
-               (state.elasticBeanstalkCost?.breakdown?.total_cost || 0),
+               (state.elasticBeanstalkCost?.breakdown?.total_cost || 0) +
+               (state.cloudWatchCost?.breakdown?.total_cost || 0) +
+               (state.cloudFrontCost?.breakdown?.total_cost || 0) +
+               (state.elastiCacheCost?.breakdown?.total_cost || 0) +
+               (state.sqsCost?.breakdown?.total_cost || 0),
   })),
 
   setDynamoDBCost: (cost) => set((state) => ({
     dynamoDBCost: cost,
-    totalCost: (state.apiGatewayCost?.breakdown?.total_cost || 0) + 
-               (state.lambdaCost?.breakdown?.total_cost || 0) + 
+    totalCost: (state.apiGatewayCost?.breakdown?.total_cost || 0) +
+               (state.lambdaCost?.breakdown?.total_cost || 0) +
                (state.s3Cost?.breakdown?.total_cost || 0) +
-               (state.dynamoDBCost?.breakdown?.total_cost || 0) +
+               (state.cognitoCost?.breakdown?.total_cost || 0) +
+               (cost?.breakdown?.total_cost || 0) +
                (state.elbCost?.breakdown?.total_cost || 0) +
-               (state.elasticBeanstalkCost?.breakdown?.total_cost || 0),
+               (state.elasticBeanstalkCost?.breakdown?.total_cost || 0) +
+               (state.cloudWatchCost?.breakdown?.total_cost || 0) +
+               (state.cloudFrontCost?.breakdown?.total_cost || 0) +
+               (state.elastiCacheCost?.breakdown?.total_cost || 0) +
+               (state.sqsCost?.breakdown?.total_cost || 0),
   })),
 
   setELBCost: (cost) => set((state) => ({
     elbCost: cost,
-    totalCost: (state.apiGatewayCost?.breakdown?.total_cost || 0) + 
-               (state.lambdaCost?.breakdown?.total_cost || 0) + 
+    totalCost: (state.apiGatewayCost?.breakdown?.total_cost || 0) +
+               (state.lambdaCost?.breakdown?.total_cost || 0) +
                (state.s3Cost?.breakdown?.total_cost || 0) +
+               (state.cognitoCost?.breakdown?.total_cost || 0) +
                (state.dynamoDBCost?.breakdown?.total_cost || 0) +
                (cost?.breakdown?.total_cost || 0) +
-               (state.elasticBeanstalkCost?.breakdown?.total_cost || 0),
+               (state.elasticBeanstalkCost?.breakdown?.total_cost || 0) +
+               (state.cloudWatchCost?.breakdown?.total_cost || 0) +
+               (state.cloudFrontCost?.breakdown?.total_cost || 0) +
+               (state.elastiCacheCost?.breakdown?.total_cost || 0) +
+               (state.sqsCost?.breakdown?.total_cost || 0),
   })),
 
   setElasticBeanstalkCost: (cost) => set((state) => ({
     elasticBeanstalkCost: cost,
-    totalCost: (state.apiGatewayCost?.breakdown?.total_cost || 0) + 
-               (state.lambdaCost?.breakdown?.total_cost || 0) + 
+    totalCost: (state.apiGatewayCost?.breakdown?.total_cost || 0) +
+               (state.lambdaCost?.breakdown?.total_cost || 0) +
                (state.s3Cost?.breakdown?.total_cost || 0) +
                (state.cognitoCost?.breakdown?.total_cost || 0) +
                (state.dynamoDBCost?.breakdown?.total_cost || 0) +
                (state.elbCost?.breakdown?.total_cost || 0) +
+               (cost?.breakdown?.total_cost || 0) +
+               (state.cloudWatchCost?.breakdown?.total_cost || 0) +
+               (state.cloudFrontCost?.breakdown?.total_cost || 0) +
+               (state.elastiCacheCost?.breakdown?.total_cost || 0) +
+               (state.sqsCost?.breakdown?.total_cost || 0),
+  })),
+
+  setCloudWatchCost: (cost) => set((state) => ({
+    cloudWatchCost: cost,
+    totalCost: (state.apiGatewayCost?.breakdown?.total_cost || 0) +
+               (state.lambdaCost?.breakdown?.total_cost || 0) +
+               (state.s3Cost?.breakdown?.total_cost || 0) +
+               (state.cognitoCost?.breakdown?.total_cost || 0) +
+               (state.dynamoDBCost?.breakdown?.total_cost || 0) +
+               (state.elbCost?.breakdown?.total_cost || 0) +
+               (state.elasticBeanstalkCost?.breakdown?.total_cost || 0) +
+               (cost?.breakdown?.total_cost || 0) +
+               (state.cloudFrontCost?.breakdown?.total_cost || 0) +
+               (state.elastiCacheCost?.breakdown?.total_cost || 0) +
+               (state.sqsCost?.breakdown?.total_cost || 0),
+  })),
+
+  setCloudFrontCost: (cost) => set((state) => ({
+    cloudFrontCost: cost,
+    totalCost: (state.apiGatewayCost?.breakdown?.total_cost || 0) +
+               (state.lambdaCost?.breakdown?.total_cost || 0) +
+               (state.s3Cost?.breakdown?.total_cost || 0) +
+               (state.cognitoCost?.breakdown?.total_cost || 0) +
+               (state.dynamoDBCost?.breakdown?.total_cost || 0) +
+               (state.elbCost?.breakdown?.total_cost || 0) +
+               (state.elasticBeanstalkCost?.breakdown?.total_cost || 0) +
+               (state.cloudWatchCost?.breakdown?.total_cost || 0) +
+               (cost?.breakdown?.total_cost || 0) +
+               (state.elastiCacheCost?.breakdown?.total_cost || 0) +
+               (state.sqsCost?.breakdown?.total_cost || 0),
+  })),
+
+  setElastiCacheCost: (cost) => set((state) => ({
+    elastiCacheCost: cost,
+    totalCost: (state.apiGatewayCost?.breakdown?.total_cost || 0) +
+               (state.lambdaCost?.breakdown?.total_cost || 0) +
+               (state.s3Cost?.breakdown?.total_cost || 0) +
+               (state.cognitoCost?.breakdown?.total_cost || 0) +
+               (state.dynamoDBCost?.breakdown?.total_cost || 0) +
+               (state.elbCost?.breakdown?.total_cost || 0) +
+               (state.elasticBeanstalkCost?.breakdown?.total_cost || 0) +
+               (state.cloudWatchCost?.breakdown?.total_cost || 0) +
+               (state.cloudFrontCost?.breakdown?.total_cost || 0) +
+               (cost?.breakdown?.total_cost || 0) +
+               (state.sqsCost?.breakdown?.total_cost || 0),
+  })),
+
+  setSQSCost: (cost) => set((state) => ({
+    sqsCost: cost,
+    totalCost: (state.apiGatewayCost?.breakdown?.total_cost || 0) +
+               (state.lambdaCost?.breakdown?.total_cost || 0) +
+               (state.s3Cost?.breakdown?.total_cost || 0) +
+               (state.cognitoCost?.breakdown?.total_cost || 0) +
+               (state.dynamoDBCost?.breakdown?.total_cost || 0) +
+               (state.elbCost?.breakdown?.total_cost || 0) +
+               (state.elasticBeanstalkCost?.breakdown?.total_cost || 0) +
+               (state.cloudWatchCost?.breakdown?.total_cost || 0) +
+               (state.cloudFrontCost?.breakdown?.total_cost || 0) +
+               (state.elastiCacheCost?.breakdown?.total_cost || 0) +
                (cost?.breakdown?.total_cost || 0),
   })),
-  
+
   reset: () => set({
     apiGatewayCost: null,
     lambdaCost: null,
@@ -253,6 +390,10 @@ export const usePricingStore = create((set) => ({
     dynamoDBCost: null,
     elbCost: null,
     elasticBeanstalkCost: null,
+    cloudWatchCost: null,
+    cloudFrontCost: null,
+    elastiCacheCost: null,
+    sqsCost: null,
     totalCost: 0,
   }),
 }));

@@ -95,3 +95,43 @@ export const simulateArchitecture = async (architecture) => {
     throw error;
   }
 };
+
+export const calculateCloudWatchCost = async (params) => {
+  const response = await apiClient.post('/cloudwatch/calculate', params);
+  return response.data;
+};
+
+export const getCloudWatchRegions = async () => {
+  const response = await apiClient.get('/cloudwatch/regions');
+  return response.data;
+};
+
+export const calculateCloudFrontCost = async (params) => {
+  const response = await apiClient.post('/cloudfront/calculate', params);
+  return response.data;
+};
+
+export const getCloudFrontRegions = async () => {
+  const response = await apiClient.get('/cloudfront/regions');
+  return response.data;
+};
+
+export const calculateElastiCacheCost = async (params) => {
+  const response = await apiClient.post('/elasticache/calculate', params);
+  return response.data;
+};
+
+export const getElastiCacheRegions = async () => {
+  const response = await apiClient.get('/elasticache/regions');
+  return response.data;
+};
+
+export const calculateSQSCost = async (params) => {
+  const response = await apiClient.post('/sqs/calculate', params);
+  return response.data;
+};
+
+export const getSQSRegions = async () => {
+  const response = await apiClient.get('/sqs/regions');
+  return response.data;
+};

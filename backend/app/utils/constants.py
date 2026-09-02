@@ -106,6 +106,60 @@ ELB_LB_TYPES = {
     },
 }
 
+# CloudWatch configuration
+CLOUDWATCH_FREE_TIER = {
+    "custom_metrics": 10,
+    "alarms": 10,
+    "logs_ingestion_gb": 5,
+    "dashboards": 3,
+    "api_requests": 1_000_000,
+}
+CLOUDWATCH_FALLBACK_PRICING = {
+    "metrics_per_metric": 0.30,
+    "alarm_standard_per_month": 0.10,
+    "alarm_high_res_per_month": 0.30,
+    "logs_ingestion_per_gb": 0.50,
+    "logs_storage_per_gb": 0.03,
+    "dashboard_per_month": 3.00,
+    "api_requests_per_request": 0.00001,
+}
+
+# CloudFront configuration (rates here are per-request, matching the
+# pricing file's pricePerUnit, not per-10k)
+CLOUDFRONT_FREE_TIER = {
+    "data_transfer_out_gb": 1024,   # 1 TB/month, first 12 months
+    "https_requests": 10_000_000,
+    "http_requests": 10_000_000,
+}
+CLOUDFRONT_FALLBACK_PRICING = {
+    "data_transfer_per_gb": 0.109,   # India tier-1 rate; adjust per geo if needed
+    "https_per_request": 0.0000012,
+    "http_per_request": 0.0000009,
+    "invalidation_per_path": 0.005,
+}
+
+# ElastiCache configuration
+ELASTICACHE_FALLBACK_PRICING = {
+    "node_hourly": {
+        "cache.t3.micro": 0.017,
+        "cache.t3.small": 0.034,
+        "cache.t3.medium": 0.068,
+        "cache.m6g.large": 0.156,
+        "cache.r6g.large": 0.226,
+        "default": 0.034,
+    },
+    "backup_per_gb": 0.085,
+}
+
+# SQS configuration
+SQS_FREE_TIER_REQUESTS = 1_000_000
+SQS_REQUEST_CHUNK_KB = 64
+SQS_FALLBACK_PRICING = {
+    "standard_per_million": 0.40,
+    "fifo_per_million": 0.50,
+    "data_transfer_per_gb": 0.09,
+}
+
 def get_service_config(service: str) -> Dict[str, Any]:
     """Get configuration for a specific service"""
     return _CONFIG.get(service, {})
@@ -114,3 +168,4 @@ def reload_config():
     """Reload configuration from file (useful for testing)"""
     global _CONFIG
     _CONFIG = _load_service_config()
+

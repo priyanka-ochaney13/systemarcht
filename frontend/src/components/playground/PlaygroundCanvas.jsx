@@ -143,6 +143,30 @@ export const PlaygroundCanvas = ({ onNodeSelect }) => {
             >
               + Elastic Beanstalk
             </button>
+                        <button
+              onClick={() => handleAddNode('cloudwatch')}
+              className="px-3 py-2 text-sm bg-pink-500 hover:bg-pink-600 text-white rounded-md transition whitespace-nowrap"
+            >
+              + CloudWatch
+            </button>
+            <button
+              onClick={() => handleAddNode('cloudfront')}
+              className="px-3 py-2 text-sm bg-purple-500 hover:bg-purple-600 text-white rounded-md transition whitespace-nowrap"
+            >
+              + CloudFront
+            </button>
+            <button
+              onClick={() => handleAddNode('elasticache')}
+              className="px-3 py-2 text-sm bg-fuchsia-500 hover:bg-fuchsia-600 text-white rounded-md transition whitespace-nowrap"
+            >
+              + ElastiCache
+            </button>
+            <button
+              onClick={() => handleAddNode('sqs')}
+              className="px-3 py-2 text-sm bg-rose-500 hover:bg-rose-600 text-white rounded-md transition whitespace-nowrap"
+            >
+              + SQS
+            </button>
           </div>
           
           {/* Action buttons on the right */}
