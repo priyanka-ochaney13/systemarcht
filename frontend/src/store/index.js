@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+export { useLearningStore } from './learningStore';
 
 export const useArchitectureStore = create((set) => ({
   nodes: [],

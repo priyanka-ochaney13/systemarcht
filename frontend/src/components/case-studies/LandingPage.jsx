@@ -1,6 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
-import { Zap, Layout, Gauge, Lightbulb, ArrowRight, MessageSquare } from 'lucide-react';
+import { Zap, Layout, Gauge, Lightbulb, ArrowRight, MessageSquare, BookOpen } from 'lucide-react';
 
 export const LandingPage = () => {
   return (
@@ -119,19 +119,49 @@ export const LandingPage = () => {
             <span className="text-xl font-bold text-gray-900">SystemArcht</span>
           </div>
           <div className="hidden md:flex items-center gap-6">
-            <a href="#features" className="text-gray-700 hover:text-yellow-600 transition">
-              Features
-            </a>
-            <a href="#patterns" className="text-gray-700 hover:text-yellow-600 transition">
-              Patterns
-            </a>
-            <Link href="/chatbot">
-              <button className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-gray-900 hover:bg-zinc-800 text-amber-400 text-sm font-medium border border-zinc-700 transition">
-                <MessageSquare className="w-3.5 h-3.5" />
-                ArchBot
-              </button>
-            </Link>
-          </div>
+
+  <a
+    href="#features"
+    className="text-gray-700 hover:text-yellow-600 transition"
+  >
+    Features
+  </a>
+
+  <a
+    href="#patterns"
+    className="text-gray-700 hover:text-yellow-600 transition"
+  >
+    Patterns
+  </a>
+
+  <Link
+    href="/learning"
+    className="text-gray-700 hover:text-yellow-600 transition font-medium"
+  >
+    Learning
+  </Link>
+
+  <Link href="/chatbot">
+    <button
+      className="
+        flex items-center gap-1.5
+        px-3 py-1.5
+        rounded-full
+        bg-gray-900
+        hover:bg-zinc-800
+        text-amber-400
+        text-sm
+        font-medium
+        border border-zinc-700
+        transition
+      "
+    >
+      <MessageSquare className="w-3.5 h-3.5" />
+      ArchBot
+    </button>
+  </Link>
+
+</div>
         </div>
       </nav>
 
@@ -149,25 +179,89 @@ export const LandingPage = () => {
             simulate their behavior with real-world constraints, and understand system design patterns.
           </p>
           <div className="flex flex-col md:flex-row gap-4 justify-center animate-hero-buttons">
-            <Link href="/playground">
-              <button className="px-8 py-4 bg-yellow-500 hover:bg-yellow-600 text-white font-semibold rounded-lg transition text-lg flex items-center gap-2 justify-center md:justify-start btn-glow hover:shadow-2xl transform hover:scale-105">
-                <Layout className="w-5 h-5" />
-                Start Building
-              </button>
-            </Link>
-            <Link href="/case-studies">
-              <button className="px-8 py-4 bg-gray-700 hover:bg-gray-600 text-white font-semibold rounded-lg transition text-lg flex items-center gap-2 justify-center md:justify-start hover:shadow-2xl transform hover:scale-105">
-                <span>Explore Case Studies</span>
-                <ArrowRight className="w-5 h-5" />
-              </button>
-            </Link>
-            <Link href="/chatbot">
-              <button className="px-8 py-4 bg-transparent hover:bg-zinc-800 text-amber-400 font-semibold rounded-lg transition text-lg flex items-center gap-2 justify-center md:justify-start border border-amber-500/40 hover:border-amber-400 hover:shadow-2xl transform hover:scale-105">
-                <MessageSquare className="w-5 h-5" />
-                Ask ArchBot
-              </button>
-            </Link>
-          </div>
+
+  {/* Start Learning */}
+  <Link href="/learning">
+    <button
+      className="
+        px-8 py-4
+        bg-yellow-500
+        hover:bg-yellow-600
+        text-white
+        font-semibold
+        rounded-lg
+        transition
+        text-lg
+        flex items-center
+        gap-2
+        justify-center
+        md:justify-start
+        btn-glow
+        hover:shadow-2xl
+        transform
+        hover:scale-105
+      "
+    >
+      <BookOpen className="w-5 h-5" />
+      Start Learning
+    </button>
+  </Link>
+
+  {/* Start Building */}
+  <Link href="/playground">
+    <button
+      className="
+        px-8 py-4
+        bg-gray-700
+        hover:bg-gray-600
+        text-white
+        font-semibold
+        rounded-lg
+        transition
+        text-lg
+        flex items-center
+        gap-2
+        justify-center
+        md:justify-start
+        hover:shadow-2xl
+        transform
+        hover:scale-105
+      "
+    >
+      <Layout className="w-5 h-5" />
+      Start Building
+    </button>
+  </Link>
+
+  {/* ArchBot */}
+  <Link href="/chatbot">
+    <button
+      className="
+        px-8 py-4
+        bg-transparent
+        hover:bg-zinc-800
+        text-amber-400
+        font-semibold
+        rounded-lg
+        transition
+        text-lg
+        flex items-center
+        gap-2
+        justify-center
+        md:justify-start
+        border border-amber-500/40
+        hover:border-amber-400
+        hover:shadow-2xl
+        transform
+        hover:scale-105
+      "
+    >
+      <MessageSquare className="w-5 h-5" />
+      Ask ArchBot
+    </button>
+  </Link>
+
+</div>
         </div>
       </section>
 

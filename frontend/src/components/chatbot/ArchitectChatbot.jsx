@@ -3,7 +3,10 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { Send, Zap, BarChart2, HelpCircle, RefreshCw, X, ChevronDown } from 'lucide-react';
 import { useArchitectureStore, useServiceConfigStore } from '@/store';
-import { analyzeArchitectureCost } from '@/api/chatbot';
+import {
+  analyzeArchitectureCost,
+  chatAboutArchitecture,
+} from '@/api/chatbot';
 import {
   buildArchitecturePayload,
   isArchitectureAnalyzable,
@@ -45,15 +48,37 @@ I can only analyze services currently supported: Lambda and API Gateway.`;
 const matchIntent = (text) => {
   const lower = text.toLowerCase().trim();
 
-  if (/analyz|calculat|cost|estimat|how much|price|break.?down/.test(lower)) return 'analyze';
-  if (/optim|cheap|reduc|sav|improv|tip/.test(lower)) return 'optimize';
-  if (/explain|describe|summar|what.*(arch|design|build)|tell me about/.test(lower)) return 'explain';
-  if (/expensive|highest|most cost|biggest/.test(lower)) return 'rank';
-  if (/help|what can|commands?|options?/.test(lower)) return 'help';
-  if (/reset|clear|start over|new conv/.test(lower)) return 'reset';
-  if (/hello|hi|hey|sup|greet/.test(lower)) return 'greet';
+  // Only explicit requests to run the deterministic calculator
+  if (/^analyz(e|ing)?\s+(my\s+)?architecture/.test(lower)) {
+    return 'analyze';
+  }
 
-  return 'unknown';
+  if (/^(run|calculate|show)\s+(the\s+)?(cost|costs|estimate|breakdown)/.test(lower)) {
+    return 'analyze';
+  }
+
+  // Conversational questions should go to Groq
+  if (/optim|cheap|reduc|sav|improv|tip|expensive|highest|most cost|costing|price|spend|monthly cost|total cost|why|how much/.test(lower)) {
+    return 'ai';
+  }
+
+  if (/explain|describe|summar|architecture|design|build|connected|services/.test(lower)) {
+    return 'ai';
+  }
+
+  if (/help|what can|commands?|options?/.test(lower)) {
+    return 'help';
+  }
+
+  if (/reset|clear|start over|new conv/.test(lower)) {
+    return 'reset';
+  }
+
+  if (/hello|hi|hey|sup|greet/.test(lower)) {
+    return 'greet';
+  }
+
+  return 'ai';
 };
 
 // ─── Main Component ───────────────────────────────────────────────────────────
@@ -63,6 +88,7 @@ export function ArchitectChatbot({ onClose, embedded = false }) {
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [lastAnalysis, setLastAnalysis] = useState(null);
+  const [lastCostResult, setLastCostResult] = useState(null);
   const [isMinimized, setIsMinimized] = useState(false);
 
   const messagesEndRef = useRef(null);
@@ -104,7 +130,9 @@ export function ArchitectChatbot({ onClose, embedded = false }) {
 
       const data = await analyzeArchitectureCost(payload);
       const parsed = parseAnalysisResponse(data);
+
       setLastAnalysis(parsed);
+      setLastCostResult(data);
 
       addMessage({ role: 'bot', type: 'analysis', payload: parsed });
 
@@ -236,6 +264,72 @@ export function ArchitectChatbot({ onClose, embedded = false }) {
     });
   }, [lastAnalysis, addMessage]);
 
+  // ── AI Free-text Chat ────────────────────────────────────────────────────
+
+const handleAIChat = useCallback(async (text) => {
+  setIsLoading(true);
+
+  try {
+    const architectureSnapshot = buildArchitecturePayload(
+      {
+        nodes: architectureNodes,
+        connections: architectureConnections,
+      },
+      serviceConfigs
+    );
+
+    const history = messages
+      .filter((msg) => msg.role === 'user' || msg.role === 'bot')
+      .filter((msg) => msg.type === 'text')
+      .slice(-10)
+      .map((msg) => ({
+        role: msg.role === 'bot' ? 'assistant' : 'user',
+        content: msg.content,
+      }));
+
+    const data = await chatAboutArchitecture({
+      message: text,
+      architectureSnapshot,
+      costResult: lastCostResult,
+      history,
+    });
+
+    addMessage({
+      role: 'bot',
+      type: 'text',
+      content: data.reply,
+    });
+  } catch (err) {
+    const status = err?.response?.status;
+    const rawDetail = err?.response?.data?.detail;
+    const detail =
+      typeof rawDetail === 'string'
+        ? rawDetail
+        : Array.isArray(rawDetail)
+          ? rawDetail
+              .map((e) => `${e.loc?.join('.')} — ${e.msg}`)
+              .join(', ')
+          : err.message;
+
+    addMessage({
+      role: 'bot',
+      type: 'error',
+      content: `❌ ArchBot request failed\n\n${
+        status ? `HTTP ${status}: ` : ''
+      }${detail || 'Unable to reach the AI backend.'}`,
+    });
+  } finally {
+    setIsLoading(false);
+  }
+}, [
+  architectureNodes,
+  architectureConnections,
+  serviceConfigs,
+  messages,
+  lastCostResult,
+  addMessage,
+]);
+
   // ── Message Send ─────────────────────────────────────────────────────────
 
   const handleSend = useCallback(async () => {
@@ -251,40 +345,45 @@ export function ArchitectChatbot({ onClose, embedded = false }) {
     await new Promise((r) => setTimeout(r, 300));
 
     switch (intent) {
-      case 'analyze':
-        await runAnalysis();
-        break;
-      case 'optimize':
-        handleOptimize();
-        break;
-      case 'explain':
-        handleExplain();
-        break;
-      case 'rank':
-        handleRank();
-        break;
-      case 'help':
-        addMessage({ role: 'bot', type: 'text', content: HELP_CONTENT });
-        break;
-      case 'reset':
-        setMessages([WELCOME_MESSAGE]);
-        setLastAnalysis(null);
-        break;
-      case 'greet':
-        addMessage({
-          role: 'bot',
-          type: 'text',
-          content: "Hey there! Ready to analyze your AWS architecture? Hit 'Analyze Architecture' or ask me about costs, optimizations, or your current design.",
-        });
-        break;
-      default:
-        addMessage({
-          role: 'bot',
-          type: 'text',
-          content: `I'm focused on AWS architecture cost analysis. Try:\n• "Analyze my architecture"\n• "How can I reduce costs?"\n• "Explain my architecture"\n\nOr type "help" to see all options.`,
-        });
-    }
-  }, [input, isLoading, addMessage, runAnalysis, handleOptimize, handleExplain, handleRank]);
+  case 'analyze':
+    await runAnalysis();
+    break;
+
+  case 'help':
+    addMessage({
+      role: 'bot',
+      type: 'text',
+      content: HELP_CONTENT,
+    });
+    break;
+
+  case 'reset':
+    setMessages([WELCOME_MESSAGE]);
+    setLastAnalysis(null);
+    setLastCostResult(null);
+    break;
+
+  case 'greet':
+    addMessage({
+      role: 'bot',
+      type: 'text',
+      content:
+        "Hey there! Ready to analyze your AWS architecture? Hit 'Analyze Architecture' or ask me about costs, optimizations, or your current design.",
+    });
+    break;
+
+  case 'ai':
+  await handleAIChat(text);
+  break;
+
+  default:
+    await handleAIChat(text);
+}
+  }, [input,
+  isLoading,
+  addMessage,
+  runAnalysis,
+  handleAIChat,]);
 
   const handleKeyDown = (e) => {
     if (e.key === 'Enter' && !e.shiftKey) {
@@ -296,10 +395,22 @@ export function ArchitectChatbot({ onClose, embedded = false }) {
   // ── Quick Actions ────────────────────────────────────────────────────────
 
   const QUICK_ACTIONS = [
-    { label: 'Analyze Architecture', icon: <BarChart2 className="w-3.5 h-3.5" />, action: runAnalysis },
-    { label: 'Optimize Costs', icon: <Zap className="w-3.5 h-3.5" />, action: handleOptimize },
-    { label: 'Explain Design', icon: <HelpCircle className="w-3.5 h-3.5" />, action: handleExplain },
-  ];
+  {
+    label: 'Analyze Architecture',
+    icon: <BarChart2 className="w-3.5 h-3.5" />,
+    action: runAnalysis,
+  },
+  {
+    label: 'Optimize Costs',
+    icon: <Zap className="w-3.5 h-3.5" />,
+    action: () => handleAIChat('How can I reduce the cost of my architecture?'),
+  },
+  {
+    label: 'Explain Design',
+    icon: <HelpCircle className="w-3.5 h-3.5" />,
+    action: () => handleAIChat('Explain my current architecture and how the services are connected.'),
+  },
+];
 
   // ── Render ───────────────────────────────────────────────────────────────
 
@@ -326,7 +437,7 @@ export function ArchitectChatbot({ onClose, embedded = false }) {
 
         <div className="flex items-center gap-1">
           <button
-            onClick={() => { setMessages([WELCOME_MESSAGE]); setLastAnalysis(null); }}
+            onClick={() => { setMessages([WELCOME_MESSAGE]); setLastAnalysis(null); setLastCostResult(null); }}
             title="Reset conversation"
             className="p-1.5 rounded-md text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800 transition"
           >
