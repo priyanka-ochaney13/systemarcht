@@ -18,7 +18,11 @@ class CloudFrontRequest(BaseCalculateRequest):
     data_transfer_out_gb: float = Field(default=0.0, ge=0, description="Data transferred out to internet (GB/month)")
     https_requests: int = Field(default=0, ge=0, description="HTTPS requests per month")
     http_requests: int = Field(default=0, ge=0, description="HTTP requests per month")
-    invalidation_paths: int = Field(default=0, ge=0, description="Invalidation paths requested per month")
+    invalidation_paths: int = Field(
+        default=0,
+        ge=0,
+        description="CloudFront invalidation paths per month across the AWS account",
+    )
 
     include_free_tier: bool = Field(default=True, description="Whether to apply free tier allowances")
 

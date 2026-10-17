@@ -37,6 +37,16 @@ const GENERIC_CONFIG_KEYS = {
   sqs: 'sqsConfig',
 };
 
+const S3_STORAGE_CLASSES = {
+  'S3 Standard': 'standard',
+  'S3 Intelligent-Tiering': 'intelligent_tiering',
+  'S3 Standard-IA': 'standard_ia',
+  'S3 One Zone-IA': 'one_zone_ia',
+  'S3 Glacier Instant': 'glacier_instant',
+  'S3 Glacier Flexible': 'glacier_flexible',
+  'S3 Deep Archive': 'deep_archive',
+};
+
 const buildNodeConfig = (serviceType, serviceConfigs) => {
   switch (serviceType) {
     case 'lambda': {
@@ -64,12 +74,15 @@ const buildNodeConfig = (serviceType, serviceConfigs) => {
       const c = serviceConfigs.s3Config;
       return {
         region: c.region || 'ap-south-1',
-        storage_class: c.storage_class || 'S3 Standard',
-        storage_gb: c.storage_gb || 100,
-        put_requests: c.put_requests || 10_000,
-        get_requests: c.get_requests || 100_000,
-        delete_requests: c.delete_requests || 1_000,
-        outbound_transfer_gb: c.outbound_transfer_gb || 50,
+        storage_class:
+          S3_STORAGE_CLASSES[c.storage_class] || c.storage_class || 'standard',
+        storage_gb: c.storage_gb ?? 100,
+        put_requests_per_month: c.put_requests_per_month ?? c.put_requests ?? 10_000,
+        get_requests_per_month: c.get_requests_per_month ?? c.get_requests ?? 100_000,
+        delete_requests_per_month:
+          c.delete_requests_per_month ?? c.delete_requests ?? 1_000,
+        outbound_transfer_gb: c.outbound_transfer_gb ?? 0,
+        intra_region_transfer_gb: c.intra_region_transfer_gb ?? 0,
       };
     }
     default: {

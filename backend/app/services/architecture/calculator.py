@@ -148,7 +148,11 @@ class ArchitectureCalculator:
             warnings=warnings
         )
     
-    def _calculate_node_cost(self, node: ServiceNode, include_free_tier: bool) -> ServiceCostDetail:
+    def _calculate_node_cost(
+        self,
+        node: ServiceNode,
+        include_free_tier: bool,
+    ) -> ServiceCostDetail:
         """Calculate cost for a single service node"""
         calculator = self._calculators.get(node.service_type)
         
@@ -226,17 +230,19 @@ class ArchitectureCalculator:
         elif node.service_type == "s3":
             service_request = S3Request(**config)
             result = calculator.calculate(service_request)
+            breakdown = {
+                "storage_cost": result.breakdown.storage_cost,
+                "request_cost": result.breakdown.request_cost,
+                "transfer_cost": result.breakdown.transfer_cost,
+            }
+
             return ServiceCostDetail(
                 node_id=node.id,
                 name=node.name,
                 service_type=node.service_type,
                 region=config.get("region", "ap-south-1"),
                 cost=result.breakdown.total_cost,
-                breakdown={
-                    "storage_cost": result.breakdown.storage_cost,
-                    "request_cost": result.breakdown.request_cost,
-                    "transfer_cost": result.breakdown.transfer_cost,
-                }
+                breakdown=breakdown,
             )
         
         elif node.service_type == "dynamodb":
@@ -343,11 +349,18 @@ class ArchitectureCalculator:
         total_payload_kb = conn.avg_request_size_kb + conn.avg_response_size_kb
         data_transfer_gb = (requests_per_month * total_payload_kb) / 1024 / 1024
         
-        # Get transfer rate based on regions
-        transfer_type, rate_per_gb, _ = self._transfer_pricing.get_transfer_rate(
-            source_region, 
-            target_region
-        )
+        is_cloudfront_origin = {
+            source_node.service_type,
+            target_node.service_type,
+        } == {"cloudfront", "s3"}
+        if is_cloudfront_origin:
+            transfer_type = "cloudfront_origin_free"
+            rate_per_gb = 0.0
+        else:
+            transfer_type, rate_per_gb, _ = self._transfer_pricing.get_transfer_rate(
+                source_region,
+                target_region
+            )
         
         # Calculate cost
         cost = data_transfer_gb * rate_per_gb

@@ -121,14 +121,14 @@ export const CloudFrontConfigPanel = ({ onClose }) => {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-foreground/80 mb-2">Invalidation Paths per Month</label>
+          <label className="block text-sm font-medium text-foreground/80 mb-2">Invalidation Paths per Month (Account-wide)</label>
           <input
             type="number"
             value={localConfig.invalidation_paths || ''}
             onChange={(e) => handleChange('invalidation_paths', e.target.value === '' ? '' : parseInt(e.target.value))}
             className="w-full px-3 py-2 border border-input bg-background text-foreground rounded-md focus:ring-2 focus:ring-ring/40"
           />
-          <p className="text-xs text-muted-foreground mt-1">💡 First 1,000 paths/month FREE</p>
+          <p className="text-xs text-muted-foreground mt-1">💡 First 1,000 paths/month are free across all distributions in the AWS account.</p>
         </div>
 
         {cost && (

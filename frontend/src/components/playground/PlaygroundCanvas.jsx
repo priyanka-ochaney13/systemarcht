@@ -173,91 +173,21 @@ export const PlaygroundCanvas = ({ onNodeSelect, onArchitectureChange }) => {
       {/* Toolbar */}
       <div className="bg-muted/50 border-b border-border p-4">
         <div className="flex items-center gap-2 flex-wrap">
-          <span className="text-sm font-medium text-foreground/80 mr-2">Add Service:</span>
-          
-          {/* Service buttons grouped */}
-          <div className="flex flex-wrap gap-2">
-            <button
-              onClick={() => handleAddNode('api_gateway')}
-              className="px-3 py-2 text-sm bg-primary hover:bg-primary/90 text-primary-foreground rounded-md transition whitespace-nowrap"
-            >
-              + API Gateway
-            </button>
-            <button
-              onClick={() => handleAddNode('lambda')}
-              className="px-3 py-2 text-sm bg-primary hover:bg-primary/90 text-primary-foreground rounded-md transition whitespace-nowrap"
-            >
-              + Lambda
-            </button>
-            <button
-              onClick={() => handleAddNode('s3')}
-              className="px-3 py-2 text-sm bg-primary hover:bg-primary/90 text-primary-foreground rounded-md transition whitespace-nowrap"
-            >
-              + S3
-            </button>
-            <button
-              onClick={() => handleAddNode('cognito')}
-              className="px-3 py-2 text-sm bg-primary hover:bg-primary/90 text-primary-foreground rounded-md transition whitespace-nowrap"
-            >
-              + Cognito
-            </button>
-            <button
-              onClick={() => handleAddNode('dynamodb')}
-              className="px-3 py-2 text-sm bg-primary hover:bg-primary/90 text-primary-foreground rounded-md transition whitespace-nowrap"
-            >
-              + DynamoDB
-            </button>
-            <button
-              onClick={() => handleAddNode('elb')}
-              className="px-3 py-2 text-sm bg-primary hover:bg-primary/90 text-primary-foreground rounded-md transition whitespace-nowrap"
-            >
-              + ELB
-            </button>
-            <button
-              onClick={() => handleAddNode('elastic_beanstalk')}
-              className="px-3 py-2 text-sm bg-secondary hover:bg-muted text-secondary-foreground border border-border rounded-md transition whitespace-nowrap font-semibold"
-              title="Click to add Elastic Beanstalk to your architecture"
-            >
-              + Elastic Beanstalk
-            </button>
-                        <button
-              onClick={() => handleAddNode('cloudwatch')}
-              className="px-3 py-2 text-sm bg-secondary hover:bg-muted text-secondary-foreground border border-border rounded-md transition whitespace-nowrap"
-            >
-              + CloudWatch
-            </button>
-            <button
-              onClick={() => handleAddNode('cloudfront')}
-              className="px-3 py-2 text-sm bg-secondary hover:bg-muted text-secondary-foreground border border-border rounded-md transition whitespace-nowrap"
-            >
-              + CloudFront
-            </button>
-            <button
-              onClick={() => handleAddNode('elasticache')}
-              className="px-3 py-2 text-sm bg-secondary hover:bg-muted text-secondary-foreground border border-border rounded-md transition whitespace-nowrap"
-            >
-              + ElastiCache
-            </button>
-            <button
-              onClick={() => handleAddNode('sqs')}
-              className="px-3 py-2 text-sm bg-secondary hover:bg-muted text-secondary-foreground border border-border rounded-md transition whitespace-nowrap"
-            >
-              + SQS
-            </button>
-            <button
-              onClick={() => handleAddNode('ec2')}
-              className="px-3 py-2 text-sm bg-primary hover:bg-primary/90 text-primary-foreground rounded-md transition whitespace-nowrap"
-            >
-              + EC2
-            </button>
-            <button
-              onClick={() => handleAddNode('rds')}
-              className="px-3 py-2 text-sm bg-secondary hover:bg-muted text-secondary-foreground border border-border rounded-md transition whitespace-nowrap"
-            >
-              + RDS
-            </button>
-          </div>
-          
+          <button
+            type="button"
+            onClick={() => setServiceMenuOpen((open) => !open)}
+            aria-expanded={serviceMenuOpen}
+            aria-controls="service-picker"
+            className="inline-flex items-center gap-2 rounded-md bg-primary px-3 py-2 text-sm text-primary-foreground transition hover:bg-primary/90"
+          >
+            Add Service
+            {serviceMenuOpen ? (
+              <ChevronUp className="h-4 w-4" />
+            ) : (
+              <ChevronDown className="h-4 w-4" />
+            )}
+          </button>
+
           {/* Action buttons on the right */}
           <div className="flex-1" />
           <div className="flex items-center gap-2">
@@ -282,7 +212,7 @@ export const PlaygroundCanvas = ({ onNodeSelect, onArchitectureChange }) => {
         </div>
 
         {serviceMenuOpen && (
-          <div className="mt-3 space-y-3">
+          <div id="service-picker" className="mt-3 space-y-3">
             <div className="flex flex-col gap-2 sm:flex-row">
               <label className="relative min-w-0 flex-1">
                 <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
@@ -318,7 +248,12 @@ export const PlaygroundCanvas = ({ onNodeSelect, onArchitectureChange }) => {
                 <button
                   key={service.type}
                   type="button"
-                  onClick={() => handleAddNode(service.type)}
+                  onClick={() => {
+                    handleAddNode(service.type);
+                    setServiceMenuOpen(false);
+                    setServiceSearch('');
+                    setServiceCategory('All');
+                  }}
                   className={`rounded-md px-3 py-2 text-left text-sm text-white transition ${service.color}`}
                 >
                   + {service.label}

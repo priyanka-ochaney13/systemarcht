@@ -51,24 +51,24 @@ function ModuleInstructions({
 }) {
   return (
     <div
-      className="w-full md:flex-none md:w-[var(--instruction-panel-width)] max-h-48 md:max-h-none md:h-full flex-shrink-0 overflow-y-auto border-b md:border-b-0 border-blue-200 bg-blue-50"
+      className="w-full md:flex-none md:w-[var(--instruction-panel-width)] max-h-48 md:max-h-none md:h-full flex-shrink-0 overflow-y-auto border-b border-border bg-info md:border-b-0 md:border-r"
       style={{ '--instruction-panel-width': `${panelWidth}px` }}
     >
       <div className="px-5 py-4">
         <div className="max-w-5xl">
           <div className="flex items-start gap-3">
-            <Info className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" />
+            <Info className="w-5 h-5 text-info-foreground mt-0.5 flex-shrink-0" />
 
             <div className="flex-1">
-              <h2 className="font-semibold text-blue-900">
+              <h2 className="font-semibold text-info-foreground">
                 Module {module.moduleNumber} Build Activity
               </h2>
 
-              <p className="text-sm text-blue-800 mt-1">
+              <p className="text-sm text-info-foreground mt-1">
                 {module.buildActivity?.title}
               </p>
 
-              <p className="text-sm text-blue-700 mt-2">
+              <p className="text-sm text-info-foreground/80 mt-2">
                 Build the required architecture on the canvas, connect the
                 services correctly, configure them if needed, and then click
                 <strong> Validate Architecture</strong>.
@@ -76,7 +76,7 @@ function ModuleInstructions({
 
               {module.buildActivity?.requiredServices?.length > 0 && (
                 <div className="mt-3">
-                  <p className="text-xs font-semibold text-blue-900 mb-2">
+                  <p className="text-xs font-semibold text-info-foreground mb-2">
                     Required Services
                   </p>
 
@@ -84,7 +84,7 @@ function ModuleInstructions({
                     {module.buildActivity.requiredServices.map((service) => (
                       <span
                         key={service}
-                        className="px-3 py-1 rounded-full bg-white border border-blue-200 text-xs text-blue-800 font-medium"
+                        className="px-3 py-1 rounded-full bg-card border border-border text-xs text-card-foreground font-medium"
                       >
                         {getServiceName(service)}
                       </span>
@@ -95,7 +95,7 @@ function ModuleInstructions({
 
               {module.buildActivity?.requiredConnections?.length > 0 && (
                 <div className="mt-3">
-                  <p className="text-xs font-semibold text-blue-900 mb-2">
+                  <p className="text-xs font-semibold text-info-foreground mb-2">
                     Required Connections
                   </p>
 
@@ -104,7 +104,7 @@ function ModuleInstructions({
                       (connection, index) => (
                         <span
                           key={`${connection.source}-${connection.target}-${index}`}
-                          className="px-3 py-1 rounded-full bg-white border border-blue-200 text-xs text-blue-800 font-medium"
+                          className="px-3 py-1 rounded-full bg-card border border-border text-xs text-card-foreground font-medium"
                         >
                           {getServiceName(connection.source)} →{' '}
                           {getServiceName(connection.target)}
@@ -118,7 +118,7 @@ function ModuleInstructions({
               {Object.keys(module.buildActivity?.minServiceCounts || {})
                 .length > 0 && (
                 <div className="mt-3">
-                  <p className="text-xs font-semibold text-blue-900 mb-2">
+                  <p className="text-xs font-semibold text-info-foreground mb-2">
                     Minimum Instances
                   </p>
 
@@ -127,7 +127,7 @@ function ModuleInstructions({
                       ([service, count]) => (
                         <span
                           key={service}
-                          className="px-3 py-1 rounded-full bg-white border border-blue-200 text-xs text-blue-800 font-medium"
+                          className="px-3 py-1 rounded-full bg-card border border-border text-xs text-card-foreground font-medium"
                         >
                           At least {count} × {getServiceName(service)}
                         </span>
@@ -139,18 +139,18 @@ function ModuleInstructions({
 
               {module.buildActivity?.rules?.length > 0 && (
                 <div className="mt-3">
-                  <p className="text-xs font-semibold text-blue-900 mb-2">
+                  <p className="text-xs font-semibold text-info-foreground mb-2">
                     Design Requirements
                   </p>
 
-                  <ul className="space-y-1 text-xs text-blue-800 list-disc pl-4">
+                  <ul className="space-y-1 text-xs text-info-foreground list-disc pl-4">
                     {module.buildActivity.rules.map((rule) => (
                       <li key={rule.id}>{rule.label}</li>
                     ))}
                   </ul>
 
                   {module.buildActivity.monthlyBudgetUSD && (
-                    <p className="text-xs text-blue-700 mt-2">
+                    <p className="text-xs text-info-foreground/80 mt-2">
                       Monthly budget: $
                       {module.buildActivity.monthlyBudgetUSD.toLocaleString(
                         'en-US'
@@ -200,8 +200,8 @@ function ValidationFeedback({ result, module, getServiceName, onDismiss }) {
       aria-live="polite"
       className={`mt-5 rounded-lg border p-3 ${
         isValid
-          ? 'border-green-200 bg-green-50'
-          : 'border-red-200 bg-red-50'
+          ? 'border-success-foreground/30 bg-success'
+          : 'border-destructive/30 bg-destructive/10'
       }`}
     >
       <div className="flex items-start gap-2">
@@ -213,14 +213,14 @@ function ValidationFeedback({ result, module, getServiceName, onDismiss }) {
         <div className="min-w-0 flex-1">
           <h3
             className={`text-sm font-semibold ${
-              isValid ? 'text-green-800' : 'text-red-800'
+              isValid ? 'text-success-foreground' : 'text-destructive'
             }`}
           >
             {isValid ? 'Architecture validated' : 'Architecture incomplete'}
           </h3>
           <p
             className={`mt-1 text-xs ${
-              isValid ? 'text-green-700' : 'text-red-700'
+              isValid ? 'text-success-foreground' : 'text-destructive'
             }`}
           >
             {isValid
@@ -231,16 +231,16 @@ function ValidationFeedback({ result, module, getServiceName, onDismiss }) {
         <button
           type="button"
           onClick={onDismiss}
-          aria-label="Dismiss validation result"
-          className="inline-flex items-center gap-1 rounded px-2 py-1 text-xs font-medium text-gray-600 hover:bg-white/70 hover:text-gray-900"
+          aria-label="Cancel validation result"
+          className="inline-flex items-center gap-1 rounded px-2 py-1 text-xs font-medium text-muted-foreground hover:bg-card hover:text-foreground"
         >
           <X className="h-4 w-4" />
-          <span>Dismiss</span>
+          <span>Cancel</span>
         </button>
       </div>
 
       {!isValid && issues.length > 0 && (
-        <ul className="mt-3 space-y-1 border-t border-red-200 pt-3 text-xs text-red-800">
+        <ul className="mt-3 space-y-1 border-t border-destructive/30 pt-3 text-xs text-destructive">
           {issues.map((issue, index) => (
             <li key={`${issue}-${index}`} className="flex gap-2">
               <span aria-hidden="true">•</span>
@@ -255,7 +255,7 @@ function ValidationFeedback({ result, module, getServiceName, onDismiss }) {
           {module.buildActivity.requiredServices.map((service) => (
             <span
               key={service}
-              className="rounded border border-green-200 bg-white px-2 py-1 text-xs text-green-800"
+              className="rounded border border-success-foreground/30 bg-card px-2 py-1 text-xs text-success-foreground"
             >
               ✓ {getServiceName(service)}
             </span>
@@ -776,485 +776,6 @@ export default function PlaygroundPage() {
       </div>
 
       {/* ======================================================
-          MODULE INSTRUCTIONS
-      ======================================================= */}
-
-      {module && (
-        <div
-          className="
-            border-b
-            border-info/40
-            bg-info
-            px-6
-            py-4
-          "
-        >
-
-          <div className="max-w-5xl">
-
-            <div className="flex items-start gap-3">
-
-              <Info
-                className="
-                  w-5 h-5
-                  text-info-foreground
-                  mt-0.5
-                  flex-shrink-0
-                "
-              />
-
-              <div className="flex-1">
-
-                <h2 className="font-semibold text-info-foreground">
-                  Module {module.moduleNumber} Build Activity
-                </h2>
-
-                <p className="text-sm text-info-foreground mt-1">
-                  {module.buildActivity?.title}
-                </p>
-
-                <p className="text-sm text-info-foreground mt-2">
-                  Build the required architecture on the
-                  canvas, connect the services correctly,
-                  configure them if needed, and then click
-                  <strong> Validate Architecture</strong>.
-                </p>
-
-                {/* REQUIRED SERVICES */}
-
-                {module.buildActivity
-                  ?.requiredServices?.length > 0 && (
-
-                  <div className="mt-3">
-
-                    <p className="text-xs font-semibold text-info-foreground mb-2">
-                      Required Services
-                    </p>
-
-                    <div className="flex flex-wrap gap-2">
-
-                      {module.buildActivity.requiredServices.map(
-                        (service) => (
-                          <span
-                            key={service}
-                            className="
-                              px-3 py-1
-                              rounded-full
-                              bg-card
-                              border
-                              border-info/40
-                              text-xs
-                              text-info-foreground
-                              font-medium
-                            "
-                          >
-                            {getServiceName(service)}
-                          </span>
-                        )
-                      )}
-
-                    </div>
-
-                  </div>
-                )}
-
-                {/* REQUIRED CONNECTIONS */}
-
-                {module.buildActivity
-                  ?.requiredConnections?.length > 0 && (
-
-                  <div className="mt-3">
-
-                    <p className="text-xs font-semibold text-info-foreground mb-2">
-                      Required Connections
-                    </p>
-
-                    <div className="flex flex-wrap gap-2">
-
-                      {module.buildActivity.requiredConnections.map(
-                        (connection, index) => (
-                          <span
-                            key={`${connection.source}-${connection.target}-${index}`}
-                            className="
-                              px-3 py-1
-                              rounded-full
-                              bg-card
-                              border
-                              border-info/40
-                              text-xs
-                              text-info-foreground
-                              font-medium
-                            "
-                          >
-                            {getServiceName(
-                              connection.source
-                            )}{' '}
-                            →
-                            {' '}
-                            {getServiceName(
-                              connection.target
-                            )}
-                          </span>
-                        )
-                      )}
-
-                    </div>
-
-                  </div>
-                )}
-
-                {/* MINIMUM COUNTS */}
-
-                {Object.keys(module.buildActivity?.minServiceCounts || {})
-                  .length > 0 && (
-                  <div className="mt-3">
-                    <p className="text-xs font-semibold text-blue-900 mb-2">
-                      Minimum Instances
-                    </p>
-
-                    <div className="flex flex-wrap gap-2">
-                      {Object.entries(
-                        module.buildActivity.minServiceCounts
-                      ).map(([service, count]) => (
-                        <span
-                          key={service}
-                          className="px-3 py-1 rounded-full bg-white border border-blue-200 text-xs text-blue-800 font-medium"
-                        >
-                          At least {count} × {getServiceName(service)}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {/* DESIGN REQUIREMENTS (rule-based modules) */}
-
-                {module.buildActivity?.rules?.length > 0 && (
-                  <div className="mt-3">
-                    <p className="text-xs font-semibold text-blue-900 mb-2">
-                      Design Requirements
-                    </p>
-
-                    <ul className="space-y-1 text-xs text-blue-800 list-disc pl-4">
-                      {module.buildActivity.rules.map((rule) => (
-                        <li key={rule.id}>{rule.label}</li>
-                      ))}
-                    </ul>
-
-                    {module.buildActivity.monthlyBudgetUSD && (
-                      <p className="text-xs text-blue-700 mt-2">
-                        Monthly budget: $
-                        {module.buildActivity.monthlyBudgetUSD.toLocaleString(
-                          'en-US'
-                        )}
-                      </p>
-                    )}
-                  </div>
-                )}
-
-              </div>
-
-            </div>
-
-          </div>
-
-        </div>
-      )}
-
-      {/* ======================================================
-          VALIDATION RESULT
-      ======================================================= */}
-
-      {validationResult && !module && (
-        <div className="border-b border-border bg-muted/50 px-6 py-4">
-
-          {validationResult.valid ? (
-
-            <div
-              className="
-                rounded-lg
-                border
-                border-success-foreground/20
-                bg-success
-                p-4
-              "
-            >
-
-              <div className="flex items-start gap-3">
-
-                <CheckCircle
-                  className="
-                    w-6 h-6
-                    text-success-foreground
-                    flex-shrink-0
-                  "
-                />
-
-                <div>
-
-                  <h2 className="font-semibold text-success-foreground">
-                    Architecture Valid
-                  </h2>
-
-                  <p className="text-sm text-success-foreground mt-1">
-                    Your architecture satisfies all required
-                    services and connections for this learning
-                    module.
-                  </p>
-
-                  <div className="mt-3 flex flex-wrap gap-2">
-
-                    {module?.buildActivity?.requiredServices?.map(
-                      (service) => (
-                        <span
-                          key={service}
-                          className="
-                            px-2 py-1
-                            rounded
-                            bg-success
-                            border
-                            border-success-foreground/20
-                            text-xs
-                            text-success-foreground
-                          "
-                        >
-                          ✓ {getServiceName(service)}
-                        </span>
-                      )
-                    )}
-
-                  </div>
-
-                </div>
-
-              </div>
-
-            </div>
-
-          ) : (
-
-            <div
-              className="
-                rounded-lg
-                border
-                border-destructive/30
-                bg-destructive/10
-                p-4
-              "
-            >
-
-              <div className="flex items-start gap-3">
-
-                <AlertCircle
-                  className="
-                    w-6 h-6
-                    text-destructive
-                    flex-shrink-0
-                  "
-                />
-
-                <div className="flex-1">
-
-                  <h2 className="font-semibold text-destructive">
-                    Architecture Incomplete
-                  </h2>
-
-                  <p className="text-sm text-destructive mt-1">
-                    Your architecture is missing required
-                    components or connections.
-                  </p>
-
-                  {/* MISSING SERVICES */}
-
-                  {validationResult.missingServices.length > 0 && (
-                    <div className="mt-3">
-
-                      <p className="text-sm font-semibold text-destructive">
-                        Missing Services
-                      </p>
-
-                      <div className="flex flex-wrap gap-2 mt-2">
-
-                        {validationResult.missingServices.map(
-                          (service) => (
-                            <span
-                              key={service}
-                              className="
-                                px-2 py-1
-                                rounded
-                                bg-red-100
-                                text-destructive
-                                border
-                                border-destructive/30
-                                text-xs
-                              "
-                            >
-                              ✕ {getServiceName(service)}
-                            </span>
-                          )
-                        )}
-
-                      </div>
-
-                    </div>
-                  )}
-
-                  {/* MISSING CONNECTIONS */}
-
-                  {validationResult.missingConnections.length > 0 && (
-                    <div className="mt-3">
-
-                      <p className="text-sm font-semibold text-destructive">
-                        Missing Connections
-                      </p>
-
-                      <div className="flex flex-wrap gap-2 mt-2">
-
-                        {validationResult.missingConnections.map(
-                          (connection, index) => (
-                            <span
-                              key={`${connection.source}-${connection.target}-${index}`}
-                              className="
-                                px-2 py-1
-                                rounded
-                                bg-red-100
-                                text-destructive
-                                border
-                                border-destructive/30
-                                text-xs
-                              "
-                            >
-                              ✕ {getServiceName(
-                                connection.source
-                              )}{' '}
-                              →
-                              {' '}
-                              {getServiceName(
-                                connection.target
-                              )}
-                            </span>
-                          )
-                        )}
-
-                      </div>
-
-                    </div>
-                  )}
-
-                  {/* EXTRA SERVICES */}
-
-                  {validationResult.extraServices.length > 0 && (
-                    <div className="mt-3">
-
-                      <div className="flex items-start gap-2">
-
-                        <Info
-                          className="
-                            w-4 h-4
-                            text-blue-500
-                            mt-0.5
-                          "
-                        />
-
-                        <div>
-
-                          <p className="text-sm font-semibold text-info-foreground">
-                            Additional Services
-                          </p>
-
-                          <p className="text-xs text-info-foreground mt-1">
-                            These services are not required
-                            for this module but are allowed
-                            for experimentation.
-                          </p>
-
-                          <div className="flex flex-wrap gap-2 mt-2">
-
-                            {validationResult.extraServices.map(
-                              (service, index) => (
-                                <span
-                                  key={`${service}-${index}`}
-                                  className="
-                                    px-2 py-1
-                                    rounded
-                                    bg-blue-100
-                                    text-info-foreground
-                                    border
-                                    border-info/40
-                                    text-xs
-                                  "
-                                >
-                                  + {getServiceName(service)}
-                                </span>
-                              )
-                            )}
-
-                          </div>
-
-                        </div>
-
-                      </div>
-
-                    </div>
-                  )}
-
-                </div>
-
-              </div>
-
-            </div>
-
-          )}
-
-          {validationResult.missingCounts?.length > 0 && (
-            <div className="mt-3 rounded-lg border border-red-200 bg-red-50 p-4">
-              <p className="text-sm font-semibold text-red-800">
-                Not Enough Instances
-              </p>
-
-              <div className="flex flex-wrap gap-2 mt-2">
-                {validationResult.missingCounts.map((item) => (
-                  <span
-                    key={item.service}
-                    className="px-2 py-1 rounded bg-red-100 text-red-800 border border-red-200 text-xs"
-                  >
-                    ✕ {getServiceName(item.service)}: need {item.required},
-                    found {item.found}
-                  </span>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {validationResult.ruleResults?.length > 0 && (
-            <div className="mt-3 rounded-lg border border-gray-200 bg-white p-4">
-              <p className="text-sm font-semibold text-gray-800">
-                Design Requirements
-              </p>
-
-              <div className="mt-3 space-y-1.5">
-                {validationResult.ruleResults.map((rule) => (
-                  <div
-                    key={rule.id}
-                    className={`flex items-start gap-2 text-xs ${
-                      rule.passed ? 'text-green-700' : 'text-red-700'
-                    }`}
-                  >
-                    <span>{rule.passed ? '✓' : '✕'}</span>
-                    <span>
-                      {rule.label}
-                      {rule.detail ? ` (${rule.detail})` : ''}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-        </div>
-      )}
-
-      {/* ======================================================
           MAIN CONTENT
       ======================================================= */}
 
@@ -1299,8 +820,8 @@ export default function PlaygroundPage() {
             }}
             className={`hidden md:block w-1 flex-shrink-0 cursor-col-resize touch-none transition-colors ${
               isResizingInstructions
-                ? 'bg-blue-500'
-                : 'bg-gray-200 hover:bg-blue-400'
+                ? 'bg-primary'
+                : 'bg-border hover:bg-primary/70'
             }`}
             title="Drag to resize instructions"
           />

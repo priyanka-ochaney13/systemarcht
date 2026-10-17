@@ -88,7 +88,7 @@ export const useServiceConfigStore = create((set) => ({
     put_requests: 10000,
     get_requests: 100000,
     delete_requests: 1000,
-    outbound_transfer_gb: 50,
+    outbound_transfer_gb: 0,
   },
 
   ec2Config: {

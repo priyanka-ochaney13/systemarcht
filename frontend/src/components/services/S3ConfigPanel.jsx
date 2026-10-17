@@ -34,7 +34,7 @@ export const S3ConfigPanel = ({ onClose }) => {
     put_requests: Number.isFinite(config.put_requests) ? config.put_requests : 10000,
     get_requests: Number.isFinite(config.get_requests) ? config.get_requests : 100000,
     delete_requests: Number.isFinite(config.delete_requests) ? config.delete_requests : 1000,
-    outbound_transfer_gb: Number.isFinite(config.outbound_transfer_gb) ? config.outbound_transfer_gb : 50,
+    outbound_transfer_gb: Number.isFinite(config.outbound_transfer_gb) ? config.outbound_transfer_gb : 0,
   };
   
   const [localConfig, setLocalConfig] = useState(safeConfig);
@@ -192,7 +192,7 @@ export const S3ConfigPanel = ({ onClose }) => {
         {/* Data Transfer */}
         <div>
           <label className="block text-sm font-medium text-foreground/80 mb-2">
-            Outbound Data Transfer (GB)
+            Direct S3-to-Internet Transfer (GB/month)
           </label>
           <input
             type="number"
@@ -200,7 +200,9 @@ export const S3ConfigPanel = ({ onClose }) => {
             onChange={(e) => handleChange('outbound_transfer_gb', e.target.value === '' ? '' : parseFloat(e.target.value))}
             className="w-full px-3 py-2 border border-input bg-background text-foreground rounded-md focus:ring-2 focus:ring-ring/40"
           />
-          <p className="text-xs text-muted-foreground mt-1">⚠️ First 1 GB/month FREE</p>
+          <p className="text-xs text-muted-foreground mt-1">
+            Only traffic sent directly from S3 to the public internet; CloudFront origin transfers are free.
+          </p>
         </div>
 
         {/* Cost Breakdown */}

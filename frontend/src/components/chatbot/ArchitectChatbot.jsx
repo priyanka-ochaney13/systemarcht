@@ -331,21 +331,6 @@ export function ArchitectChatbot({ onClose, embedded = false }) {
             <div ref={messagesEndRef} />
           </div>
 
-          {/* Quick Actions */}
-          <div className="px-3 py-2 flex gap-1.5 flex-wrap border-t border-border flex-shrink-0">
-            {QUICK_ACTIONS.map((qa) => (
-              <button
-                key={qa.label}
-                onClick={qa.action}
-                disabled={isLoading}
-                className="flex items-center gap-1.5 text-xs px-2.5 py-1.5 rounded-full bg-muted hover:bg-muted text-foreground/80 hover:text-foreground border border-border hover:border-primary/40 transition disabled:opacity-40"
-              >
-                <span className="text-primary">{qa.icon}</span>
-                {qa.label}
-              </button>
-            ))}
-          </div>
-
           {/* Input */}
           <div className="px-3 pb-3 flex-shrink-0">
             <div className="flex items-end gap-2 bg-muted rounded-xl border border-border focus-within:border-amber-500/50 transition px-3 py-2">
