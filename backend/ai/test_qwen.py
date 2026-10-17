@@ -4,8 +4,12 @@ import json
 import os
 import unittest
 
+from pydantic import ValidationError
+
 from ai.qwen import _extract_json_payload, generate_architecture
+from ai.prompts import ARCHITECTURE_GENERATION_SYSTEM_PROMPT, build_generation_prompt
 from ai.retrieval import retrieve_relevant_documents
+from ai.schemas import ArchitectureGenerationResponse, architecture_json_schema
 from ai.tools import extract_constraints, infer_scale_hints
 
 
@@ -32,6 +36,14 @@ class ToolHintTests(unittest.TestCase):
         self.assertIn("traffic_profile=bursty", hints)
         self.assertIn("scale=high", hints)
 
+    def test_generation_prompt_contains_required_structured_sections(self) -> None:
+        prompt = build_generation_prompt("Build a photo-sharing app.", "Use S3 for image storage.")
+        self.assertIn("USER REQUIREMENT", prompt)
+        self.assertIn("RETRIEVED KNOWLEDGE", prompt)
+        self.assertIn("ARCHITECTURE JSON SCHEMA", prompt)
+        self.assertIn('"$defs"', prompt)
+        self.assertIn("Every service must have a unique ID", ARCHITECTURE_GENERATION_SYSTEM_PROMPT)
+
 
 class ParsingTests(unittest.TestCase):
     def test_extract_json_payload_from_wrapped_response(self) -> None:
@@ -39,6 +51,49 @@ class ParsingTests(unittest.TestCase):
         wrapped = f"Here is the answer:\n{json.dumps(payload)}\nThanks"
         parsed = _extract_json_payload(wrapped)
         self.assertEqual(parsed["confidence"], 0.9)
+
+    def test_structured_response_rejects_dangling_connections(self) -> None:
+        payload = {
+            "architecture": {
+                "name": "Image Processing",
+                "description": "Serverless",
+                "services": [{"id": "images", "type": "s3", "name": "Images"}],
+                "connections": [{"source": "images", "target": "processor", "type": "trigger"}],
+            },
+        }
+        with self.assertRaises(ValidationError):
+            ArchitectureGenerationResponse.model_validate(payload)
+
+    def test_structured_response_rejects_duplicate_service_ids(self) -> None:
+        payload = {
+            "architecture": {
+                "name": "Duplicate Services",
+                "description": "Invalid architecture",
+                "services": [
+                    {"id": "service-1", "type": "s3", "name": "Images"},
+                    {"id": "service-1", "type": "lambda", "name": "Processor"},
+                ],
+            },
+        }
+        with self.assertRaises(ValidationError):
+            ArchitectureGenerationResponse.model_validate(payload)
+
+    def test_architecture_json_schema_comes_from_pydantic_models(self) -> None:
+        schema = architecture_json_schema()
+        self.assertEqual(schema["title"], "Architecture")
+        self.assertIn("$defs", schema)
+        self.assertEqual(
+            set(schema["required"]),
+            {"name", "description", "services"},
+        )
+        self.assertEqual(
+            set(schema["$defs"]["Service"]["required"]),
+            {"id", "type", "name"},
+        )
+        self.assertEqual(
+            set(schema["$defs"]["Connection"]["required"]),
+            {"source", "target", "type"},
+        )
 
 
 @unittest.skipUnless(os.getenv("RUN_QWEN_INTEGRATION") == "1", "Set RUN_QWEN_INTEGRATION=1")

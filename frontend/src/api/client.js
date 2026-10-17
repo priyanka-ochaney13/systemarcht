@@ -95,3 +95,15 @@ export const simulateArchitecture = async (architecture) => {
     throw error;
   }
 };
+
+// Module 1 AI assistant API (kept separate from the Playground chatbot).
+export const chatWithArchitectureAssistant = async (message) => {
+  const response = await apiClient.post('/ai/chat', { message });
+  return response.data;
+};
+
+// Module 5 Mermaid diagram API. The backend validates the architecture first.
+export const generateArchitectureDiagram = async (architecture) => {
+  const response = await apiClient.post('/ai/architecture/diagram', { architecture });
+  return response.data;
+};

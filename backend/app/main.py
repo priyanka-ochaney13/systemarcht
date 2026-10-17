@@ -10,6 +10,7 @@ from app.routers.cognito import router as cognito_router
 from app.routers.dynamodb import router as dynamodb_router
 from app.routers.elastic_beanstalk import router as elastic_beanstalk_router
 from app.routers.elb import router as elb_router
+from app.routers.ai_chat import router as ai_chat_router
 import logging
 
 logging.basicConfig(level=logging.INFO)
@@ -37,6 +38,7 @@ app.include_router(cognito_router)
 app.include_router(dynamodb_router)
 app.include_router(elastic_beanstalk_router)
 app.include_router(elb_router)
+app.include_router(ai_chat_router)
 
 @app.get("/")
 def root():

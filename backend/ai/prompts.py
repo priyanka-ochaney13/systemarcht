@@ -1,50 +1,42 @@
-"""Prompt construction for Module 1 architecture generation."""
+"""Prompt construction for structured architecture generation."""
 
 from __future__ import annotations
 
 import json
-from ai.tools import extract_constraints, infer_scale_hints
+from ai.schemas import architecture_json_schema_text
 
 
 SYSTEM_PROMPT = """You are SystemArcht AI assistant for AWS architecture design.
 Generate only valid JSON. Do not include markdown code fences.
 Use only these service types: api_gateway, lambda, ec2, rds, dynamodb, s3.
 Keep output compact, factual, and implementation-oriented.
+Return exactly the requested top-level keys: architecture, services, and connections.
+"""
+
+ARCHITECTURE_GENERATION_SYSTEM_PROMPT = """You are the SystemArcht architecture generation assistant.
+
+Convert the user's cloud architecture requirement into a structured architecture representation.
+
+Rules:
+1. Return ONLY valid JSON.
+2. Do not return Markdown.
+3. Do not wrap the JSON in ```json fences.
+4. Follow the supplied Architecture JSON Schema exactly.
+5. Use only AWS services currently supported by SystemArcht.
+6. Do not invent unsupported AWS services.
+7. Every service must have a unique ID.
+8. Every connection source and target must reference an existing service ID.
+9. Put service-specific settings inside configuration.
+10. Use the retrieved SystemArcht knowledge as architectural context.
+11. If the requested architecture cannot be represented using supported services, do not invent services to satisfy the request.
+12. Keep the generated architecture technically consistent with the retrieved knowledge.
 """
 
 
 def build_generation_prompt(user_prompt: str, retrieved_context: str) -> str:
-    constraints = extract_constraints(user_prompt)
-    scale_hints = infer_scale_hints(user_prompt)
-    schema = {
-        "architecture": {
-            "name": "string",
-            "description": "string",
-            "services": [
-                {
-                    "id": "string",
-                    "type": "api_gateway|lambda|ec2|rds|dynamodb|s3",
-                    "name": "string",
-                    "configuration": {"key": "value"},
-                }
-            ],
-            "connections": [{"source": "service-id", "target": "service-id"}],
-        },
-        "reasoning": {"pattern": "string", "key_decisions": ["string"]},
-        "assumptions": ["string"],
-        "confidence": "number in range [0,1]",
-    }
-
+    schema = architecture_json_schema_text()
     return (
-        f"User request:\n{user_prompt}\n\n"
-        f"Retrieved knowledge:\n{retrieved_context}\n\n"
-        f"Tool hints:\n"
-        f"- constraints={json.dumps(constraints)}\n"
-        f"- scale_hints={json.dumps(scale_hints)}\n\n"
-        "Task:\n"
-        "1) Propose a practical AWS architecture.\n"
-        "2) Respect the service type whitelist.\n"
-        "3) Create valid service IDs and valid connection references.\n"
-        "4) Return strict JSON matching this schema:\n"
-        f"{json.dumps(schema, indent=2)}\n"
+        f"USER REQUIREMENT\n{user_prompt}\n\n"
+        f"RETRIEVED KNOWLEDGE\n{retrieved_context}\n\n"
+        f"ARCHITECTURE JSON SCHEMA\n{schema}\n"
     )

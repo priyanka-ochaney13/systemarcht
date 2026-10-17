@@ -10,11 +10,12 @@ import { DynamoDBConfigPanel } from '@/components/services/DynamoDBConfigPanel';
 import { ELBConfigPanel } from '@/components/services/ELBConfigPanel';
 import { ElasticBeanstalkConfigPanel } from '@/components/services/ElasticBeanstalkConfigPanel';
 import { ArchitectChatbot } from '@/components/chatbot';
+import { MermaidArchitectureDiagram } from '@/components/playground/MermaidArchitectureDiagram';
 import { usePricingStore } from '@/store';
 import Link from 'next/link';
 import { ChevronLeft, MessageSquare, X } from 'lucide-react';
 
-export default function PlaygroundPage() {
+export default function PlaygroundPage({ architectureDiagram }) {
   const [selectedNodeId, setSelectedNodeId] = useState(null);
   const [openConfigPanel, setOpenConfigPanel] = useState(null);
   const [showChatbot, setShowChatbot] = useState(false);
@@ -103,6 +104,12 @@ export default function PlaygroundPage() {
         {/* Canvas */}
         <div className="flex-1 flex flex-col min-w-0">
           <PlaygroundCanvas onNodeSelect={handleNodeSelect} />
+          {architectureDiagram && (
+            <MermaidArchitectureDiagram
+              mermaidSource={architectureDiagram.mermaid}
+              valid={architectureDiagram.valid === true}
+            />
+          )}
         </div>
 
         {/* Config Panel — hidden when chatbot is open */}
