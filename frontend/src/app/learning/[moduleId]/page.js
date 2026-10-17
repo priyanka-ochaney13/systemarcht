@@ -199,7 +199,7 @@ export default function LearningModulePage() {
                 width: `${
                   completedSections.length === 0
                     ? 0
-                    : (completedSections.length / 4) * 100
+                    : (completedSections.length / 3) * 100
                 }%`,
               }}
             />
@@ -451,41 +451,61 @@ export default function LearningModulePage() {
             "
           >
 
-            {/* Architecture flow */}
+            {/* Single chain (Modules 1 and 2) */}
 
-            <div className="flex flex-wrap items-center gap-3 mb-8">
-
-              {module.exploreActivity.architecture.map(
-                (service, index) => (
-
-                  <React.Fragment key={`${service}-${index}`}>
-
-                    <div
-                      className="
-                        px-4
-                        py-3
-                        rounded-xl
-                        border border-gray-200
-                        bg-gray-50
-                        text-sm
-                        font-medium
-                        text-gray-800
-                      "
-                    >
-                      {service}
-                    </div>
-
-                    {index <
-                      module.exploreActivity.architecture.length - 1 && (
-                      <ArrowRight className="w-4 h-4 text-amber-500" />
-                    )}
-
-                  </React.Fragment>
-
-                )
+            {!module.exploreActivity.comparisons &&
+              module.exploreActivity.architecture && (
+                <div className="mb-8">
+                  <ArchitectureFlow
+                    paths={[module.exploreActivity.architecture]}
+                  />
+                </div>
               )}
 
-            </div>
+            {/* Comparisons (Modules 3 and later) */}
+
+            {module.exploreActivity.comparisons && (
+              <div className="space-y-6 mb-8">
+                {module.exploreActivity.comparisons.map((item) => (
+                  <div
+                    key={item.title}
+                    className="rounded-xl border border-gray-200 bg-gray-50 p-5"
+                  >
+                    <p className="text-sm font-semibold text-gray-800 mb-4">
+                      {item.title}
+                    </p>
+
+                    <ArchitectureFlow paths={item.paths} />
+
+                    {item.note && (
+                      <p className="mt-4 text-sm text-gray-600 leading-relaxed">
+                        {item.note}
+                      </p>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Trade-offs */}
+
+            {module.exploreActivity.tradeoffs && (
+              <div className="grid gap-3 mb-8">
+                {module.exploreActivity.tradeoffs.map((point) => (
+                  <div
+                    key={point.term}
+                    className="rounded-lg bg-gray-50 border border-gray-200 p-4"
+                  >
+                    <p className="text-sm font-semibold text-gray-800 mb-1">
+                      {point.term}
+                    </p>
+                    <p className="text-sm text-gray-600">
+                      {point.description}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            )}
 
             {/* Service information */}
 
@@ -667,91 +687,95 @@ export default function LearningModulePage() {
 
             </div>
 
-            <div className="mb-6">
+            {module.buildActivity.requiredServices.length > 0 && (
+              <div className="mb-6">
+                <p className="text-xs uppercase tracking-wide text-gray-500 mb-3">
+                  Required Services
+                </p>
 
-              <p className="text-xs uppercase tracking-wide text-gray-500 mb-3">
-                Required Services
-              </p>
-
-              <div className="flex flex-wrap gap-2">
-
-                {module.buildActivity.requiredServices.map(
-                  (service) => (
-
+                <div className="flex flex-wrap gap-2">
+                  {module.buildActivity.requiredServices.map((service) => (
                     <span
                       key={service}
-                      className="
-                        px-3
-                        py-1.5
-                        rounded-full
-                        bg-white
-                        border border-gray-200
-                        text-xs
-                        text-gray-700
-                      "
+                      className="px-3 py-1.5 rounded-full bg-white border border-gray-200 text-xs text-gray-700"
                     >
                       {service}
                     </span>
-
-                  )
-                )}
-
+                  ))}
+                </div>
               </div>
+            )}
 
-            </div>
+            {module.buildActivity.minServiceCounts && (
+              <div className="mb-6">
+                <p className="text-xs uppercase tracking-wide text-gray-500 mb-3">
+                  Minimum Instances
+                </p>
 
-            <div className="mb-6">
-
-              <p className="text-xs uppercase tracking-wide text-gray-500 mb-3">
-                Required Connections
-              </p>
-
-              <div className="space-y-2">
-
-                {module.buildActivity.requiredConnections.map(
-                  (connection, index) => (
-
-                    <div
-                      key={index}
-                      className="flex items-center gap-3 text-sm"
-                    >
-
+                <div className="flex flex-wrap gap-2">
+                  {Object.entries(module.buildActivity.minServiceCounts).map(
+                    ([service, count]) => (
                       <span
-                        className="
-                          px-3
-                          py-1.5
-                          rounded-lg
-                          bg-white
-                          border border-gray-200
-                          text-gray-700
-                        "
+                        key={service}
+                        className="px-3 py-1.5 rounded-full bg-white border border-gray-200 text-xs text-gray-700"
                       >
-                        {connection.source}
+                        At least {count} × {service}
                       </span>
-
-                      <ArrowRight className="w-4 h-4 text-amber-500" />
-
-                      <span
-                        className="
-                          px-3
-                          py-1.5
-                          rounded-lg
-                          bg-white
-                          border border-gray-200
-                          text-gray-700
-                        "
-                      >
-                        {connection.target}
-                      </span>
-
-                    </div>
-
-                  )
-                )}
-
+                    )
+                  )}
+                </div>
               </div>
+            )}
 
-            </div>
+            {module.buildActivity.requiredConnections.length > 0 && (
+              <div className="mb-6">
+                <p className="text-xs uppercase tracking-wide text-gray-500 mb-3">
+                  Required Connections
+                </p>
+
+                <div className="space-y-2">
+                  {module.buildActivity.requiredConnections.map(
+                    (connection, index) => (
+                      <div
+                        key={index}
+                        className="flex items-center gap-3 text-sm"
+                      >
+                        <span className="px-3 py-1.5 rounded-lg bg-white border border-gray-200 text-gray-700">
+                          {connection.source}
+                        </span>
+
+                        <ArrowRight className="w-4 h-4 text-amber-500" />
+
+                        <span className="px-3 py-1.5 rounded-lg bg-white border border-gray-200 text-gray-700">
+                          {connection.target}
+                        </span>
+                      </div>
+                    )
+                  )}
+                </div>
+              </div>
+            )}
+
+            {module.buildActivity.rules && (
+              <div className="mb-6">
+                <p className="text-xs uppercase tracking-wide text-gray-500 mb-3">
+                  Design Requirements
+                </p>
+
+                <ul className="space-y-2 text-sm text-gray-700 list-disc pl-5">
+                  {module.buildActivity.rules.map((rule) => (
+                    <li key={rule.id}>{rule.label}</li>
+                  ))}
+                </ul>
+
+                {module.buildActivity.monthlyBudgetUSD && (
+                  <p className="mt-3 text-sm text-gray-600">
+                    Monthly budget: $
+                    {module.buildActivity.monthlyBudgetUSD.toLocaleString('en-US')}
+                  </p>
+                )}
+              </div>
+            )}
 
             {/* IMPORTANT: module context passed to Playground */}
 
@@ -904,6 +928,33 @@ export default function LearningModulePage() {
               </div>
             )}
 
+            {module.costChallenge.steps && (
+              <ol className="space-y-3">
+                {module.costChallenge.steps.map((step, index) => (
+                  <li
+                    key={index}
+                    className="flex items-start gap-3 text-sm text-gray-600 leading-relaxed"
+                  >
+                    <span className="mt-0.5 w-5 h-5 rounded-full bg-amber-50 border border-amber-200 flex items-center justify-center text-[10px] text-amber-600 flex-shrink-0">
+                      {index + 1}
+                    </span>
+                    <span>{step}</span>
+                  </li>
+                ))}
+              </ol>
+            )}
+
+            {module.costChallenge.question && (
+              <div className="mt-5 rounded-xl border border-gray-200 bg-gray-50 p-4">
+                <p className="text-xs uppercase tracking-wide text-gray-500 mb-1">
+                  Think about it
+                </p>
+                <p className="text-sm text-gray-800">
+                  {module.costChallenge.question}
+                </p>
+              </div>
+            )}
+
             <div
               className="
                 mt-6
@@ -1006,6 +1057,15 @@ export default function LearningModulePage() {
                 </p>
 
               </div>
+
+              {module.aiActivity.studentTask && (
+                <p className="mb-5 text-sm text-gray-600 leading-relaxed">
+                  <span className="font-semibold text-amber-700">
+                    Your task:
+                  </span>{' '}
+                  {module.aiActivity.studentTask}
+                </p>
+              )}
 
               <Link
                 href="/chatbot"
@@ -1369,6 +1429,31 @@ function Quiz({ questions }) {
 
       )}
 
+    </div>
+  );
+}
+
+function ArchitectureFlow({ paths }) {
+  return (
+    <div className="space-y-3">
+      {paths.map((path, pathIndex) => (
+        <div
+          key={pathIndex}
+          className="flex flex-wrap items-center gap-3"
+        >
+          {path.map((service, index) => (
+            <React.Fragment key={`${service}-${index}`}>
+              <div className="px-4 py-3 rounded-xl border border-gray-200 bg-white text-sm font-medium text-gray-800">
+                {service}
+              </div>
+
+              {index < path.length - 1 && (
+                <ArrowRight className="w-4 h-4 text-amber-500" />
+              )}
+            </React.Fragment>
+          ))}
+        </div>
+      ))}
     </div>
   );
 }

@@ -7,6 +7,36 @@
  * Builds a ServiceNode config object based on the service type and
  * the shared config from useServiceConfigStore.
  */
+export const SUPPORTED_SERVICE_TYPES = [
+  'lambda',
+  'api_gateway',
+  's3',
+  'ec2',
+  'rds',
+  'dynamodb',
+  'elb',
+  'cognito',
+  'elastic_beanstalk',
+  'cloudwatch',
+  'cloudfront',
+  'elasticache',
+  'sqs',
+];
+
+// Services whose store config already matches the backend request fields
+const GENERIC_CONFIG_KEYS = {
+  ec2: 'ec2Config',
+  rds: 'rdsConfig',
+  dynamodb: 'dynamoDBConfig',
+  elb: 'elbConfig',
+  cognito: 'cognitoConfig',
+  elastic_beanstalk: 'elasticBeanstalkConfig',
+  cloudwatch: 'cloudWatchConfig',
+  cloudfront: 'cloudFrontConfig',
+  elasticache: 'elastiCacheConfig',
+  sqs: 'sqsConfig',
+};
+
 const buildNodeConfig = (serviceType, serviceConfigs) => {
   switch (serviceType) {
     case 'lambda': {
@@ -42,8 +72,10 @@ const buildNodeConfig = (serviceType, serviceConfigs) => {
         outbound_transfer_gb: c.outbound_transfer_gb || 50,
       };
     }
-    default:
-      return {};
+    default: {
+      const configKey = GENERIC_CONFIG_KEYS[serviceType];
+      return configKey ? { ...(serviceConfigs[configKey] || {}) } : {};
+    }
   }
 };
 
@@ -54,7 +86,7 @@ export const buildArchitecturePayload = (architectureStore, serviceConfigs) => {
   const { nodes, connections } = architectureStore;
 
   // Filter to only supported backend service types
-  const supportedTypes = new Set(['lambda', 'api_gateway']);
+  const supportedTypes = new Set(SUPPORTED_SERVICE_TYPES);
   const validNodes = nodes.filter((n) => supportedTypes.has(n.serviceType));
 
   const apiNodes = validNodes.map((node) => ({
@@ -87,7 +119,7 @@ export const buildArchitecturePayload = (architectureStore, serviceConfigs) => {
  * Checks if the current architecture has enough to calculate
  */
 export const isArchitectureAnalyzable = (nodes) => {
-  const supported = ['lambda', 'api_gateway'];
+  const supported = SUPPORTED_SERVICE_TYPES;
   return nodes.some((n) => supported.includes(n.serviceType));
 };
 

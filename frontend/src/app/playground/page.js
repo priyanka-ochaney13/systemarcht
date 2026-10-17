@@ -18,7 +18,10 @@ import { learningModules } from '@/lib/learningModules';
 import {
   useArchitectureStore,
   usePricingStore,
+  useLearningStore,
 } from '@/store';
+
+import { evaluateRules } from '@/lib/architectureRules';
 
 import { PlaygroundCanvas } from '@/components/playground/PlaygroundCanvas';
 
@@ -86,6 +89,27 @@ export default function PlaygroundPage() {
   const totalCost = usePricingStore(
     (state) => state.totalCost
   );
+
+  // ============================================================
+  // LEARNING PROGRESS
+  // ============================================================
+
+  const startModule = useLearningStore((state) => state.startModule);
+  const updateModuleProgress = useLearningStore(
+    (state) => state.updateModuleProgress
+  );
+
+  useEffect(() => {
+    if (module?.id) {
+      startModule(module.id);
+    }
+  }, [module?.id, startModule]);
+
+  useEffect(() => {
+    if (module?.id && totalCost > 0) {
+      updateModuleProgress(module.id, { costCalculated: true });
+    }
+  }, [module?.id, totalCost, updateModuleProgress]);
 
   // ============================================================
   // MODULE CONTEXT DEBUG
@@ -231,8 +255,8 @@ export default function PlaygroundPage() {
       case 'sqs':
         setOpenConfigPanel('sqs');
         break;
-      
-        case 'ec2':
+
+      case 'ec2':
         setOpenConfigPanel('ec2');
         break;
 
@@ -394,18 +418,75 @@ export default function PlaygroundPage() {
       );
 
     // ----------------------------------------------------------
-    // Final validation
+    // Minimum counts (for example at least 2 EC2 nodes)
     // ----------------------------------------------------------
+
+    const missingCounts = Object.entries(
+      module.buildActivity.minServiceCounts || {}
+    )
+      .map(([service, required]) => ({
+        service,
+        required,
+        found: studentServices.filter((item) => item === service).length,
+      }))
+      .filter((item) => item.found < item.required);
+
+    // ----------------------------------------------------------
+    // Rule-based checks (used by the capstone)
+    // ----------------------------------------------------------
+
+    const connectionPairs = architectureConnections
+      .map((connection) => {
+        const sourceNode = architectureNodes.find(
+          (node) => node.id === connection.source
+        );
+        const targetNode = architectureNodes.find(
+          (node) => node.id === connection.target
+        );
+
+        return {
+          source: sourceNode?.serviceType || sourceNode?.data?.serviceType,
+          target: targetNode?.serviceType || targetNode?.data?.serviceType,
+        };
+      })
+      .filter((pair) => pair.source && pair.target);
+
+    const ruleResults = evaluateRules(module.buildActivity.rules || [], {
+      serviceTypes: studentServices,
+      connectionPairs,
+      totalCost,
+      budget: module.buildActivity.monthlyBudgetUSD,
+    });
+
+    const failedRules = ruleResults.filter((rule) => !rule.passed);
+
+    // ----------------------------------------------------------
+    // Extras: skip optional services, and skip entirely for
+    // rule-based modules where nothing is strictly required
+    // ----------------------------------------------------------
+
+    const optionalServices = module.buildActivity.optionalServices || [];
+
+    const visibleExtraServices =
+      requiredServices.length === 0
+        ? []
+        : [...new Set(extraServices)].filter(
+            (service) => !optionalServices.includes(service)
+          );
 
     const valid =
       missingServices.length === 0 &&
-      missingConnections.length === 0;
+      missingConnections.length === 0 &&
+      missingCounts.length === 0 &&
+      failedRules.length === 0;
 
     const result = {
       valid,
       missingServices,
       missingConnections,
-      extraServices,
+      missingCounts,
+      ruleResults,
+      extraServices: visibleExtraServices,
     };
 
     console.log(
@@ -414,6 +495,8 @@ export default function PlaygroundPage() {
     );
 
     setValidationResult(result);
+
+    updateModuleProgress(module.id, { architectureValidated: valid });
 
     return result;
   };
@@ -741,6 +824,55 @@ export default function PlaygroundPage() {
                   </div>
                 )}
 
+                {/* MINIMUM COUNTS */}
+
+                {Object.keys(module.buildActivity?.minServiceCounts || {})
+                  .length > 0 && (
+                  <div className="mt-3">
+                    <p className="text-xs font-semibold text-blue-900 mb-2">
+                      Minimum Instances
+                    </p>
+
+                    <div className="flex flex-wrap gap-2">
+                      {Object.entries(
+                        module.buildActivity.minServiceCounts
+                      ).map(([service, count]) => (
+                        <span
+                          key={service}
+                          className="px-3 py-1 rounded-full bg-white border border-blue-200 text-xs text-blue-800 font-medium"
+                        >
+                          At least {count} × {getServiceName(service)}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* DESIGN REQUIREMENTS (rule-based modules) */}
+
+                {module.buildActivity?.rules?.length > 0 && (
+                  <div className="mt-3">
+                    <p className="text-xs font-semibold text-blue-900 mb-2">
+                      Design Requirements
+                    </p>
+
+                    <ul className="space-y-1 text-xs text-blue-800 list-disc pl-4">
+                      {module.buildActivity.rules.map((rule) => (
+                        <li key={rule.id}>{rule.label}</li>
+                      ))}
+                    </ul>
+
+                    {module.buildActivity.monthlyBudgetUSD && (
+                      <p className="text-xs text-blue-700 mt-2">
+                        Monthly budget: $
+                        {module.buildActivity.monthlyBudgetUSD.toLocaleString(
+                          'en-US'
+                        )}
+                      </p>
+                    )}
+                  </div>
+                )}
+
               </div>
 
             </div>
@@ -995,6 +1127,51 @@ export default function PlaygroundPage() {
 
           )}
 
+          {validationResult.missingCounts?.length > 0 && (
+            <div className="mt-3 rounded-lg border border-red-200 bg-red-50 p-4">
+              <p className="text-sm font-semibold text-red-800">
+                Not Enough Instances
+              </p>
+
+              <div className="flex flex-wrap gap-2 mt-2">
+                {validationResult.missingCounts.map((item) => (
+                  <span
+                    key={item.service}
+                    className="px-2 py-1 rounded bg-red-100 text-red-800 border border-red-200 text-xs"
+                  >
+                    ✕ {getServiceName(item.service)}: need {item.required},
+                    found {item.found}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {validationResult.ruleResults?.length > 0 && (
+            <div className="mt-3 rounded-lg border border-gray-200 bg-white p-4">
+              <p className="text-sm font-semibold text-gray-800">
+                Design Requirements
+              </p>
+
+              <div className="mt-3 space-y-1.5">
+                {validationResult.ruleResults.map((rule) => (
+                  <div
+                    key={rule.id}
+                    className={`flex items-start gap-2 text-xs ${
+                      rule.passed ? 'text-green-700' : 'text-red-700'
+                    }`}
+                  >
+                    <span>{rule.passed ? '✓' : '✕'}</span>
+                    <span>
+                      {rule.label}
+                      {rule.detail ? ` (${rule.detail})` : ''}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
         </div>
       )}
 
@@ -1115,7 +1292,8 @@ export default function PlaygroundPage() {
                   }
                 />
               )}
-                            {openConfigPanel === 'ec2' && (
+
+              {openConfigPanel === 'ec2' && (
                 <EC2ConfigPanel
                   onClose={() => setOpenConfigPanel(null)}
                 />
