@@ -415,20 +415,20 @@ const handleAIChat = useCallback(async (text) => {
   // ── Render ───────────────────────────────────────────────────────────────
 
   const containerClass = embedded
-    ? 'flex flex-col h-full bg-zinc-900'
-    : 'flex flex-col h-full bg-zinc-900 rounded-xl overflow-hidden shadow-2xl shadow-black/60 border border-zinc-700/50';
+    ? 'flex flex-col h-full bg-card'
+    : 'flex flex-col h-full bg-card rounded-xl overflow-hidden shadow-2xl shadow-black/60 border border-border';
 
   return (
     <div className={containerClass}>
       {/* Header */}
-      <div className="flex items-center justify-between px-4 py-3 bg-zinc-900 border-b border-zinc-700/60 flex-shrink-0">
+      <div className="flex items-center justify-between px-4 py-3 bg-card border-b border-border flex-shrink-0">
         <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-full bg-amber-500 flex items-center justify-center shadow-md shadow-amber-500/30">
-            <span className="text-sm font-black text-zinc-900">A</span>
+          <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center shadow-md shadow-primary/20">
+            <span className="text-sm font-black text-foreground">A</span>
           </div>
           <div>
-            <p className="text-sm font-semibold text-zinc-100 leading-none">ArchBot</p>
-            <p className="text-[10px] text-emerald-400 mt-0.5 flex items-center gap-1">
+            <p className="text-sm font-semibold text-foreground leading-none">ArchBot</p>
+            <p className="text-[10px] text-success-foreground mt-0.5 flex items-center gap-1">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 inline-block animate-pulse" />
               AWS Cost Assistant
             </p>
@@ -439,7 +439,7 @@ const handleAIChat = useCallback(async (text) => {
           <button
             onClick={() => { setMessages([WELCOME_MESSAGE]); setLastAnalysis(null); setLastCostResult(null); }}
             title="Reset conversation"
-            className="p-1.5 rounded-md text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800 transition"
+            className="p-1.5 rounded-md text-muted-foreground hover:text-foreground/80 hover:bg-muted transition"
           >
             <RefreshCw className="w-4 h-4" />
           </button>
@@ -447,14 +447,14 @@ const handleAIChat = useCallback(async (text) => {
             <>
               <button
                 onClick={() => setIsMinimized((v) => !v)}
-                className="p-1.5 rounded-md text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800 transition"
+                className="p-1.5 rounded-md text-muted-foreground hover:text-foreground/80 hover:bg-muted transition"
               >
                 <ChevronDown className={`w-4 h-4 transition-transform ${isMinimized ? 'rotate-180' : ''}`} />
               </button>
               {onClose && (
                 <button
                   onClick={onClose}
-                  className="p-1.5 rounded-md text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800 transition"
+                  className="p-1.5 rounded-md text-muted-foreground hover:text-foreground/80 hover:bg-muted transition"
                 >
                   <X className="w-4 h-4" />
                 </button>
@@ -466,14 +466,14 @@ const handleAIChat = useCallback(async (text) => {
 
       {/* Arch node count badge */}
       {!isMinimized && (
-        <div className="px-4 py-2 bg-zinc-800/50 border-b border-zinc-700/40 flex-shrink-0">
-          <div className="flex items-center gap-2 text-xs text-zinc-400">
+        <div className="px-4 py-2 bg-muted/60 border-b border-border flex-shrink-0">
+          <div className="flex items-center gap-2 text-xs text-muted-foreground">
             <span className="font-mono">Playground:</span>
-            <span className={`font-semibold ${architectureNodes.length > 0 ? 'text-amber-400' : 'text-zinc-500'}`}>
+            <span className={`font-semibold ${architectureNodes.length > 0 ? 'text-primary' : 'text-muted-foreground'}`}>
               {architectureNodes.length} node{architectureNodes.length !== 1 ? 's' : ''}
             </span>
-            <span className="text-zinc-600">·</span>
-            <span className="font-semibold text-zinc-300">
+            <span className="text-muted-foreground">·</span>
+            <span className="font-semibold text-foreground/80">
               {architectureConnections.length} connection{architectureConnections.length !== 1 ? 's' : ''}
             </span>
           </div>
@@ -492,15 +492,15 @@ const handleAIChat = useCallback(async (text) => {
           </div>
 
           {/* Quick Actions */}
-          <div className="px-3 py-2 flex gap-1.5 flex-wrap border-t border-zinc-800 flex-shrink-0">
+          <div className="px-3 py-2 flex gap-1.5 flex-wrap border-t border-border flex-shrink-0">
             {QUICK_ACTIONS.map((qa) => (
               <button
                 key={qa.label}
                 onClick={qa.action}
                 disabled={isLoading}
-                className="flex items-center gap-1.5 text-xs px-2.5 py-1.5 rounded-full bg-zinc-800 hover:bg-zinc-700 text-zinc-300 hover:text-zinc-100 border border-zinc-700/50 hover:border-amber-500/40 transition disabled:opacity-40"
+                className="flex items-center gap-1.5 text-xs px-2.5 py-1.5 rounded-full bg-muted hover:bg-muted text-foreground/80 hover:text-foreground border border-border hover:border-primary/40 transition disabled:opacity-40"
               >
-                <span className="text-amber-400">{qa.icon}</span>
+                <span className="text-primary">{qa.icon}</span>
                 {qa.label}
               </button>
             ))}
@@ -508,7 +508,7 @@ const handleAIChat = useCallback(async (text) => {
 
           {/* Input */}
           <div className="px-3 pb-3 flex-shrink-0">
-            <div className="flex items-end gap-2 bg-zinc-800 rounded-xl border border-zinc-700/50 focus-within:border-amber-500/50 transition px-3 py-2">
+            <div className="flex items-end gap-2 bg-muted rounded-xl border border-border focus-within:border-amber-500/50 transition px-3 py-2">
               <textarea
                 ref={inputRef}
                 value={input}
@@ -517,18 +517,18 @@ const handleAIChat = useCallback(async (text) => {
                 placeholder="Ask about costs, optimizations, or your design…"
                 rows={1}
                 disabled={isLoading}
-                className="flex-1 bg-transparent text-sm text-zinc-100 placeholder-zinc-500 resize-none outline-none leading-relaxed max-h-24 disabled:opacity-50"
+                className="flex-1 bg-transparent text-sm text-foreground placeholder:text-muted-foreground resize-none outline-none leading-relaxed max-h-24 disabled:opacity-50"
                 style={{ scrollbarWidth: 'none' }}
               />
               <button
                 onClick={handleSend}
                 disabled={!input.trim() || isLoading}
-                className="w-8 h-8 rounded-lg bg-amber-500 hover:bg-amber-400 flex items-center justify-center flex-shrink-0 transition disabled:opacity-30 disabled:cursor-not-allowed shadow-md shadow-amber-500/20"
+                className="w-8 h-8 rounded-lg bg-primary hover:bg-primary/90 flex items-center justify-center flex-shrink-0 transition disabled:opacity-30 disabled:cursor-not-allowed shadow-md shadow-primary/20"
               >
-                <Send className="w-3.5 h-3.5 text-zinc-900" />
+                <Send className="w-3.5 h-3.5 text-foreground" />
               </button>
             </div>
-            <p className="text-[10px] text-zinc-600 mt-1.5 text-center">
+            <p className="text-[10px] text-muted-foreground mt-1.5 text-center">
               Press Enter to send · Shift+Enter for new line
             </p>
           </div>

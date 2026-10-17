@@ -63,24 +63,24 @@ export const CloudWatchConfigPanel = ({ onClose }) => {
   };
 
   return (
-    <div className="bg-white rounded-lg border border-gray-200 w-full max-w-md shadow-lg">
-      <div className="flex items-center justify-between bg-gradient-to-r from-gray-50 to-gray-100 px-6 py-4 border-b">
+    <div className="bg-card rounded-lg border border-border w-full max-w-md shadow-sm">
+      <div className="flex items-center justify-between bg-muted/70 px-6 py-4 border-b">
         <div className="flex items-center gap-2">
           <Activity className="w-5 h-5" style={{ color: '#FF9900' }} />
-          <h3 className="font-semibold text-gray-900">CloudWatch Configuration</h3>
+          <h3 className="font-semibold text-foreground">CloudWatch Configuration</h3>
         </div>
-        <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
+        <button onClick={onClose} className="text-muted-foreground hover:text-foreground">
           <X className="w-5 h-5" />
         </button>
       </div>
 
       <div className="p-6 space-y-6 max-h-[600px] overflow-y-auto">
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">📍 Region</label>
+          <label className="block text-sm font-medium text-foreground/80 mb-2">📍 Region</label>
           <select
             value={localConfig.region}
             onChange={(e) => handleChange('region', e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-yellow-500"
+            className="w-full px-3 py-2 border border-input bg-background text-foreground rounded-md focus:ring-2 focus:ring-ring/40"
           >
             {Object.entries(REGIONS).map(([name, value]) => (
               <option key={value} value={value}>{name}</option>
@@ -89,117 +89,117 @@ export const CloudWatchConfigPanel = ({ onClose }) => {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">Custom Metrics</label>
+          <label className="block text-sm font-medium text-foreground/80 mb-2">Custom Metrics</label>
           <input
             type="number"
             value={localConfig.custom_metrics || ''}
             onChange={(e) => handleChange('custom_metrics', e.target.value === '' ? '' : parseInt(e.target.value))}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-yellow-500"
+            className="w-full px-3 py-2 border border-input bg-background text-foreground rounded-md focus:ring-2 focus:ring-ring/40"
           />
-          <p className="text-xs text-gray-500 mt-1">💡 First 10 metrics/month FREE</p>
+          <p className="text-xs text-muted-foreground mt-1">💡 First 10 metrics/month FREE</p>
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">Standard Alarms</label>
+          <label className="block text-sm font-medium text-foreground/80 mb-2">Standard Alarms</label>
           <input
             type="number"
             value={localConfig.standard_alarms || ''}
             onChange={(e) => handleChange('standard_alarms', e.target.value === '' ? '' : parseInt(e.target.value))}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-yellow-500"
+            className="w-full px-3 py-2 border border-input bg-background text-foreground rounded-md focus:ring-2 focus:ring-ring/40"
           />
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">High-Resolution Alarms</label>
+          <label className="block text-sm font-medium text-foreground/80 mb-2">High-Resolution Alarms</label>
           <input
             type="number"
             value={localConfig.high_res_alarms || ''}
             onChange={(e) => handleChange('high_res_alarms', e.target.value === '' ? '' : parseInt(e.target.value))}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-yellow-500"
+            className="w-full px-3 py-2 border border-input bg-background text-foreground rounded-md focus:ring-2 focus:ring-ring/40"
           />
-          <p className="text-xs text-gray-500 mt-1">💡 First 10 alarms/month FREE (shared with standard)</p>
+          <p className="text-xs text-muted-foreground mt-1">💡 First 10 alarms/month FREE (shared with standard)</p>
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">Logs Ingested (GB/month)</label>
+          <label className="block text-sm font-medium text-foreground/80 mb-2">Logs Ingested (GB/month)</label>
           <input
             type="number"
             value={localConfig.logs_ingested_gb || ''}
             onChange={(e) => handleChange('logs_ingested_gb', e.target.value === '' ? '' : parseFloat(e.target.value))}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-yellow-500"
+            className="w-full px-3 py-2 border border-input bg-background text-foreground rounded-md focus:ring-2 focus:ring-ring/40"
           />
-          <p className="text-xs text-gray-500 mt-1">💡 First 5 GB/month FREE</p>
+          <p className="text-xs text-muted-foreground mt-1">💡 First 5 GB/month FREE</p>
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">Logs Storage (GB)</label>
+          <label className="block text-sm font-medium text-foreground/80 mb-2">Logs Storage (GB)</label>
           <input
             type="number"
             value={localConfig.logs_storage_gb || ''}
             onChange={(e) => handleChange('logs_storage_gb', e.target.value === '' ? '' : parseFloat(e.target.value))}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-yellow-500"
+            className="w-full px-3 py-2 border border-input bg-background text-foreground rounded-md focus:ring-2 focus:ring-ring/40"
           />
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">Dashboards</label>
+          <label className="block text-sm font-medium text-foreground/80 mb-2">Dashboards</label>
           <input
             type="number"
             value={localConfig.dashboards || ''}
             onChange={(e) => handleChange('dashboards', e.target.value === '' ? '' : parseInt(e.target.value))}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-yellow-500"
+            className="w-full px-3 py-2 border border-input bg-background text-foreground rounded-md focus:ring-2 focus:ring-ring/40"
           />
-          <p className="text-xs text-gray-500 mt-1">💡 First 3 dashboards FREE</p>
+          <p className="text-xs text-muted-foreground mt-1">💡 First 3 dashboards FREE</p>
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">API Requests per Month</label>
+          <label className="block text-sm font-medium text-foreground/80 mb-2">API Requests per Month</label>
           <input
             type="number"
             value={localConfig.api_requests_per_month || ''}
             onChange={(e) => handleChange('api_requests_per_month', e.target.value === '' ? '' : parseInt(e.target.value))}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-yellow-500"
+            className="w-full px-3 py-2 border border-input bg-background text-foreground rounded-md focus:ring-2 focus:ring-ring/40"
           />
-          <p className="text-xs text-gray-500 mt-1">💡 GetMetricData, PutMetricData, etc.</p>
+          <p className="text-xs text-muted-foreground mt-1">💡 GetMetricData, PutMetricData, etc.</p>
         </div>
 
         {cost && (
-          <div className="bg-gray-50 p-4 rounded-md border border-gray-200">
-            <p className="text-sm font-semibold text-gray-900 mb-2">💰 Cost Breakdown</p>
+          <div className="bg-muted/50 p-4 rounded-md border border-border">
+            <p className="text-sm font-semibold text-foreground mb-2">💰 Cost Breakdown</p>
             <div className="space-y-1 text-sm">
-              <div className="flex justify-between text-gray-700">
+              <div className="flex justify-between text-foreground/80">
                 <span>Metrics:</span>
                 <span className="font-medium">${cost.breakdown.metrics_cost.toFixed(4)}</span>
               </div>
-              <div className="flex justify-between text-gray-700">
+              <div className="flex justify-between text-foreground/80">
                 <span>Alarms:</span>
                 <span className="font-medium">${cost.breakdown.alarms_cost.toFixed(4)}</span>
               </div>
-              <div className="flex justify-between text-gray-700">
+              <div className="flex justify-between text-foreground/80">
                 <span>Logs Ingestion:</span>
                 <span className="font-medium">${cost.breakdown.logs_ingestion_cost.toFixed(4)}</span>
               </div>
-              <div className="flex justify-between text-gray-700">
+              <div className="flex justify-between text-foreground/80">
                 <span>Logs Storage:</span>
                 <span className="font-medium">${cost.breakdown.logs_storage_cost.toFixed(4)}</span>
               </div>
-              <div className="flex justify-between text-gray-700">
+              <div className="flex justify-between text-foreground/80">
                 <span>Dashboards:</span>
                 <span className="font-medium">${cost.breakdown.dashboards_cost.toFixed(4)}</span>
               </div>
-              <div className="flex justify-between text-gray-700">
+              <div className="flex justify-between text-foreground/80">
                 <span>API Requests:</span>
                 <span className="font-medium">${cost.breakdown.api_requests_cost.toFixed(4)}</span>
               </div>
             </div>
-            <div className="border-t border-gray-300 pt-2 mt-2 flex justify-between text-sm font-semibold">
+            <div className="border-t border-input pt-2 mt-2 flex justify-between text-sm font-semibold">
               <span>Total:</span>
-              <span className="text-yellow-600">${cost.breakdown.total_cost.toFixed(2)}/month</span>
+              <span className="text-primary">${cost.breakdown.total_cost.toFixed(2)}/month</span>
             </div>
             {cost.notes && cost.notes.length > 0 && (
-              <div className="mt-2 pt-2 border-t border-gray-200">
+              <div className="mt-2 pt-2 border-t border-border">
                 {cost.notes.map((note, i) => (
-                  <p key={i} className="text-xs text-gray-500">⚠️ {note}</p>
+                  <p key={i} className="text-xs text-muted-foreground">⚠️ {note}</p>
                 ))}
               </div>
             )}
@@ -210,13 +210,13 @@ export const CloudWatchConfigPanel = ({ onClose }) => {
           <button
             onClick={handleCalculate}
             disabled={loading}
-            className="flex-1 bg-yellow-500 hover:bg-yellow-600 text-white font-semibold py-2 px-4 rounded-md transition disabled:opacity-50"
+            className="flex-1 bg-primary hover:bg-primary/90 text-primary-foreground font-semibold py-2 px-4 rounded-md transition disabled:opacity-50"
           >
             {loading ? 'Calculating...' : 'Calculate'}
           </button>
           <button
             onClick={onClose}
-            className="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-900 font-semibold py-2 px-4 rounded-md transition"
+            className="flex-1 bg-secondary hover:bg-muted text-secondary-foreground font-semibold py-2 px-4 rounded-md transition"
           >
             Close
           </button>

@@ -104,90 +104,90 @@ export const PlaygroundCanvas = ({ onNodeSelect }) => {
   };
 
   return (
-    <div className="w-full h-full flex flex-col bg-white">
+    <div className="w-full h-full flex flex-col bg-background">
       {/* Toolbar */}
-      <div className="bg-gray-50 border-b border-gray-200 p-4">
+      <div className="bg-muted/50 border-b border-border p-4">
         <div className="flex items-center gap-2 flex-wrap">
-          <span className="text-sm font-medium text-gray-700 mr-2">Add Service:</span>
+          <span className="text-sm font-medium text-foreground/80 mr-2">Add Service:</span>
           
           {/* Service buttons grouped */}
           <div className="flex flex-wrap gap-2">
             <button
               onClick={() => handleAddNode('api_gateway')}
-              className="px-3 py-2 text-sm bg-yellow-500 hover:bg-yellow-600 text-white rounded-md transition whitespace-nowrap"
+              className="px-3 py-2 text-sm bg-primary hover:bg-primary/90 text-primary-foreground rounded-md transition whitespace-nowrap"
             >
               + API Gateway
             </button>
             <button
               onClick={() => handleAddNode('lambda')}
-              className="px-3 py-2 text-sm bg-yellow-500 hover:bg-yellow-600 text-white rounded-md transition whitespace-nowrap"
+              className="px-3 py-2 text-sm bg-primary hover:bg-primary/90 text-primary-foreground rounded-md transition whitespace-nowrap"
             >
               + Lambda
             </button>
             <button
               onClick={() => handleAddNode('s3')}
-              className="px-3 py-2 text-sm bg-yellow-500 hover:bg-yellow-600 text-white rounded-md transition whitespace-nowrap"
+              className="px-3 py-2 text-sm bg-primary hover:bg-primary/90 text-primary-foreground rounded-md transition whitespace-nowrap"
             >
               + S3
             </button>
             <button
               onClick={() => handleAddNode('cognito')}
-              className="px-3 py-2 text-sm bg-yellow-500 hover:bg-yellow-600 text-white rounded-md transition whitespace-nowrap"
+              className="px-3 py-2 text-sm bg-primary hover:bg-primary/90 text-primary-foreground rounded-md transition whitespace-nowrap"
             >
               + Cognito
             </button>
             <button
               onClick={() => handleAddNode('dynamodb')}
-              className="px-3 py-2 text-sm bg-yellow-500 hover:bg-yellow-600 text-white rounded-md transition whitespace-nowrap"
+              className="px-3 py-2 text-sm bg-primary hover:bg-primary/90 text-primary-foreground rounded-md transition whitespace-nowrap"
             >
               + DynamoDB
             </button>
             <button
               onClick={() => handleAddNode('elb')}
-              className="px-3 py-2 text-sm bg-yellow-500 hover:bg-yellow-600 text-white rounded-md transition whitespace-nowrap"
+              className="px-3 py-2 text-sm bg-primary hover:bg-primary/90 text-primary-foreground rounded-md transition whitespace-nowrap"
             >
               + ELB
             </button>
             <button
               onClick={() => handleAddNode('elastic_beanstalk')}
-              className="px-3 py-2 text-sm bg-orange-500 hover:bg-orange-600 text-white rounded-md transition whitespace-nowrap font-semibold"
+              className="px-3 py-2 text-sm bg-secondary hover:bg-muted text-secondary-foreground border border-border rounded-md transition whitespace-nowrap font-semibold"
               title="Click to add Elastic Beanstalk to your architecture"
             >
               + Elastic Beanstalk
             </button>
                         <button
               onClick={() => handleAddNode('cloudwatch')}
-              className="px-3 py-2 text-sm bg-pink-500 hover:bg-pink-600 text-white rounded-md transition whitespace-nowrap"
+              className="px-3 py-2 text-sm bg-secondary hover:bg-muted text-secondary-foreground border border-border rounded-md transition whitespace-nowrap"
             >
               + CloudWatch
             </button>
             <button
               onClick={() => handleAddNode('cloudfront')}
-              className="px-3 py-2 text-sm bg-purple-500 hover:bg-purple-600 text-white rounded-md transition whitespace-nowrap"
+              className="px-3 py-2 text-sm bg-secondary hover:bg-muted text-secondary-foreground border border-border rounded-md transition whitespace-nowrap"
             >
               + CloudFront
             </button>
             <button
               onClick={() => handleAddNode('elasticache')}
-              className="px-3 py-2 text-sm bg-fuchsia-500 hover:bg-fuchsia-600 text-white rounded-md transition whitespace-nowrap"
+              className="px-3 py-2 text-sm bg-secondary hover:bg-muted text-secondary-foreground border border-border rounded-md transition whitespace-nowrap"
             >
               + ElastiCache
             </button>
             <button
               onClick={() => handleAddNode('sqs')}
-              className="px-3 py-2 text-sm bg-rose-500 hover:bg-rose-600 text-white rounded-md transition whitespace-nowrap"
+              className="px-3 py-2 text-sm bg-secondary hover:bg-muted text-secondary-foreground border border-border rounded-md transition whitespace-nowrap"
             >
               + SQS
             </button>
             <button
               onClick={() => handleAddNode('ec2')}
-              className="px-3 py-2 text-sm bg-amber-500 hover:bg-amber-600 text-white rounded-md transition whitespace-nowrap"
+              className="px-3 py-2 text-sm bg-primary hover:bg-primary/90 text-primary-foreground rounded-md transition whitespace-nowrap"
             >
               + EC2
             </button>
             <button
               onClick={() => handleAddNode('rds')}
-              className="px-3 py-2 text-sm bg-blue-600 hover:bg-blue-700 text-white rounded-md transition whitespace-nowrap"
+              className="px-3 py-2 text-sm bg-secondary hover:bg-muted text-secondary-foreground border border-border rounded-md transition whitespace-nowrap"
             >
               + RDS
             </button>
@@ -199,7 +199,7 @@ export const PlaygroundCanvas = ({ onNodeSelect }) => {
             <button
               onClick={handleDeleteSelected}
               disabled={!selectedNodeId}
-              className="px-3 py-2 text-sm bg-red-500 hover:bg-red-600 text-white rounded-md transition disabled:opacity-50 flex items-center gap-1 whitespace-nowrap"
+              className="px-3 py-2 text-sm bg-destructive text-destructive-foreground hover:bg-destructive/90 rounded-md transition disabled:opacity-50 flex items-center gap-1 whitespace-nowrap"
               title="Delete selected service"
             >
               <Trash2 className="w-4 h-4" />
@@ -207,7 +207,7 @@ export const PlaygroundCanvas = ({ onNodeSelect }) => {
             </button>
             <button
               onClick={handleClear}
-              className="px-3 py-2 text-sm bg-gray-400 hover:bg-gray-500 text-white rounded-md transition flex items-center gap-1 whitespace-nowrap"
+              className="px-3 py-2 text-sm bg-secondary hover:bg-muted text-secondary-foreground border border-border rounded-md transition flex items-center gap-1 whitespace-nowrap"
               title="Clear entire architecture"
             >
               <RotateCw className="w-4 h-4" />

@@ -79,16 +79,16 @@ export const LambdaConfigPanel = ({ onClose }) => {
   };
 
   return (
-    <div className="bg-white rounded-lg border border-gray-200 w-full max-w-md shadow-lg">
+    <div className="bg-card rounded-lg border border-border w-full max-w-md shadow-sm">
       {/* Header */}
-      <div className="flex items-center justify-between bg-gradient-to-r from-gray-50 to-gray-100 px-6 py-4 border-b">
+      <div className="flex items-center justify-between bg-muted/70 px-6 py-4 border-b">
         <div className="flex items-center gap-2">
           <Zap className="w-5 h-5" style={{ color: '#FF9900' }} />
-          <h3 className="font-semibold text-gray-900">Lambda Configuration</h3>
+          <h3 className="font-semibold text-foreground">Lambda Configuration</h3>
         </div>
         <button
           onClick={onClose}
-          className="text-gray-400 hover:text-gray-600"
+          className="text-muted-foreground hover:text-foreground"
         >
           <X className="w-5 h-5" />
         </button>
@@ -98,13 +98,13 @@ export const LambdaConfigPanel = ({ onClose }) => {
       <div className="p-6 space-y-6 max-h-[600px] overflow-y-auto">
         {/* Region */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm font-medium text-foreground/80 mb-2">
             📍 Region
           </label>
           <select
             value={localConfig.region}
             onChange={(e) => handleChange('region', e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-yellow-500"
+            className="w-full px-3 py-2 border border-input bg-background text-foreground rounded-md focus:ring-2 focus:ring-ring/40"
           >
             {Object.entries(REGIONS).map(([name, value]) => (
               <option key={value} value={value}>{name}</option>
@@ -114,7 +114,7 @@ export const LambdaConfigPanel = ({ onClose }) => {
 
         {/* Architecture */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-3">
+          <label className="block text-sm font-medium text-foreground/80 mb-3">
             ⚙️ ARCHITECTURE
           </label>
           <div className="space-y-2">
@@ -122,7 +122,7 @@ export const LambdaConfigPanel = ({ onClose }) => {
               { label: 'x86_64 (Intel/AMD)', value: 'x86_64', hint: 'Standard pricing' },
               { label: 'ARM64 (Graviton2)', value: 'arm64', hint: '~20% cheaper' },
             ].map(option => (
-              <label key={option.value} className="flex items-center gap-3 cursor-pointer p-2 rounded hover:bg-gray-50">
+              <label key={option.value} className="flex items-center gap-3 cursor-pointer p-2 rounded hover:bg-muted/50">
                 <input
                   type="radio"
                   name="architecture"
@@ -132,8 +132,8 @@ export const LambdaConfigPanel = ({ onClose }) => {
                   className="w-4 h-4 cursor-pointer"
                 />
                 <div>
-                  <span className="font-medium text-gray-900">{option.label}</span>
-                  <span className="text-xs text-gray-500 ml-2">{option.hint}</span>
+                  <span className="font-medium text-foreground">{option.label}</span>
+                  <span className="text-xs text-muted-foreground ml-2">{option.hint}</span>
                 </div>
               </label>
             ))}
@@ -142,21 +142,21 @@ export const LambdaConfigPanel = ({ onClose }) => {
 
         {/* Number of Requests */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm font-medium text-foreground/80 mb-2">
             Number of Requests per Month
           </label>
           <input
             type="number"
             value={localConfig.requests_per_month}
             onChange={(e) => handleChange('requests_per_month', parseInt(e.target.value))}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-yellow-500"
+            className="w-full px-3 py-2 border border-input bg-background text-foreground rounded-md focus:ring-2 focus:ring-ring/40"
           />
-          <p className="text-xs text-gray-500 mt-1">💡 First 1M requests FREE every month</p>
+          <p className="text-xs text-muted-foreground mt-1">💡 First 1M requests FREE every month</p>
         </div>
 
         {/* Average Duration */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm font-medium text-foreground/80 mb-2">
             Average Duration per Request (milliseconds)
           </label>
           <input
@@ -165,26 +165,26 @@ export const LambdaConfigPanel = ({ onClose }) => {
             onChange={(e) => handleChange('average_duration_ms', parseInt(e.target.value) || 0)}
             min="1"
             max="900000"
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-yellow-500"
+            className="w-full px-3 py-2 border border-input bg-background text-foreground rounded-md focus:ring-2 focus:ring-ring/40"
           />
-          <p className="text-xs text-gray-500 mt-1">💡 Max: 15 minutes (900,000 ms)</p>
+          <p className="text-xs text-muted-foreground mt-1">💡 Max: 15 minutes (900,000 ms)</p>
         </div>
 
         {/* Allocated Memory */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm font-medium text-foreground/80 mb-2">
             Allocated Memory (MB)
           </label>
           <select
             value={localConfig.allocated_memory_mb}
             onChange={(e) => handleChange('allocated_memory_mb', parseInt(e.target.value))}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-yellow-500"
+            className="w-full px-3 py-2 border border-input bg-background text-foreground rounded-md focus:ring-2 focus:ring-ring/40"
           >
             {MEMORY_OPTIONS.map(mb => (
               <option key={mb} value={mb}>{mb} MB</option>
             ))}
           </select>
-          <p className="text-xs text-gray-500 mt-1">💡 Memory determines CPU allocation</p>
+          <p className="text-xs text-muted-foreground mt-1">💡 Memory determines CPU allocation</p>
         </div>
 
         {/* Free Tier */}
@@ -196,9 +196,9 @@ export const LambdaConfigPanel = ({ onClose }) => {
               onChange={(e) => handleChange('include_free_tier', e.target.checked)}
               className="w-4 h-4 cursor-pointer"
             />
-            <span className="text-sm font-medium text-gray-700">Include Free Tier</span>
+            <span className="text-sm font-medium text-foreground/80">Include Free Tier</span>
           </label>
-          <p className="text-xs text-gray-500 mt-1">📋 1M requests + 400K GB-seconds free/month</p>
+          <p className="text-xs text-muted-foreground mt-1">📋 1M requests + 400K GB-seconds free/month</p>
         </div>
 
         {/* Provisioned Concurrency */}
@@ -211,13 +211,13 @@ export const LambdaConfigPanel = ({ onClose }) => {
                 onChange={(e) => handleProvisionedChange('enabled', e.target.checked)}
                 className="w-4 h-4 cursor-pointer"
               />
-              <span className="text-sm font-medium text-gray-700">Enable Provisioned Concurrency</span>
+              <span className="text-sm font-medium text-foreground/80">Enable Provisioned Concurrency</span>
             </label>
-            <p className="text-xs text-gray-500 mt-1">⚠️ Charges 24/7 regardless of usage</p>
+            <p className="text-xs text-muted-foreground mt-1">⚠️ Charges 24/7 regardless of usage</p>
           </div>
           {localConfig.provisioned_concurrency.enabled && (
             <div className="mt-3 ml-6">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-foreground/80 mb-2">
                 Number of Instances
               </label>
               <input
@@ -225,7 +225,7 @@ export const LambdaConfigPanel = ({ onClose }) => {
                 value={localConfig.provisioned_concurrency.count}
                 onChange={(e) => handleProvisionedChange('count', parseInt(e.target.value))}
                 min="1"
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-yellow-500"
+                className="w-full px-3 py-2 border border-input bg-background text-foreground rounded-md focus:ring-2 focus:ring-ring/40"
               />
             </div>
           )}
@@ -233,27 +233,27 @@ export const LambdaConfigPanel = ({ onClose }) => {
 
         {/* Cost Breakdown */}
         {cost && (
-          <div className="bg-gray-50 p-4 rounded-md border border-gray-200">
-            <p className="text-sm font-semibold text-gray-900 mb-2">💰 Cost Breakdown</p>
+          <div className="bg-muted/50 p-4 rounded-md border border-border">
+            <p className="text-sm font-semibold text-foreground mb-2">💰 Cost Breakdown</p>
             <div className="space-y-1 text-sm">
-              <div className="flex justify-between text-gray-700">
+              <div className="flex justify-between text-foreground/80">
                 <span>Requests:</span>
                 <span className="font-medium">${cost.breakdown.requests_cost.toFixed(4)}</span>
               </div>
-              <div className="flex justify-between text-gray-700">
+              <div className="flex justify-between text-foreground/80">
                 <span>Duration:</span>
                 <span className="font-medium">${cost.breakdown.compute_cost.toFixed(4)}</span>
               </div>
               {cost.breakdown.provisioned_concurrency_cost > 0 && (
-                <div className="flex justify-between text-gray-700">
+                <div className="flex justify-between text-foreground/80">
                   <span>Provisioned:</span>
                   <span className="font-medium">${cost.breakdown.provisioned_concurrency_cost.toFixed(2)}</span>
                 </div>
               )}
             </div>
-            <div className="border-t border-gray-300 pt-2 mt-2 flex justify-between text-sm font-semibold">
+            <div className="border-t border-input pt-2 mt-2 flex justify-between text-sm font-semibold">
               <span>Total:</span>
-              <span className="text-yellow-600">${cost.breakdown.total_cost.toFixed(2)}/month</span>
+              <span className="text-primary">${cost.breakdown.total_cost.toFixed(2)}/month</span>
             </div>
           </div>
         )}
@@ -263,13 +263,13 @@ export const LambdaConfigPanel = ({ onClose }) => {
           <button
             onClick={handleCalculate}
             disabled={loading}
-            className="flex-1 bg-yellow-500 hover:bg-yellow-600 text-white font-semibold py-2 px-4 rounded-md transition disabled:opacity-50"
+            className="flex-1 bg-primary hover:bg-primary/90 text-primary-foreground font-semibold py-2 px-4 rounded-md transition disabled:opacity-50"
           >
             {loading ? 'Calculating...' : 'Calculate'}
           </button>
           <button
             onClick={onClose}
-            className="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-900 font-semibold py-2 px-4 rounded-md transition"
+            className="flex-1 bg-secondary hover:bg-muted text-secondary-foreground font-semibold py-2 px-4 rounded-md transition"
           >
             Close
           </button>

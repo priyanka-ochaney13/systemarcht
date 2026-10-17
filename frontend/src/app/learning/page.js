@@ -5,46 +5,29 @@ import {
   BookOpen,
   ArrowRight,
   CheckCircle2,
-  ChevronLeft,
-  Sparkles,
 } from 'lucide-react';
 
 import { learningModules } from '@/lib/learningModules';
+import { SiteHeader } from '@/components/layout/SiteHeader';
 
 export default function LearningPage() {
   return (
-    <main className="min-h-screen bg-white text-gray-900 px-6 py-10">
-      <div className="max-w-6xl mx-auto">
-
-        {/* Top bar with back and nav */}
-        <div className="flex items-center justify-between pb-6 mb-8 border-b border-gray-200">
-          <Link href="/" className="flex items-center gap-1.5 text-sm text-gray-600 hover:text-gray-900 transition font-medium">
-            <ChevronLeft className="w-4 h-4" />
-            Back to Home
-          </Link>
-          <div className="flex items-center gap-3">
-            <Link href="/ai-architect" className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-zinc-950 font-bold text-xs transition">
-              <Sparkles className="w-3.5 h-3.5 fill-zinc-950" />
-              AI Architect
-            </Link>
-            <Link href="/playground" className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-800 font-semibold text-xs transition">
-              Playground
-            </Link>
-          </div>
-        </div>
+    <main className="min-h-screen bg-background text-foreground">
+      <SiteHeader />
+      <div className="max-w-6xl mx-auto px-6 py-10">
 
         {/* Header */}
         <div className="mb-10">
 
-          <p className="text-sm text-amber-600 font-semibold mb-2">
+          <p className="text-sm text-primary font-semibold mb-2">
             SYSTEMARCHT LEARNING
           </p>
 
-          <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-3">
+          <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-3">
             Learn Cloud Architecture
           </h1>
 
-          <p className="text-gray-600 max-w-2xl leading-relaxed">
+          <p className="text-muted-foreground max-w-2xl leading-relaxed">
             Learn a concept, explore an architecture, build it in the
             Playground, calculate its cost, and use ArchBot to reason about
             your design.
@@ -53,9 +36,9 @@ export default function LearningPage() {
         </div>
 
         {/* Learning Flow */}
-        <div className="mb-10 p-5 rounded-xl border border-gray-200 bg-gray-50">
+        <div className="mb-10 p-5 rounded-xl border border-border bg-muted/50">
 
-          <h2 className="text-sm font-semibold text-gray-800 mb-4">
+          <h2 className="text-sm font-semibold text-foreground mb-4">
             Your Learning Journey
           </h2>
 
@@ -79,9 +62,9 @@ export default function LearningPage() {
                   className="
                     px-3 py-1.5
                     rounded-full
-                    bg-white
-                    border border-gray-200
-                    text-gray-700
+                    bg-card
+                    border border-border
+                    text-foreground/80
                     font-medium
                   "
                 >
@@ -89,7 +72,7 @@ export default function LearningPage() {
                 </span>
 
                 {index < 6 && (
-                  <ArrowRight className="w-4 h-4 text-gray-400" />
+                  <ArrowRight className="w-4 h-4 text-muted-foreground" />
                 )}
 
               </div>
@@ -102,7 +85,7 @@ export default function LearningPage() {
         {/* Modules */}
         <div>
 
-          <h2 className="text-xl font-semibold text-gray-900 mb-5">
+          <h2 className="text-xl font-semibold text-foreground mb-5">
             Learning Modules
           </h2>
 
@@ -120,12 +103,12 @@ export default function LearningPage() {
                   className="
                     h-full
                     rounded-2xl
-                    border border-gray-200
-                    bg-white
+                    border border-border
+                    bg-card
                     p-6
                     shadow-sm
                     transition-all duration-200
-                    hover:border-amber-400
+                    hover:border-primary
                     hover:shadow-md
                     hover:-translate-y-1
                   "
@@ -138,15 +121,15 @@ export default function LearningPage() {
                       className="
                         w-11 h-11
                         rounded-xl
-                        bg-amber-50
-                        border border-amber-200
+                        bg-accent
+                        border border-primary/30
                         flex items-center justify-center
                       "
                     >
-                      <BookOpen className="w-5 h-5 text-amber-600" />
+                      <BookOpen className="w-5 h-5 text-primary" />
                     </div>
 
-                    <span className="text-xs font-semibold text-gray-500">
+                    <span className="text-xs font-semibold text-muted-foreground">
                       MODULE {module.moduleNumber}
                     </span>
 
@@ -157,9 +140,9 @@ export default function LearningPage() {
                     className="
                       text-xl
                       font-semibold
-                      text-gray-900
+                      text-foreground
                       mb-3
-                      group-hover:text-amber-600
+                      group-hover:text-primary
                       transition
                     "
                   >
@@ -167,7 +150,7 @@ export default function LearningPage() {
                   </h3>
 
                   {/* Description */}
-                  <p className="text-sm text-gray-600 leading-relaxed mb-6">
+                  <p className="text-sm text-muted-foreground leading-relaxed mb-6">
                     {module.description}
                   </p>
 
@@ -179,7 +162,7 @@ export default function LearningPage() {
                         text-xs
                         uppercase
                         tracking-wide
-                        text-gray-500
+                        text-muted-foreground
                         font-semibold
                         mb-2
                       "
@@ -187,7 +170,7 @@ export default function LearningPage() {
                       Objective
                     </p>
 
-                    <p className="text-sm text-gray-700 leading-relaxed">
+                    <p className="text-sm text-foreground/80 leading-relaxed">
                       {module.objective}
                     </p>
 
@@ -201,7 +184,7 @@ export default function LearningPage() {
                         text-xs
                         uppercase
                         tracking-wide
-                        text-gray-500
+                        text-muted-foreground
                         font-semibold
                         mb-2
                       "
@@ -227,9 +210,9 @@ export default function LearningPage() {
                             text-xs
                             px-2.5 py-1
                             rounded-full
-                            bg-gray-100
-                            text-gray-700
-                            border border-gray-200
+                            bg-muted
+                            text-foreground/80
+                            border border-border
                           "
                         >
                           {service.name || service.serviceType}
@@ -242,7 +225,7 @@ export default function LearningPage() {
                   </div>
 
                   {/* Learning stages */}
-                  <div className="border-t border-gray-200 pt-5">
+                  <div className="border-t border-border pt-5">
 
                     <div
                       className="
@@ -251,13 +234,13 @@ export default function LearningPage() {
                         gap-x-4
                         gap-y-2
                         text-xs
-                        text-gray-500
+                        text-muted-foreground
                       "
                     >
 
-                      <span className="flex items-center gap-1 text-gray-700">
+                      <span className="flex items-center gap-1 text-foreground/80">
 
-                        <CheckCircle2 className="w-3.5 h-3.5 text-green-600" />
+                        <CheckCircle2 className="w-3.5 h-3.5 text-success-foreground" />
 
                         Learn
 
@@ -270,7 +253,7 @@ export default function LearningPage() {
                       <span>Cost Activity</span>
 
                       {module.aiActivity && (
-                        <span className="text-amber-600 font-medium">
+                        <span className="text-primary font-medium">
                           Ask ArchBot
                         </span>
                       )}
@@ -288,7 +271,7 @@ export default function LearningPage() {
                       className="
                         text-sm
                         font-semibold
-                        text-amber-600
+                        text-primary
                       "
                     >
                       Start Module
@@ -297,7 +280,7 @@ export default function LearningPage() {
                     <ArrowRight
                       className="
                         w-4 h-4
-                        text-amber-600
+                        text-primary
                         transition-transform
                         group-hover:translate-x-1
                       "

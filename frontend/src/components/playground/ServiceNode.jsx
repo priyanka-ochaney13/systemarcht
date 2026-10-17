@@ -43,13 +43,13 @@ export const ServiceNode = ({ data, isConnecting, isSelected }) => {
       className={`px-4 py-3 shadow-lg rounded-lg border-2 transition-all ${
         isSelected
           ? 'bg-blue-100 border-blue-500'
-          : 'bg-white border-gray-300 hover:border-blue-400'
+          : 'bg-card border-input hover:border-blue-400'
       }`}
     >
       <Handle type="target" position={Position.Top} />
       <div className="flex items-center gap-2">
         <Icon className="w-5 h-5" style={{ color }} />
-        <div className="text-sm font-semibold text-gray-900">{data.label}</div>
+        <div className="text-sm font-semibold text-foreground">{data.label}</div>
       </div>
       <Handle type="source" position={Position.Bottom} />
     </div>

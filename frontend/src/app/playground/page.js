@@ -38,6 +38,7 @@ import { RDSConfigPanel } from '@/components/services/RDSConfigPanel';
 
 import { ArchitectChatbot } from '@/components/chatbot';
 import { MermaidArchitectureDiagram } from '@/components/playground/MermaidArchitectureDiagram';
+import { ThemeToggle } from '@/components/theme/ThemeToggle';
 
 export default function PlaygroundPage() {
   const searchParams = useSearchParams();
@@ -439,13 +440,13 @@ export default function PlaygroundPage() {
   // ============================================================
 
   return (
-    <div className="w-full h-screen flex flex-col bg-white">
+    <div className="w-full h-screen flex flex-col bg-background">
 
       {/* ======================================================
           HEADER
       ======================================================= */}
 
-      <div className="bg-white border-b border-gray-200 p-4 flex items-center justify-between">
+      <div className="bg-background border-b border-border p-3 md:p-4 flex flex-wrap items-center justify-between gap-3">
 
         {/* LEFT */}
 
@@ -455,8 +456,8 @@ export default function PlaygroundPage() {
             <button
               className="
                 flex items-center gap-1
-                text-gray-600
-                hover:text-gray-900
+                text-muted-foreground
+                hover:text-foreground
               "
             >
               <ChevronLeft className="w-5 h-5" />
@@ -466,16 +467,16 @@ export default function PlaygroundPage() {
 
           <div>
 
-            <h1 className="text-2xl font-bold text-gray-900">
+            <h1 className="text-2xl font-bold text-foreground">
               Architecture Playground
             </h1>
 
-            <p className="text-sm text-gray-500">
+            <p className="text-sm text-muted-foreground">
               Design and simulate AWS architectures
             </p>
 
             {module && (
-              <div className="mt-1 text-xs text-blue-600 font-medium">
+              <div className="mt-1 text-xs text-info-foreground font-medium">
                 Learning Module {module.moduleNumber}:{' '}
                 {module.shortTitle}
               </div>
@@ -494,16 +495,7 @@ export default function PlaygroundPage() {
           {module && (
             <button
               onClick={validateArchitecture}
-              className="
-                px-4 py-2
-                rounded-lg
-                bg-blue-600
-                hover:bg-blue-700
-                text-white
-                font-medium
-                text-sm
-                transition
-              "
+              className="px-4 py-2 rounded-lg bg-primary hover:bg-primary/90 text-primary-foreground font-medium text-sm transition"
             >
               Validate Architecture
             </button>
@@ -514,11 +506,11 @@ export default function PlaygroundPage() {
           {totalCost > 0 && (
             <div className="text-right">
 
-              <p className="text-xs text-gray-500">
+              <p className="text-xs text-muted-foreground">
                 Estimated Monthly Cost
               </p>
 
-              <p className="text-2xl font-bold text-yellow-600">
+              <p className="text-2xl font-bold text-primary">
                 ${totalCost.toFixed(2)}
               </p>
 
@@ -528,21 +520,10 @@ export default function PlaygroundPage() {
           {/* AI ARCHITECT */}
           <Link href="/ai-architect">
             <button
-              className="
-                flex items-center gap-1.5
-                px-3.5 py-2
-                rounded-lg
-                font-semibold
-                text-sm
-                bg-gradient-to-r from-amber-500 to-amber-600
-                hover:from-amber-400 hover:to-amber-500
-                text-zinc-950
-                shadow-sm hover:shadow-md
-                transition-all
-              "
+              className="flex items-center gap-1.5 px-3.5 py-2 rounded-lg font-semibold text-sm bg-primary hover:bg-primary/90 text-primary-foreground shadow-xs transition-colors"
               title="Design new architecture with AI"
             >
-              <Sparkles className="w-4 h-4 fill-zinc-950" />
+              <Sparkles className="w-4 h-4 fill-primary-foreground" />
               <span>AI Architect</span>
             </button>
           </Link>
@@ -564,16 +545,16 @@ export default function PlaygroundPage() {
               ${
                 showChatbot
                   ? `
-                    bg-zinc-900
-                    text-amber-400
-                    border-zinc-700
+                    bg-card
+                    text-primary
+                    border-border
                   `
                   : `
-                    bg-gray-100
-                    hover:bg-gray-900
-                    text-gray-700
-                    hover:text-amber-400
-                    border-gray-200
+                    bg-muted
+                    hover:bg-muted/80
+                    text-foreground/80
+                    hover:text-foreground
+                    border-border
                   `
               }
             `}
@@ -589,25 +570,15 @@ export default function PlaygroundPage() {
                 <MessageSquare className="w-4 h-4" />
                 ArchBot
 
-                <span
-                  className="
-                    inline-flex
-                    items-center
-                    justify-center
-                    w-4 h-4
-                    rounded-full
-                    bg-amber-500
-                    text-zinc-900
-                    text-[9px]
-                    font-black
-                  "
-                >
+                <span className="inline-flex items-center justify-center w-4 h-4 rounded-full bg-primary text-primary-foreground text-[9px] font-black">
                   AI
                 </span>
               </>
             )}
 
           </button>
+
+          <ThemeToggle />
 
         </div>
 
@@ -621,8 +592,8 @@ export default function PlaygroundPage() {
         <div
           className="
             border-b
-            border-blue-200
-            bg-blue-50
+            border-info/40
+            bg-info
             px-6
             py-4
           "
@@ -635,7 +606,7 @@ export default function PlaygroundPage() {
               <Info
                 className="
                   w-5 h-5
-                  text-blue-600
+                  text-info-foreground
                   mt-0.5
                   flex-shrink-0
                 "
@@ -643,15 +614,15 @@ export default function PlaygroundPage() {
 
               <div className="flex-1">
 
-                <h2 className="font-semibold text-blue-900">
+                <h2 className="font-semibold text-info-foreground">
                   Module {module.moduleNumber} Build Activity
                 </h2>
 
-                <p className="text-sm text-blue-800 mt-1">
+                <p className="text-sm text-info-foreground mt-1">
                   {module.buildActivity?.title}
                 </p>
 
-                <p className="text-sm text-blue-700 mt-2">
+                <p className="text-sm text-info-foreground mt-2">
                   Build the required architecture on the
                   canvas, connect the services correctly,
                   configure them if needed, and then click
@@ -665,7 +636,7 @@ export default function PlaygroundPage() {
 
                   <div className="mt-3">
 
-                    <p className="text-xs font-semibold text-blue-900 mb-2">
+                    <p className="text-xs font-semibold text-info-foreground mb-2">
                       Required Services
                     </p>
 
@@ -678,11 +649,11 @@ export default function PlaygroundPage() {
                             className="
                               px-3 py-1
                               rounded-full
-                              bg-white
+                              bg-card
                               border
-                              border-blue-200
+                              border-info/40
                               text-xs
-                              text-blue-800
+                              text-info-foreground
                               font-medium
                             "
                           >
@@ -703,7 +674,7 @@ export default function PlaygroundPage() {
 
                   <div className="mt-3">
 
-                    <p className="text-xs font-semibold text-blue-900 mb-2">
+                    <p className="text-xs font-semibold text-info-foreground mb-2">
                       Required Connections
                     </p>
 
@@ -716,11 +687,11 @@ export default function PlaygroundPage() {
                             className="
                               px-3 py-1
                               rounded-full
-                              bg-white
+                              bg-card
                               border
-                              border-blue-200
+                              border-info/40
                               text-xs
-                              text-blue-800
+                              text-info-foreground
                               font-medium
                             "
                           >
@@ -755,7 +726,7 @@ export default function PlaygroundPage() {
       ======================================================= */}
 
       {validationResult && (
-        <div className="border-b border-gray-200 bg-gray-50 px-6 py-4">
+        <div className="border-b border-border bg-muted/50 px-6 py-4">
 
           {validationResult.valid ? (
 
@@ -763,8 +734,8 @@ export default function PlaygroundPage() {
               className="
                 rounded-lg
                 border
-                border-green-200
-                bg-green-50
+                border-success-foreground/20
+                bg-success
                 p-4
               "
             >
@@ -774,18 +745,18 @@ export default function PlaygroundPage() {
                 <CheckCircle
                   className="
                     w-6 h-6
-                    text-green-600
+                    text-success-foreground
                     flex-shrink-0
                   "
                 />
 
                 <div>
 
-                  <h2 className="font-semibold text-green-800">
+                  <h2 className="font-semibold text-success-foreground">
                     Architecture Valid
                   </h2>
 
-                  <p className="text-sm text-green-700 mt-1">
+                  <p className="text-sm text-success-foreground mt-1">
                     Your architecture satisfies all required
                     services and connections for this learning
                     module.
@@ -800,11 +771,11 @@ export default function PlaygroundPage() {
                           className="
                             px-2 py-1
                             rounded
-                            bg-green-100
+                            bg-success
                             border
-                            border-green-200
+                            border-success-foreground/20
                             text-xs
-                            text-green-800
+                            text-success-foreground
                           "
                         >
                           ✓ {getServiceName(service)}
@@ -826,8 +797,8 @@ export default function PlaygroundPage() {
               className="
                 rounded-lg
                 border
-                border-red-200
-                bg-red-50
+                border-destructive/30
+                bg-destructive/10
                 p-4
               "
             >
@@ -837,18 +808,18 @@ export default function PlaygroundPage() {
                 <AlertCircle
                   className="
                     w-6 h-6
-                    text-red-600
+                    text-destructive
                     flex-shrink-0
                   "
                 />
 
                 <div className="flex-1">
 
-                  <h2 className="font-semibold text-red-800">
+                  <h2 className="font-semibold text-destructive">
                     Architecture Incomplete
                   </h2>
 
-                  <p className="text-sm text-red-700 mt-1">
+                  <p className="text-sm text-destructive mt-1">
                     Your architecture is missing required
                     components or connections.
                   </p>
@@ -858,7 +829,7 @@ export default function PlaygroundPage() {
                   {validationResult.missingServices.length > 0 && (
                     <div className="mt-3">
 
-                      <p className="text-sm font-semibold text-red-800">
+                      <p className="text-sm font-semibold text-destructive">
                         Missing Services
                       </p>
 
@@ -872,9 +843,9 @@ export default function PlaygroundPage() {
                                 px-2 py-1
                                 rounded
                                 bg-red-100
-                                text-red-800
+                                text-destructive
                                 border
-                                border-red-200
+                                border-destructive/30
                                 text-xs
                               "
                             >
@@ -893,7 +864,7 @@ export default function PlaygroundPage() {
                   {validationResult.missingConnections.length > 0 && (
                     <div className="mt-3">
 
-                      <p className="text-sm font-semibold text-red-800">
+                      <p className="text-sm font-semibold text-destructive">
                         Missing Connections
                       </p>
 
@@ -907,9 +878,9 @@ export default function PlaygroundPage() {
                                 px-2 py-1
                                 rounded
                                 bg-red-100
-                                text-red-800
+                                text-destructive
                                 border
-                                border-red-200
+                                border-destructive/30
                                 text-xs
                               "
                             >
@@ -947,11 +918,11 @@ export default function PlaygroundPage() {
 
                         <div>
 
-                          <p className="text-sm font-semibold text-blue-800">
+                          <p className="text-sm font-semibold text-info-foreground">
                             Additional Services
                           </p>
 
-                          <p className="text-xs text-blue-700 mt-1">
+                          <p className="text-xs text-info-foreground mt-1">
                             These services are not required
                             for this module but are allowed
                             for experimentation.
@@ -967,9 +938,9 @@ export default function PlaygroundPage() {
                                     px-2 py-1
                                     rounded
                                     bg-blue-100
-                                    text-blue-800
+                                    text-info-foreground
                                     border
-                                    border-blue-200
+                                    border-info/40
                                     text-xs
                                   "
                                 >
@@ -1018,8 +989,8 @@ export default function PlaygroundPage() {
             className="
               w-96
               border-l
-              border-gray-200
-              bg-gray-50
+              border-border
+              bg-muted/50
               p-4
               overflow-y-auto
               flex-shrink-0
@@ -1142,7 +1113,7 @@ export default function PlaygroundPage() {
               w-[420px]
               flex-shrink-0
               border-l
-              border-zinc-800
+              border-border
               overflow-hidden
             "
             style={{

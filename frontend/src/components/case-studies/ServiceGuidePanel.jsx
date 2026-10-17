@@ -27,29 +27,29 @@ export const ServiceGuidePanel = ({ caseStudyId, selectedServices }) => {
   };
 
   return (
-    <div className="w-full h-full bg-white border-l border-gray-200 overflow-y-auto">
+    <div className="w-full h-full bg-card border-l border-border overflow-y-auto">
       {/* Header */}
-      <div className="sticky top-0 bg-gradient-to-r from-yellow-50 to-white border-b border-gray-200 p-4">
-        <h2 className="text-lg font-bold text-gray-900">Service Guide</h2>
-        <p className="text-xs text-gray-500 mt-1">Specifications & Data Flow</p>
+      <div className="sticky top-0 bg-muted/70 border-b border-border p-4">
+        <h2 className="text-lg font-bold text-foreground">Service Guide</h2>
+        <p className="text-xs text-muted-foreground mt-1">Specifications & Data Flow</p>
       </div>
 
       <div className="p-4 space-y-4">
         {/* Case Study Overview */}
         {caseStudyFlow && (
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
-            <p className="text-sm font-semibold text-blue-900">{caseStudyFlow.name}</p>
-            <p className="text-xs text-blue-700 mt-1">{caseStudyFlow.overview}</p>
+          <div className="bg-info border border-info/40 rounded-lg p-3">
+            <p className="text-sm font-semibold text-info-foreground">{caseStudyFlow.name}</p>
+            <p className="text-xs text-info-foreground mt-1">{caseStudyFlow.overview}</p>
           </div>
         )}
 
         {/* Services Section */}
-        <div className="border border-gray-200 rounded-lg overflow-hidden">
+        <div className="border border-border rounded-lg overflow-hidden">
           <button
             onClick={() => toggleSection('services')}
-            className="w-full bg-gray-100 hover:bg-gray-200 px-4 py-3 flex items-center justify-between transition"
+            className="w-full bg-muted hover:bg-muted px-4 py-3 flex items-center justify-between transition"
           >
-            <span className="font-semibold text-gray-900 text-sm">Services & Specifications</span>
+            <span className="font-semibold text-foreground text-sm">Services & Specifications</span>
             {expandedSections.services ? (
               <ChevronDown className="w-4 h-4" />
             ) : (
@@ -58,7 +58,7 @@ export const ServiceGuidePanel = ({ caseStudyId, selectedServices }) => {
           </button>
 
           {expandedSections.services && (
-            <div className="divide-y divide-gray-200">
+            <div className="divide-y divide-border">
               {selectedServices && selectedServices.length > 0 ? (
                 selectedServices.map((serviceId) => {
                   const guide = SERVICE_GUIDES[serviceId];
@@ -70,11 +70,11 @@ export const ServiceGuidePanel = ({ caseStudyId, selectedServices }) => {
                     <div key={serviceId}>
                       <button
                         onClick={() => toggleService(serviceId)}
-                        className="w-full p-3 hover:bg-yellow-50 transition text-left flex items-center justify-between"
+                        className="w-full p-3 hover:bg-accent transition text-left flex items-center justify-between"
                       >
                         <div className="flex-1">
-                          <p className="font-semibold text-gray-900 text-sm">{guide.name}</p>
-                          <p className="text-xs text-gray-600 line-clamp-1">{guide.description}</p>
+                          <p className="font-semibold text-foreground text-sm">{guide.name}</p>
+                          <p className="text-xs text-muted-foreground line-clamp-1">{guide.description}</p>
                         </div>
                         {isExpanded ? (
                           <ChevronDown className="w-4 h-4 ml-2 flex-shrink-0" />
@@ -84,14 +84,14 @@ export const ServiceGuidePanel = ({ caseStudyId, selectedServices }) => {
                       </button>
 
                       {isExpanded && (
-                        <div className="bg-gray-50 p-3 border-t border-gray-200 space-y-3 text-xs">
+                        <div className="bg-muted/50 p-3 border-t border-border space-y-3 text-xs">
                           {/* Key Features */}
                           <div>
-                            <p className="font-semibold text-gray-900 mb-1">Key Features:</p>
+                            <p className="font-semibold text-foreground mb-1">Key Features:</p>
                             <ul className="space-y-1">
                               {guide.keyFeatures.slice(0, 4).map((feature, idx) => (
-                                <li key={idx} className="text-gray-700 flex gap-2">
-                                  <span className="text-yellow-600 font-bold">•</span>
+                                <li key={idx} className="text-foreground/80 flex gap-2">
+                                  <span className="text-primary font-bold">•</span>
                                   <span>{feature}</span>
                                 </li>
                               ))}
@@ -101,16 +101,16 @@ export const ServiceGuidePanel = ({ caseStudyId, selectedServices }) => {
                           {/* Specifications */}
                           {guide.specifications && (
                             <div>
-                              <p className="font-semibold text-gray-900 mb-1">Specifications:</p>
+                              <p className="font-semibold text-foreground mb-1">Specifications:</p>
                               {Object.entries(guide.specifications).map(([specName, specItems]) => (
-                                <div key={specName} className="mb-2 bg-white p-2 rounded border border-gray-200">
-                                  <p className="font-medium text-gray-800 text-xs">{specName}:</p>
+                                <div key={specName} className="mb-2 bg-card p-2 rounded border border-border">
+                                  <p className="font-medium text-foreground text-xs">{specName}:</p>
                                   <div className="grid grid-cols-1 gap-1 mt-1">
                                     {typeof specItems === 'object' &&
                                       Object.entries(specItems).map(([key, value]) => (
-                                        <div key={key} className="flex items-start justify-between py-1 px-2 bg-gray-50 rounded">
-                                          <span className="font-medium text-gray-700">{key}</span>
-                                          <span className="text-gray-600 text-right">
+                                        <div key={key} className="flex items-start justify-between py-1 px-2 bg-muted/50 rounded">
+                                          <span className="font-medium text-foreground/80">{key}</span>
+                                          <span className="text-muted-foreground text-right">
                                             {typeof value === 'object' ? JSON.stringify(value) : value}
                                           </span>
                                         </div>
@@ -124,12 +124,12 @@ export const ServiceGuidePanel = ({ caseStudyId, selectedServices }) => {
                           {/* Connection Patterns */}
                           {guide.connectionPatterns && (
                             <div>
-                              <p className="font-semibold text-gray-900 mb-1">Connection Patterns:</p>
+                              <p className="font-semibold text-foreground mb-1">Connection Patterns:</p>
                               {guide.connectionPatterns.map((pattern, idx) => (
-                                <div key={idx} className="bg-white p-2 rounded border border-gray-200 mb-1">
-                                  <p className="font-medium text-gray-800">{pattern.name}</p>
-                                  <p className="text-gray-600 text-xs mt-1">{pattern.description}</p>
-                                  <p className="text-gray-500 text-xs mt-1">
+                                <div key={idx} className="bg-card p-2 rounded border border-border mb-1">
+                                  <p className="font-medium text-foreground">{pattern.name}</p>
+                                  <p className="text-muted-foreground text-xs mt-1">{pattern.description}</p>
+                                  <p className="text-muted-foreground text-xs mt-1">
                                     <span className="font-medium">Connects to:</span> {pattern.targetServices.join(', ')}
                                   </p>
                                 </div>
@@ -140,12 +140,12 @@ export const ServiceGuidePanel = ({ caseStudyId, selectedServices }) => {
                           {/* Data Flow */}
                           {guide.dataFlow && (
                             <div>
-                              <p className="font-semibold text-gray-900 mb-1">Data Flow:</p>
-                              <div className="bg-white p-2 rounded border border-gray-200 space-y-1">
+                              <p className="font-semibold text-foreground mb-1">Data Flow:</p>
+                              <div className="bg-card p-2 rounded border border-border space-y-1">
                                 {Object.entries(guide.dataFlow).map(([phase, description]) => (
                                   <div key={phase} className="py-1">
-                                    <span className="font-medium text-gray-800">{phase}:</span>{' '}
-                                    <span className="text-gray-600">{description}</span>
+                                    <span className="font-medium text-foreground">{phase}:</span>{' '}
+                                    <span className="text-muted-foreground">{description}</span>
                                   </div>
                                 ))}
                               </div>
@@ -157,7 +157,7 @@ export const ServiceGuidePanel = ({ caseStudyId, selectedServices }) => {
                   );
                 })
               ) : (
-                <div className="p-3 text-xs text-gray-600">
+                <div className="p-3 text-xs text-muted-foreground">
                   Add services to the canvas to see specifications
                 </div>
               )}
@@ -167,12 +167,12 @@ export const ServiceGuidePanel = ({ caseStudyId, selectedServices }) => {
 
         {/* Data Flow Section */}
         {caseStudyFlow && expandedSections.dataFlow && (
-          <div className="border border-gray-200 rounded-lg overflow-hidden">
+          <div className="border border-border rounded-lg overflow-hidden">
             <button
               onClick={() => toggleSection('dataFlow')}
-              className="w-full bg-gray-100 hover:bg-gray-200 px-4 py-3 flex items-center justify-between transition"
+              className="w-full bg-muted hover:bg-muted px-4 py-3 flex items-center justify-between transition"
             >
-              <span className="font-semibold text-gray-900 text-sm">Data Flow Analysis</span>
+              <span className="font-semibold text-foreground text-sm">Data Flow Analysis</span>
               {expandedSections.dataFlow ? (
                 <ChevronDown className="w-4 h-4" />
               ) : (
@@ -180,27 +180,27 @@ export const ServiceGuidePanel = ({ caseStudyId, selectedServices }) => {
               )}
             </button>
 
-            <div className="p-3 space-y-3 bg-gray-50 border-t border-gray-200 text-xs">
+            <div className="p-3 space-y-3 bg-muted/50 border-t border-border text-xs">
               {/* Steps */}
               <div>
-                <p className="font-semibold text-gray-900 mb-2">Request Flow Steps:</p>
+                <p className="font-semibold text-foreground mb-2">Request Flow Steps:</p>
                 <div className="space-y-2">
                   {caseStudyFlow.steps.map((step) => (
-                    <div key={step.number} className="bg-white p-2 rounded border border-gray-200">
+                    <div key={step.number} className="bg-card p-2 rounded border border-border">
                       <div className="flex items-start gap-2">
-                        <div className="w-6 h-6 rounded-full bg-yellow-100 text-yellow-700 flex items-center justify-center font-bold text-xs flex-shrink-0">
+                        <div className="w-6 h-6 rounded-full bg-accent text-primary flex items-center justify-center font-bold text-xs flex-shrink-0">
                           {step.number}
                         </div>
                         <div className="flex-1">
-                          <p className="font-medium text-gray-800">{step.description}</p>
-                          <p className="text-gray-600 text-xs mt-1">
+                          <p className="font-medium text-foreground">{step.description}</p>
+                          <p className="text-muted-foreground text-xs mt-1">
                             <span className="font-medium">Services:</span> {step.services.join(' → ')}
                           </p>
-                          <p className="text-gray-600 text-xs">
+                          <p className="text-muted-foreground text-xs">
                             <span className="font-medium">Data:</span> {step.data}
                           </p>
                           {step.cost && (
-                            <p className="text-yellow-700 text-xs font-medium mt-1">Cost: {step.cost}</p>
+                            <p className="text-primary text-xs font-medium mt-1">Cost: {step.cost}</p>
                           )}
                         </div>
                       </div>
@@ -212,12 +212,12 @@ export const ServiceGuidePanel = ({ caseStudyId, selectedServices }) => {
               {/* Bottlenecks */}
               {caseStudyFlow.bottlenecks && (
                 <div>
-                  <p className="font-semibold text-gray-900 mb-2">Potential Bottlenecks:</p>
+                  <p className="font-semibold text-foreground mb-2">Potential Bottlenecks:</p>
                   {caseStudyFlow.bottlenecks.map((bottleneck, idx) => (
-                    <div key={idx} className="bg-red-50 border border-red-200 p-2 rounded mb-1">
+                    <div key={idx} className="bg-destructive/10 border border-destructive/30 p-2 rounded mb-1">
                       <p className="font-medium text-red-900 text-xs">{bottleneck.service}</p>
-                      <p className="text-red-800 text-xs">{bottleneck.issue}</p>
-                      <p className="text-red-700 text-xs font-medium mt-1">Solution: {bottleneck.solution}</p>
+                      <p className="text-destructive text-xs">{bottleneck.issue}</p>
+                      <p className="text-destructive text-xs font-medium mt-1">Solution: {bottleneck.solution}</p>
                     </div>
                   ))}
                 </div>
@@ -226,12 +226,12 @@ export const ServiceGuidePanel = ({ caseStudyId, selectedServices }) => {
               {/* Cost Breakdown */}
               {caseStudyFlow.costBreakdown && (
                 <div>
-                  <p className="font-semibold text-gray-900 mb-2">Monthly Cost Breakdown:</p>
-                  <div className="bg-white border border-gray-200 rounded p-2 space-y-1">
+                  <p className="font-semibold text-foreground mb-2">Monthly Cost Breakdown:</p>
+                  <div className="bg-card border border-border rounded p-2 space-y-1">
                     {Object.entries(caseStudyFlow.costBreakdown).map(([item, cost]) => (
                       <div key={item} className="flex justify-between py-1 border-b border-gray-100 last:border-b-0">
-                        <span className="text-gray-700 font-medium">{item}</span>
-                        <span className="text-gray-900 font-bold text-yellow-700">{cost}</span>
+                        <span className="text-foreground/80 font-medium">{item}</span>
+                        <span className="text-foreground font-bold text-primary">{cost}</span>
                       </div>
                     ))}
                   </div>
@@ -241,10 +241,10 @@ export const ServiceGuidePanel = ({ caseStudyId, selectedServices }) => {
               {/* Optimizations */}
               {caseStudyFlow.optimizations && (
                 <div>
-                  <p className="font-semibold text-gray-900 mb-2">Optimization Tips:</p>
+                  <p className="font-semibold text-foreground mb-2">Optimization Tips:</p>
                   {caseStudyFlow.optimizations.map((opt, idx) => (
-                    <div key={idx} className="bg-green-50 border-l-2 border-green-500 p-2 mb-1">
-                      <p className="text-green-800 text-xs">{opt}</p>
+                    <div key={idx} className="bg-success border-l-2 border-green-500 p-2 mb-1">
+                      <p className="text-success-foreground text-xs">{opt}</p>
                     </div>
                   ))}
                 </div>
@@ -254,12 +254,12 @@ export const ServiceGuidePanel = ({ caseStudyId, selectedServices }) => {
         )}
 
         {/* Connection Patterns Section */}
-        <div className="border border-gray-200 rounded-lg overflow-hidden">
+        <div className="border border-border rounded-lg overflow-hidden">
           <button
             onClick={() => toggleSection('connections')}
-            className="w-full bg-gray-100 hover:bg-gray-200 px-4 py-3 flex items-center justify-between transition"
+            className="w-full bg-muted hover:bg-muted px-4 py-3 flex items-center justify-between transition"
           >
-            <span className="font-semibold text-gray-900 text-sm">Connection Patterns</span>
+            <span className="font-semibold text-foreground text-sm">Connection Patterns</span>
             {expandedSections.connections ? (
               <ChevronDown className="w-4 h-4" />
             ) : (
@@ -268,27 +268,27 @@ export const ServiceGuidePanel = ({ caseStudyId, selectedServices }) => {
           </button>
 
           {expandedSections.connections && (
-            <div className="p-3 space-y-2 bg-gray-50 border-t border-gray-200 text-xs divide-y">
+            <div className="p-3 space-y-2 bg-muted/50 border-t border-border text-xs divide-y">
               {Object.entries(CONNECTION_PATTERNS).map(([name, pattern]) => (
                 <div key={name} className="py-2 first:pt-0">
-                  <p className="font-semibold text-gray-900">{name}</p>
-                  <p className="text-gray-600 mt-1">{pattern.description}</p>
-                  <div className="bg-white p-2 rounded mt-1 border border-gray-200 space-y-1">
+                  <p className="font-semibold text-foreground">{name}</p>
+                  <p className="text-muted-foreground mt-1">{pattern.description}</p>
+                  <div className="bg-card p-2 rounded mt-1 border border-border space-y-1">
                     <div>
-                      <span className="font-medium text-gray-800">Flow:</span>{' '}
-                      <span className="text-gray-600 text-xs break-words">{pattern.flow}</span>
+                      <span className="font-medium text-foreground">Flow:</span>{' '}
+                      <span className="text-muted-foreground text-xs break-words">{pattern.flow}</span>
                     </div>
                     <div>
-                      <span className="font-medium text-gray-800">Latency:</span>{' '}
-                      <span className="text-gray-600">{pattern.latency}</span>
+                      <span className="font-medium text-foreground">Latency:</span>{' '}
+                      <span className="text-muted-foreground">{pattern.latency}</span>
                     </div>
                     <div>
-                      <span className="font-medium text-gray-800">Use Case:</span>{' '}
-                      <span className="text-gray-600">{pattern.useCase}</span>
+                      <span className="font-medium text-foreground">Use Case:</span>{' '}
+                      <span className="text-muted-foreground">{pattern.useCase}</span>
                     </div>
                     <div>
-                      <span className="font-medium text-yellow-700">Cost Impact:</span>{' '}
-                      <span className="text-yellow-600 font-medium">{pattern.costImpact}</span>
+                      <span className="font-medium text-primary">Cost Impact:</span>{' '}
+                      <span className="text-primary font-medium">{pattern.costImpact}</span>
                     </div>
                   </div>
                 </div>

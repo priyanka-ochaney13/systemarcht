@@ -1,438 +1,148 @@
 import React from 'react';
 import Link from 'next/link';
 import { Zap, Layout, Gauge, Lightbulb, ArrowRight, MessageSquare, BookOpen, Sparkles } from 'lucide-react';
+import { SiteHeader } from '@/components/layout/SiteHeader';
+
+const FEATURES = [
+  {
+    icon: Layout,
+    title: 'Drag & Drop Design',
+    description: 'Visually design cloud architectures by dragging AWS services onto a canvas.',
+  },
+  {
+    icon: Gauge,
+    title: 'Real-World Simulation',
+    description: 'Simulate actual AWS service behavior including cold starts, throttling, and latency.',
+  },
+  {
+    icon: Lightbulb,
+    title: 'Learn Patterns',
+    description: 'Study core system design patterns used by companies like Netflix, Uber, and Instagram.',
+  },
+  {
+    icon: MessageSquare,
+    title: 'ArchBot — Cost AI',
+    description: 'Chat with your assistant for cost breakdowns and optimization tips for your architecture.',
+    link: '/chatbot',
+    highlight: true,
+  },
+];
+
+const PATTERNS = [
+  {
+    title: 'Event-Driven Microservices',
+    example: 'Netflix-like video streaming',
+    cost: '$13,020/month',
+  },
+  {
+    title: 'Real-Time Analytics',
+    example: 'Uber/Airbnb dashboards',
+    cost: '$86/month',
+  },
+  {
+    title: 'Photo Sharing Platform',
+    example: 'Instagram/Pinterest scale',
+    cost: '$253,000/month',
+  },
+];
 
 export const LandingPage = () => {
   return (
-    <div className="min-h-screen bg-white">
-      {/* Global animations */}
-      <style>{`
-        @keyframes slideInDown {
-          from {
-            opacity: 0;
-            transform: translateY(-30px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-        
-        @keyframes slideInUp {
-          from {
-            opacity: 0;
-            transform: translateY(30px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-        
-        @keyframes fadeInScale {
-          from {
-            opacity: 0;
-            transform: scale(0.9);
-          }
-          to {
-            opacity: 1;
-            transform: scale(1);
-          }
-        }
-        
-        @keyframes float {
-          0%, 100% { transform: translateY(0px); }
-          50% { transform: translateY(-10px); }
-        }
-        
-        @keyframes pulse-glow {
-          0%, 100% {
-            box-shadow: 0 0 20px rgba(255, 153, 0, 0.3);
-          }
-          50% {
-            box-shadow: 0 0 40px rgba(255, 153, 0, 0.6);
-          }
-        }
-        
-        .animate-hero-icon {
-          animation: slideInDown 0.8s ease-out;
-        }
-        
-        .animate-hero-title {
-          animation: slideInDown 0.8s ease-out 0.2s backwards;
-        }
-        
-        .animate-hero-subtitle {
-          animation: slideInDown 0.8s ease-out 0.4s backwards;
-        }
-        
-        .animate-hero-buttons {
-          animation: slideInUp 0.8s ease-out 0.6s backwards;
-        }
-        
-        .animate-feature-card {
-          animation: fadeInScale 0.6s ease-out;
-        }
-        
-        .animate-feature-card:nth-child(1) {
-          animation-delay: 0s;
-        }
-        
-        .animate-feature-card:nth-child(2) {
-          animation-delay: 0.1s;
-        }
-        
-        .animate-feature-card:nth-child(3) {
-          animation-delay: 0.2s;
-        }
-        
-        .animate-pattern-item {
-          animation: slideInUp 0.6s ease-out;
-        }
-        
-        .animate-pattern-item:nth-child(1) {
-          animation-delay: 0s;
-        }
-        
-        .animate-pattern-item:nth-child(2) {
-          animation-delay: 0.1s;
-        }
-        
-        .animate-pattern-item:nth-child(3) {
-          animation-delay: 0.2s;
-        }
-        
-        .btn-glow {
-          animation: pulse-glow 2s ease-in-out infinite;
-        }
-        
-        .float-animation {
-          animation: float 3s ease-in-out infinite;
-        }
-      `}</style>
+    <div className="min-h-screen bg-background text-foreground">
+      <SiteHeader showLandingAnchors />
 
-      {/* Navigation */}
-      <nav className="bg-white border-b border-gray-200 sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Zap className="w-6 h-6" style={{ color: '#FF9900' }} />
-            <span className="text-xl font-bold text-gray-900">SystemArcht</span>
-          </div>
-          <div className="hidden md:flex items-center gap-6">
-
-  <a
-    href="#features"
-    className="text-gray-700 hover:text-yellow-600 transition"
-  >
-    Features
-  </a>
-
-  <a
-    href="#patterns"
-    className="text-gray-700 hover:text-yellow-600 transition"
-  >
-    Patterns
-  </a>
-
-  <Link
-    href="/playground"
-    className="text-gray-700 hover:text-yellow-600 transition font-medium"
-  >
-    Playground
-  </Link>
-
-  <Link
-    href="/learning"
-    className="text-gray-700 hover:text-yellow-600 transition font-medium"
-  >
-    Learning
-  </Link>
-
-  <Link href="/ai-architect">
-    <button
-      className="
-        flex items-center gap-1.5
-        px-3.5 py-1.5
-        rounded-full
-        bg-gradient-to-r from-amber-500 to-amber-600
-        hover:from-amber-400 hover:to-amber-500
-        text-zinc-950
-        text-sm
-        font-bold
-        shadow-sm hover:shadow-md
-        transition
-      "
-    >
-      <Sparkles className="w-3.5 h-3.5 fill-zinc-950" />
-      AI Architect
-    </button>
-  </Link>
-
-  <Link href="/chatbot">
-    <button
-      className="
-        flex items-center gap-1.5
-        px-3 py-1.5
-        rounded-full
-        bg-gray-900
-        hover:bg-zinc-800
-        text-amber-400
-        text-sm
-        font-medium
-        border border-zinc-700
-        transition
-      "
-    >
-      <MessageSquare className="w-3.5 h-3.5" />
-      ArchBot
-    </button>
-  </Link>
-
-</div>
-        </div>
-      </nav>
-
-      {/* Hero Section */}
-      <section className="bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white py-24 px-4 overflow-hidden">
-        <div className="max-w-6xl mx-auto text-center">
-          <Zap className="w-16 h-16 mx-auto mb-6 animate-hero-icon float-animation" style={{ color: '#FF9900' }} />
-          <h1 className="text-5xl md:text-6xl font-bold mb-6 leading-tight animate-hero-title">
-            Design, Simulate, Learn
-            <br />
-            <span style={{ color: '#FF9900' }}>AWS Architectures</span>
+      <section className="border-b border-border px-4 py-16 md:py-20">
+        <div className="mx-auto max-w-5xl text-center">
+          <p className="mb-3 text-xs font-semibold tracking-[0.18em] text-primary uppercase">
+            AWS Architecture Learning
+          </p>
+          <h1 className="text-4xl font-semibold tracking-tight text-foreground md:text-5xl">
+            Design, simulate, and learn
+            <span className="block mt-1">AWS architectures</span>
           </h1>
-          <p className="text-xl text-gray-300 mb-8 max-w-2xl mx-auto animate-hero-subtitle">
+          <p className="mx-auto mt-5 max-w-2xl text-base leading-relaxed text-muted-foreground md:text-[17px]">
             SystemArcht is an interactive platform where you can visually design cloud architectures,
             simulate their behavior with real-world constraints, and understand system design patterns.
           </p>
-          <div className="flex flex-col md:flex-row gap-4 justify-center animate-hero-buttons">
-
-  {/* Start Learning */}
-  <Link href="/learning">
-    <button
-      className="
-        px-8 py-4
-        bg-yellow-500
-        hover:bg-yellow-600
-        text-white
-        font-semibold
-        rounded-lg
-        transition
-        text-lg
-        flex items-center
-        gap-2
-        justify-center
-        md:justify-start
-        btn-glow
-        hover:shadow-2xl
-        transform
-        hover:scale-105
-      "
-    >
-      <BookOpen className="w-5 h-5" />
-      Start Learning
-    </button>
-  </Link>
-
-  {/* Start Building */}
-  <Link href="/playground">
-    <button
-      className="
-        px-8 py-4
-        bg-gray-700
-        hover:bg-gray-600
-        text-white
-        font-semibold
-        rounded-lg
-        transition
-        text-lg
-        flex items-center
-        gap-2
-        justify-center
-        md:justify-start
-        hover:shadow-2xl
-        transform
-        hover:scale-105
-      "
-    >
-      <Layout className="w-5 h-5" />
-      Start Building
-    </button>
-  </Link>
-
-  {/* AI Architect */}
-  <Link href="/ai-architect">
-    <button
-      className="
-        px-8 py-4
-        bg-gradient-to-r from-amber-500 to-amber-600
-        hover:from-amber-400 hover:to-amber-500
-        text-zinc-950
-        font-bold
-        rounded-lg
-        transition
-        text-lg
-        flex items-center
-        gap-2
-        justify-center
-        md:justify-start
-        shadow-xl shadow-amber-500/20
-        transform
-        hover:scale-105
-      "
-    >
-      <Sparkles className="w-5 h-5 fill-zinc-950" />
-      AI Architect
-    </button>
-  </Link>
-
-  {/* ArchBot */}
-  <Link href="/chatbot">
-    <button
-      className="
-        px-8 py-4
-        bg-transparent
-        hover:bg-zinc-800
-        text-amber-400
-        font-semibold
-        rounded-lg
-        transition
-        text-lg
-        flex items-center
-        gap-2
-        justify-center
-        md:justify-start
-        border border-amber-500/40
-        hover:border-amber-400
-        hover:shadow-2xl
-        transform
-        hover:scale-105
-      "
-    >
-      <MessageSquare className="w-5 h-5" />
-      Ask ArchBot
-    </button>
-  </Link>
-
-</div>
+          <div className="mt-8 flex flex-col items-stretch justify-center gap-3 sm:flex-row sm:flex-wrap sm:items-center">
+            <Link href="/learning" className="sa-btn-primary h-11 px-5 text-[15px]">
+              <BookOpen className="size-4" />
+              Start Learning
+            </Link>
+            <Link href="/playground" className="sa-btn-secondary h-11 px-5 text-[15px]">
+              <Layout className="size-4" />
+              Start Building
+            </Link>
+            <Link href="/ai-architect" className="sa-btn-secondary h-11 px-5 text-[15px]">
+              <Sparkles className="size-4" />
+              AI Architect
+            </Link>
+            <Link href="/chatbot" className="sa-btn-secondary h-11 px-5 text-[15px]">
+              <MessageSquare className="size-4" />
+              Ask ArchBot
+            </Link>
+          </div>
         </div>
       </section>
 
-      {/* Features Section */}
-      <section id="features" className="py-20 px-4 bg-gray-50">
-        <div className="max-w-6xl mx-auto">
-          <h2 className="text-3xl font-bold text-gray-900 text-center mb-16">Why SystemArcht?</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {[
-              {
-                icon: Layout,
-                title: 'Drag & Drop Design',
-                description: 'Visually design cloud architectures by dragging AWS services onto a canvas',
-              },
-              {
-                icon: Gauge,
-                title: 'Real-World Simulation',
-                description: 'Simulate actual AWS service behavior including cold starts, throttling, and latency',
-              },
-              {
-                icon: Lightbulb,
-                title: 'Learn Patterns',
-                description: 'Study 5 core system design patterns used by companies like Netflix, Uber, and Instagram',
-              },
-              {
-                icon: MessageSquare,
-                title: 'ArchBot — Cost AI',
-                description: 'Chat with your AI assistant to get instant cost breakdowns and optimization tips for your architecture',
-                link: '/chatbot',
-                highlight: true,
-              },
-            ].map((feature, idx) => (
-              <div
-                key={idx}
-                className={`bg-white p-8 rounded-lg shadow-md hover:shadow-lg transition animate-feature-card transform hover:-translate-y-1 duration-300 ${
-                  feature.highlight ? 'border-2 border-amber-400/40 relative overflow-hidden' : ''
-                }`}
-              >
-                {feature.highlight && (
-                  <span className="absolute top-3 right-3 text-[10px] font-bold text-amber-600 bg-amber-50 border border-amber-200 px-1.5 py-0.5 rounded-full uppercase tracking-wider">
+      <section id="features" className="bg-muted/50 px-4 py-16">
+        <div className="mx-auto max-w-6xl">
+          <h2 className="mb-10 text-center text-2xl font-semibold tracking-tight">Why SystemArcht?</h2>
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
+            {FEATURES.map((feature) => (
+              <div key={feature.title} className="relative rounded-xl border border-border bg-card p-6 shadow-xs">
+                {feature.highlight ? (
+                  <span className="absolute top-3 right-3 rounded-full border border-border bg-accent px-2 py-0.5 text-[10px] font-semibold tracking-wide text-accent-foreground uppercase">
                     New
                   </span>
-                )}
-                <feature.icon
-                  className="w-12 h-12 mb-4"
-                  style={{ color: feature.highlight ? '#F59E0B' : '#FF9900' }}
-                />
-                <h3 className="text-xl font-bold text-gray-900 mb-3">{feature.title}</h3>
-                <p className="text-gray-600 mb-4">{feature.description}</p>
-                {feature.link && (
-                  <Link href={feature.link}>
-                    <span className="text-sm font-semibold text-amber-600 hover:text-amber-700 flex items-center gap-1 transition">
-                      Try ArchBot <ArrowRight className="w-3.5 h-3.5" />
-                    </span>
+                ) : null}
+                <feature.icon className="mb-4 size-6 text-primary" />
+                <h3 className="mb-2 text-base font-semibold">{feature.title}</h3>
+                <p className="text-sm leading-relaxed text-muted-foreground">{feature.description}</p>
+                {feature.link ? (
+                  <Link href={feature.link} className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-primary hover:underline">
+                    Try ArchBot <ArrowRight className="size-3.5" />
                   </Link>
-                )}
+                ) : null}
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Patterns Overview */}
-      <section id="patterns" className="py-20 px-4 bg-white">
-        <div className="max-w-6xl mx-auto">
-          <h2 className="text-3xl font-bold text-gray-900 text-center mb-16">Learn 3 Core Patterns</h2>
-          <div className="space-y-4">
-            {[
-              {
-                title: 'Event-Driven Microservices',
-                example: 'Netflix-like video streaming',
-                cost: '$13,020/month',
-              },
-              {
-                title: 'Real-Time Analytics',
-                example: 'Uber/Airbnb dashboards',
-                cost: '$86/month',
-              },
-              {
-                title: 'Photo Sharing Platform',
-                example: 'Instagram/Pinterest scale',
-                cost: '$253,000/month',
-              },
-            ].map((pattern, idx) => (
-              <div key={idx} className="bg-gray-50 p-6 rounded-lg border border-gray-200 hover:border-yellow-400 transition animate-pattern-item transform hover:-translate-y-1 hover:shadow-md duration-300">
-                <div className="flex items-center justify-between mb-2">
-                  <h3 className="text-lg font-bold text-gray-900">{pattern.title}</h3>
-                  <span className="text-sm font-semibold text-yellow-600">Est: {pattern.cost}</span>
+      <section id="patterns" className="px-4 py-16">
+        <div className="mx-auto max-w-6xl">
+          <h2 className="mb-8 text-center text-2xl font-semibold tracking-tight">Learn 3 core patterns</h2>
+          <div className="space-y-3">
+            {PATTERNS.map((pattern) => (
+              <div key={pattern.title} className="flex flex-col gap-2 rounded-xl border border-border bg-card px-5 py-4 shadow-xs sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                  <h3 className="text-base font-semibold">{pattern.title}</h3>
+                  <p className="text-sm text-muted-foreground">{pattern.example}</p>
                 </div>
-                <p className="text-gray-600">{pattern.example}</p>
+                <span className="text-sm font-semibold text-primary">Est: {pattern.cost}</span>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="bg-gray-900 text-white py-16 px-4">
-        <div className="max-w-4xl mx-auto text-center animate-hero-subtitle">
-          <h2 className="text-3xl font-bold mb-6">Ready to Learn?</h2>
-          <p className="text-gray-300 mb-8 text-lg">
+      <section className="border-t border-border bg-foreground px-4 py-14 text-background">
+        <div className="mx-auto max-w-3xl text-center">
+          <h2 className="text-2xl font-semibold tracking-tight">Ready to learn?</h2>
+          <p className="mt-3 text-sm text-background/70 md:text-base">
             Start building your first AWS architecture and understand real-world constraints.
           </p>
-          <Link href="/playground">
-            <button className="px-8 py-4 bg-yellow-500 hover:bg-yellow-600 text-white font-semibold rounded-lg transition text-lg flex items-center gap-2 justify-center mx-auto btn-glow hover:shadow-2xl transform hover:scale-105">
-              <Layout className="w-5 h-5" />
-              Launch Playground
-            </button>
+          <Link href="/playground" className="sa-btn-primary mx-auto mt-6 h-11 px-5">
+            <Layout className="size-4" />
+            Launch Playground
           </Link>
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="bg-gray-100 border-t border-gray-200 py-8 px-4">
-        <div className="max-w-6xl mx-auto text-center text-gray-600 text-sm">
-          <p>
-            SystemArcht © 2025 • An interactive learning platform for AWS cloud architecture
-          </p>
+      <footer className="border-t border-border px-4 py-8">
+        <div className="mx-auto max-w-6xl text-center text-sm text-muted-foreground">
+          <p>SystemArcht © 2026 · An interactive learning platform for AWS cloud architecture</p>
         </div>
       </footer>
     </div>

@@ -84,16 +84,16 @@ export const S3ConfigPanel = ({ onClose }) => {
   };
 
   return (
-    <div className="bg-white rounded-lg border border-gray-200 w-full max-w-md shadow-lg">
+    <div className="bg-card rounded-lg border border-border w-full max-w-md shadow-sm">
       {/* Header */}
-      <div className="flex items-center justify-between bg-gradient-to-r from-gray-50 to-gray-100 px-6 py-4 border-b">
+      <div className="flex items-center justify-between bg-muted/70 px-6 py-4 border-b">
         <div className="flex items-center gap-2">
           <Database className="w-5 h-5" style={{ color: '#FF9900' }} />
-          <h3 className="font-semibold text-gray-900">S3 Configuration</h3>
+          <h3 className="font-semibold text-foreground">S3 Configuration</h3>
         </div>
         <button
           onClick={onClose}
-          className="text-gray-400 hover:text-gray-600"
+          className="text-muted-foreground hover:text-foreground"
         >
           <X className="w-5 h-5" />
         </button>
@@ -103,13 +103,13 @@ export const S3ConfigPanel = ({ onClose }) => {
       <div className="p-6 space-y-6 max-h-[600px] overflow-y-auto">
         {/* Region */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm font-medium text-foreground/80 mb-2">
             📍 Region
           </label>
           <select
             value={localConfig.region}
             onChange={(e) => handleChange('region', e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-yellow-500"
+            className="w-full px-3 py-2 border border-input bg-background text-foreground rounded-md focus:ring-2 focus:ring-ring/40"
           >
             {Object.entries(REGIONS).map(([name, value]) => (
               <option key={value} value={value}>{name}</option>
@@ -119,111 +119,111 @@ export const S3ConfigPanel = ({ onClose }) => {
 
         {/* Storage Class */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm font-medium text-foreground/80 mb-2">
             📦 STORAGE CLASS
           </label>
           <select
             value={localConfig.storage_class}
             onChange={(e) => handleChange('storage_class', e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-yellow-500"
+            className="w-full px-3 py-2 border border-input bg-background text-foreground rounded-md focus:ring-2 focus:ring-ring/40"
           >
             {STORAGE_CLASSES.map(cls => (
               <option key={cls} value={cls}>{cls}</option>
             ))}
           </select>
-          <p className="text-xs text-gray-500 mt-1">💡 Choose based on access patterns</p>
+          <p className="text-xs text-muted-foreground mt-1">💡 Choose based on access patterns</p>
         </div>
 
         {/* Storage Size */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm font-medium text-foreground/80 mb-2">
             Average Storage Size (GB)
           </label>
           <input
             type="number"
             value={localConfig.storage_gb || ''}
             onChange={(e) => handleChange('storage_gb', e.target.value === '' ? '' : parseFloat(e.target.value))}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-yellow-500"
+            className="w-full px-3 py-2 border border-input bg-background text-foreground rounded-md focus:ring-2 focus:ring-ring/40"
           />
-          <p className="text-xs text-gray-500 mt-1">💡 Billed on average daily storage</p>
+          <p className="text-xs text-muted-foreground mt-1">💡 Billed on average daily storage</p>
         </div>
 
         {/* PUT Requests */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm font-medium text-foreground/80 mb-2">
             PUT Requests per Month
           </label>
           <input
             type="number"
             value={localConfig.put_requests || ''}
             onChange={(e) => handleChange('put_requests', e.target.value === '' ? '' : parseInt(e.target.value))}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-yellow-500"
+            className="w-full px-3 py-2 border border-input bg-background text-foreground rounded-md focus:ring-2 focus:ring-ring/40"
           />
-          <p className="text-xs text-gray-500 mt-1">💡 Upload/Write operations</p>
+          <p className="text-xs text-muted-foreground mt-1">💡 Upload/Write operations</p>
         </div>
 
         {/* GET Requests */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm font-medium text-foreground/80 mb-2">
             GET Requests per Month
           </label>
           <input
             type="number"
             value={localConfig.get_requests || ''}
             onChange={(e) => handleChange('get_requests', e.target.value === '' ? '' : parseInt(e.target.value))}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-yellow-500"
+            className="w-full px-3 py-2 border border-input bg-background text-foreground rounded-md focus:ring-2 focus:ring-ring/40"
           />
-          <p className="text-xs text-gray-500 mt-1">💡 Download/Read operations</p>
+          <p className="text-xs text-muted-foreground mt-1">💡 Download/Read operations</p>
         </div>
 
         {/* DELETE Requests */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm font-medium text-foreground/80 mb-2">
             DELETE Requests per Month
           </label>
           <input
             type="number"
             value={localConfig.delete_requests || ''}
             onChange={(e) => handleChange('delete_requests', e.target.value === '' ? '' : parseInt(e.target.value))}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-yellow-500"
+            className="w-full px-3 py-2 border border-input bg-background text-foreground rounded-md focus:ring-2 focus:ring-ring/40"
           />
         </div>
 
         {/* Data Transfer */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm font-medium text-foreground/80 mb-2">
             Outbound Data Transfer (GB)
           </label>
           <input
             type="number"
             value={localConfig.outbound_transfer_gb || ''}
             onChange={(e) => handleChange('outbound_transfer_gb', e.target.value === '' ? '' : parseFloat(e.target.value))}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-yellow-500"
+            className="w-full px-3 py-2 border border-input bg-background text-foreground rounded-md focus:ring-2 focus:ring-ring/40"
           />
-          <p className="text-xs text-gray-500 mt-1">⚠️ First 1 GB/month FREE</p>
+          <p className="text-xs text-muted-foreground mt-1">⚠️ First 1 GB/month FREE</p>
         </div>
 
         {/* Cost Breakdown */}
         {cost && (
-          <div className="bg-gray-50 p-4 rounded-md border border-gray-200">
-            <p className="text-sm font-semibold text-gray-900 mb-2">💰 Cost Breakdown</p>
+          <div className="bg-muted/50 p-4 rounded-md border border-border">
+            <p className="text-sm font-semibold text-foreground mb-2">💰 Cost Breakdown</p>
             <div className="space-y-1 text-sm">
-              <div className="flex justify-between text-gray-700">
+              <div className="flex justify-between text-foreground/80">
                 <span>Storage:</span>
                 <span className="font-medium">${cost.breakdown.storage_cost.toFixed(4)}</span>
               </div>
-              <div className="flex justify-between text-gray-700">
+              <div className="flex justify-between text-foreground/80">
                 <span>Requests:</span>
                 <span className="font-medium">${cost.breakdown.request_cost.toFixed(4)}</span>
               </div>
-              <div className="flex justify-between text-gray-700">
+              <div className="flex justify-between text-foreground/80">
                 <span>Data Transfer:</span>
                 <span className="font-medium">${cost.breakdown.transfer_cost.toFixed(4)}</span>
               </div>
             </div>
-            <div className="border-t border-gray-300 pt-2 mt-2 flex justify-between text-sm font-semibold">
+            <div className="border-t border-input pt-2 mt-2 flex justify-between text-sm font-semibold">
               <span>Total:</span>
-              <span className="text-yellow-600">${cost.breakdown.total_cost.toFixed(2)}/month</span>
+              <span className="text-primary">${cost.breakdown.total_cost.toFixed(2)}/month</span>
             </div>
           </div>
         )}
@@ -233,13 +233,13 @@ export const S3ConfigPanel = ({ onClose }) => {
           <button
             onClick={handleCalculate}
             disabled={loading}
-            className="flex-1 bg-yellow-500 hover:bg-yellow-600 text-white font-semibold py-2 px-4 rounded-md transition disabled:opacity-50"
+            className="flex-1 bg-primary hover:bg-primary/90 text-primary-foreground font-semibold py-2 px-4 rounded-md transition disabled:opacity-50"
           >
             {loading ? 'Calculating...' : 'Calculate'}
           </button>
           <button
             onClick={onClose}
-            className="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-900 font-semibold py-2 px-4 rounded-md transition"
+            className="flex-1 bg-secondary hover:bg-muted text-secondary-foreground font-semibold py-2 px-4 rounded-md transition"
           >
             Close
           </button>

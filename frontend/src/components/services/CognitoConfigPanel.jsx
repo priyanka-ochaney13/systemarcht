@@ -111,16 +111,16 @@ export const CognitoConfigPanel = ({ onClose }) => {
   };
 
   return (
-    <div className="bg-white rounded-lg border border-gray-200 w-full max-w-md shadow-lg">
+    <div className="bg-card rounded-lg border border-border w-full max-w-md shadow-sm">
       {/* Header */}
-      <div className="flex items-center justify-between bg-gradient-to-r from-gray-50 to-gray-100 px-6 py-4 border-b">
+      <div className="flex items-center justify-between bg-muted/70 px-6 py-4 border-b">
         <div className="flex items-center gap-2">
           <Lock className="w-5 h-5" style={{ color: '#FF9900' }} />
-          <h3 className="font-semibold text-gray-900">Cognito Configuration</h3>
+          <h3 className="font-semibold text-foreground">Cognito Configuration</h3>
         </div>
         <button
           onClick={onClose}
-          className="text-gray-400 hover:text-gray-600"
+          className="text-muted-foreground hover:text-foreground"
         >
           <X className="w-5 h-5" />
         </button>
@@ -130,13 +130,13 @@ export const CognitoConfigPanel = ({ onClose }) => {
       <div className="p-6 space-y-6 max-h-[600px] overflow-y-auto">
         {/* Region */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm font-medium text-foreground/80 mb-2">
             📍 Region
           </label>
           <select
             value={localConfig.region}
             onChange={(e) => handleChange('region', e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-yellow-500"
+            className="w-full px-3 py-2 border border-input bg-background text-foreground rounded-md focus:ring-2 focus:ring-ring/40"
           >
             {Object.entries(REGIONS).map(([name, value]) => (
               <option key={value} value={value}>{name}</option>
@@ -146,55 +146,55 @@ export const CognitoConfigPanel = ({ onClose }) => {
 
         {/* Monthly Active Users */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm font-medium text-foreground/80 mb-2">
             👥 Monthly Active Users (MAU)
           </label>
           <input
             type="number"
             value={localConfig.mau}
             onChange={(e) => handleChange('mau', parseInt(e.target.value))}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-yellow-500"
+            className="w-full px-3 py-2 border border-input bg-background text-foreground rounded-md focus:ring-2 focus:ring-ring/40"
           />
-          <p className="text-xs text-gray-500 mt-1">💡 Free: First 50,000 MAUs | Paid: $0.004/user/month</p>
+          <p className="text-xs text-muted-foreground mt-1">💡 Free: First 50,000 MAUs | Paid: $0.004/user/month</p>
         </div>
 
         {/* Authentication Requests */}
         <div className="space-y-4">
-          <h4 className="font-medium text-gray-900">🔑 Authentication Requests</h4>
+          <h4 className="font-medium text-foreground">🔑 Authentication Requests</h4>
           
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-foreground/80 mb-2">
               Sign-Ups per Month
             </label>
             <input
               type="number"
               value={localConfig.signups_per_month}
               onChange={(e) => handleChange('signups_per_month', parseInt(e.target.value))}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-yellow-500"
+              className="w-full px-3 py-2 border border-input bg-background text-foreground rounded-md focus:ring-2 focus:ring-ring/40"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-foreground/80 mb-2">
               Sign-Ins per Month
             </label>
             <input
               type="number"
               value={localConfig.signins_per_month}
               onChange={(e) => handleChange('signins_per_month', parseInt(e.target.value))}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-yellow-500"
+              className="w-full px-3 py-2 border border-input bg-background text-foreground rounded-md focus:ring-2 focus:ring-ring/40"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-foreground/80 mb-2">
               Token Refreshes per Month
             </label>
             <input
               type="number"
               value={localConfig.token_refreshes_per_month}
               onChange={(e) => handleChange('token_refreshes_per_month', parseInt(e.target.value))}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-yellow-500"
+              className="w-full px-3 py-2 border border-input bg-background text-foreground rounded-md focus:ring-2 focus:ring-ring/40"
             />
           </div>
         </div>
@@ -203,7 +203,7 @@ export const CognitoConfigPanel = ({ onClose }) => {
         <div className="border rounded-lg p-4">
           <button
             onClick={() => handleToggleSection('mfa')}
-            className="flex items-center gap-2 w-full text-left font-medium text-gray-900 hover:bg-gray-50 p-2 rounded"
+            className="flex items-center gap-2 w-full text-left font-medium text-foreground hover:bg-muted/50 p-2 rounded"
           >
             <span>{expandedSections.mfa ? '▼' : '▶'}</span>
             <span>🛡️ Multi-Factor Authentication (MFA)</span>
@@ -218,13 +218,13 @@ export const CognitoConfigPanel = ({ onClose }) => {
                   onChange={(e) => handleChange('mfa_enabled', e.target.checked)}
                   className="w-4 h-4 cursor-pointer"
                 />
-                <span className="text-sm font-medium text-gray-700">Enable MFA</span>
+                <span className="text-sm font-medium text-foreground/80">Enable MFA</span>
               </label>
 
               {localConfig.mfa_enabled && (
                 <>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-medium text-foreground/80 mb-2">
                       MFA Type
                     </label>
                     <div className="space-y-2">
@@ -242,15 +242,15 @@ export const CognitoConfigPanel = ({ onClose }) => {
                             onChange={(e) => handleChange('mfa_type', e.target.value)}
                             className="w-4 h-4 cursor-pointer"
                           />
-                          <span className="text-sm text-gray-700">{option.label}</span>
-                          <span className="text-xs text-gray-500">({option.cost})</span>
+                          <span className="text-sm text-foreground/80">{option.label}</span>
+                          <span className="text-xs text-muted-foreground">({option.cost})</span>
                         </label>
                       ))}
                     </div>
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-sm font-medium text-foreground/80 mb-2">
                       Percentage of Users with MFA
                     </label>
                     <div className="flex items-center gap-2">
@@ -262,7 +262,7 @@ export const CognitoConfigPanel = ({ onClose }) => {
                         onChange={(e) => handleChange('mfa_percentage', parseInt(e.target.value))}
                         className="flex-1"
                       />
-                      <span className="text-sm font-medium text-gray-700 w-12">{localConfig.mfa_percentage}%</span>
+                      <span className="text-sm font-medium text-foreground/80 w-12">{localConfig.mfa_percentage}%</span>
                     </div>
                   </div>
                 </>
@@ -275,7 +275,7 @@ export const CognitoConfigPanel = ({ onClose }) => {
         <div className="border rounded-lg p-4">
           <button
             onClick={() => handleToggleSection('advancedSecurity')}
-            className="flex items-center gap-2 w-full text-left font-medium text-gray-900 hover:bg-gray-50 p-2 rounded"
+            className="flex items-center gap-2 w-full text-left font-medium text-foreground hover:bg-muted/50 p-2 rounded"
           >
             <span>{expandedSections.advancedSecurity ? '▼' : '▶'}</span>
             <span>⚠️ Advanced Security</span>
@@ -290,21 +290,21 @@ export const CognitoConfigPanel = ({ onClose }) => {
                   onChange={(e) => handleChange('advanced_security_enabled', e.target.checked)}
                   className="w-4 h-4 cursor-pointer"
                 />
-                <span className="text-sm font-medium text-gray-700">Enable Advanced Security</span>
+                <span className="text-sm font-medium text-foreground/80">Enable Advanced Security</span>
               </label>
 
               {localConfig.advanced_security_enabled && (
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-foreground/80 mb-2">
                     Risk-Evaluated Logins per Month
                   </label>
                   <input
                     type="number"
                     value={localConfig.risk_evaluated_logins}
                     onChange={(e) => handleChange('risk_evaluated_logins', parseInt(e.target.value))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-yellow-500"
+                    className="w-full px-3 py-2 border border-input bg-background text-foreground rounded-md focus:ring-2 focus:ring-ring/40"
                   />
-                  <p className="text-xs text-gray-500 mt-1">💡 First 1M evaluations FREE | Paid: $0.01/evaluation</p>
+                  <p className="text-xs text-muted-foreground mt-1">💡 First 1M evaluations FREE | Paid: $0.01/evaluation</p>
                 </div>
               )}
             </div>
@@ -315,7 +315,7 @@ export const CognitoConfigPanel = ({ onClose }) => {
         <div className="border rounded-lg p-4">
           <button
             onClick={() => handleToggleSection('additionalFeatures')}
-            className="flex items-center gap-2 w-full text-left font-medium text-gray-900 hover:bg-gray-50 p-2 rounded"
+            className="flex items-center gap-2 w-full text-left font-medium text-foreground hover:bg-muted/50 p-2 rounded"
           >
             <span>{expandedSections.additionalFeatures ? '▼' : '▶'}</span>
             <span>🎨 Additional Features</span>
@@ -330,8 +330,8 @@ export const CognitoConfigPanel = ({ onClose }) => {
                   onChange={(e) => handleChange('custom_domain_enabled', e.target.checked)}
                   className="w-4 h-4 cursor-pointer"
                 />
-                <span className="text-sm font-medium text-gray-700">Custom Domain</span>
-                <span className="text-xs text-gray-500">($0.50/month)</span>
+                <span className="text-sm font-medium text-foreground/80">Custom Domain</span>
+                <span className="text-xs text-muted-foreground">($0.50/month)</span>
               </label>
 
               <label className="flex items-center gap-2 cursor-pointer">
@@ -341,20 +341,20 @@ export const CognitoConfigPanel = ({ onClose }) => {
                   onChange={(e) => handleChange('email_customization_enabled', e.target.checked)}
                   className="w-4 h-4 cursor-pointer"
                 />
-                <span className="text-sm font-medium text-gray-700">Email Customization</span>
-                <span className="text-xs text-gray-500">($0.00003/email)</span>
+                <span className="text-sm font-medium text-foreground/80">Email Customization</span>
+                <span className="text-xs text-muted-foreground">($0.00003/email)</span>
               </label>
 
               {localConfig.email_customization_enabled && (
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-foreground/80 mb-2">
                     Monthly Emails
                   </label>
                   <input
                     type="number"
                     value={localConfig.monthly_emails}
                     onChange={(e) => handleChange('monthly_emails', parseInt(e.target.value))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-yellow-500"
+                    className="w-full px-3 py-2 border border-input bg-background text-foreground rounded-md focus:ring-2 focus:ring-ring/40"
                   />
                 </div>
               )}
@@ -364,40 +364,40 @@ export const CognitoConfigPanel = ({ onClose }) => {
 
         {/* Cost Breakdown */}
         {cost && (
-          <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
-            <h4 className="font-semibold text-gray-900 mb-3">💰 Cost Breakdown</h4>
+          <div className="bg-muted/50 rounded-lg p-4 border border-border">
+            <h4 className="font-semibold text-foreground mb-3">💰 Cost Breakdown</h4>
             <div className="space-y-2 text-sm">
               <div className="flex justify-between">
-                <span className="text-gray-700">MAU Charges:</span>
+                <span className="text-foreground/80">MAU Charges:</span>
                 <span className="font-medium">${cost.breakdown.mau_charge.toFixed(2)}</span>
               </div>
               {cost.breakdown.sms_mfa_charge > 0 && (
                 <div className="flex justify-between">
-                  <span className="text-gray-700">SMS MFA:</span>
+                  <span className="text-foreground/80">SMS MFA:</span>
                   <span className="font-medium">${cost.breakdown.sms_mfa_charge.toFixed(2)}</span>
                 </div>
               )}
               {cost.breakdown.advanced_security_charge > 0 && (
                 <div className="flex justify-between">
-                  <span className="text-gray-700">Advanced Security:</span>
+                  <span className="text-foreground/80">Advanced Security:</span>
                   <span className="font-medium">${cost.breakdown.advanced_security_charge.toFixed(2)}</span>
                 </div>
               )}
               {cost.breakdown.custom_domain_charge > 0 && (
                 <div className="flex justify-between">
-                  <span className="text-gray-700">Custom Domain:</span>
+                  <span className="text-foreground/80">Custom Domain:</span>
                   <span className="font-medium">${cost.breakdown.custom_domain_charge.toFixed(2)}</span>
                 </div>
               )}
               {cost.breakdown.email_customization_charge > 0 && (
                 <div className="flex justify-between">
-                  <span className="text-gray-700">Email Customization:</span>
+                  <span className="text-foreground/80">Email Customization:</span>
                   <span className="font-medium">${cost.breakdown.email_customization_charge.toFixed(2)}</span>
                 </div>
               )}
-              <div className="border-t pt-2 flex justify-between font-semibold text-gray-900">
+              <div className="border-t pt-2 flex justify-between font-semibold text-foreground">
                 <span>Total Monthly Cost:</span>
-                <span className="text-yellow-600">${cost.breakdown.total_cost.toFixed(2)}</span>
+                <span className="text-primary">${cost.breakdown.total_cost.toFixed(2)}</span>
               </div>
             </div>
           </div>
@@ -405,17 +405,17 @@ export const CognitoConfigPanel = ({ onClose }) => {
       </div>
 
       {/* Footer Buttons */}
-      <div className="border-t bg-gray-50 px-6 py-4 flex gap-3">
+      <div className="border-t bg-muted/50 px-6 py-4 flex gap-3">
         <button
           onClick={handleCalculate}
           disabled={loading}
-          className="flex-1 px-4 py-2 bg-yellow-500 hover:bg-yellow-600 text-white rounded-md font-medium transition disabled:opacity-50"
+          className="flex-1 px-4 py-2 bg-primary hover:bg-primary/90 text-white rounded-md font-medium transition disabled:opacity-50"
         >
           {loading ? 'Calculating...' : 'Calculate'}
         </button>
         <button
           onClick={handleReset}
-          className="flex-1 px-4 py-2 bg-gray-300 hover:bg-gray-400 text-gray-900 rounded-md font-medium transition"
+          className="flex-1 px-4 py-2 bg-muted hover:bg-muted text-foreground rounded-md font-medium transition"
         >
           Reset
         </button>

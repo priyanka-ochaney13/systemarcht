@@ -12,7 +12,7 @@ export default function CaseStudyDetailPage() {
     <>
       <div className="absolute top-4 left-4 z-50">
         <Link href="/case-studies">
-          <button className="flex items-center gap-1 text-gray-600 hover:text-gray-900 bg-white px-4 py-2 rounded-lg shadow-md border border-gray-200">
+          <button className="flex items-center gap-1 text-muted-foreground hover:text-foreground bg-card px-4 py-2 rounded-lg shadow-md border border-border">
             <ChevronLeft className="w-5 h-5" />
             <span>Back</span>
           </button>

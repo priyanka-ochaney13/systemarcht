@@ -109,38 +109,38 @@ export const RDSConfigPanel = ({ onClose }) => {
   };
 
   return (
-    <div className="bg-white rounded-lg border border-gray-200 w-full max-w-md shadow-lg">
-      <div className="flex items-center justify-between bg-gradient-to-r from-gray-50 to-gray-100 px-6 py-4 border-b">
+    <div className="bg-card rounded-lg border border-border w-full max-w-md shadow-sm">
+      <div className="flex items-center justify-between bg-muted/70 px-6 py-4 border-b">
         <div className="flex items-center gap-2">
           <Database className="w-5 h-5" style={{ color: '#3B48CC' }} />
-          <h3 className="font-semibold text-gray-900">RDS Configuration</h3>
+          <h3 className="font-semibold text-foreground">RDS Configuration</h3>
         </div>
-        <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
+        <button onClick={onClose} className="text-muted-foreground hover:text-foreground">
           <X className="w-5 h-5" />
         </button>
       </div>
 
       <div className="p-6 space-y-6 max-h-[600px] overflow-y-auto">
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">📍 Region</label>
+          <label className="block text-sm font-medium text-foreground/80 mb-2">📍 Region</label>
           <select
             value={localConfig.region}
             onChange={(e) => handleChange('region', e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-yellow-500"
+            className="w-full px-3 py-2 border border-input bg-background text-foreground rounded-md focus:ring-2 focus:ring-ring/40"
           >
             {Object.entries(REGIONS).map(([name, value]) => (
               <option key={value} value={value}>{name}</option>
             ))}
           </select>
-          <p className="text-xs text-gray-500 mt-1">💡 Pricing data is currently available for this region only</p>
+          <p className="text-xs text-muted-foreground mt-1">💡 Pricing data is currently available for this region only</p>
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">🗄️ Database Engine</label>
+          <label className="block text-sm font-medium text-foreground/80 mb-2">🗄️ Database Engine</label>
           <select
             value={localConfig.db_engine}
             onChange={(e) => handleChange('db_engine', e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-yellow-500"
+            className="w-full px-3 py-2 border border-input bg-background text-foreground rounded-md focus:ring-2 focus:ring-ring/40"
           >
             {ENGINES.map((engine) => (
               <option key={engine} value={engine}>{engine}</option>
@@ -149,7 +149,7 @@ export const RDSConfigPanel = ({ onClose }) => {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-3">⚙️ DEPLOYMENT</label>
+          <label className="block text-sm font-medium text-foreground/80 mb-3">⚙️ DEPLOYMENT</label>
           <div className="space-y-2">
             {[
               { label: 'Single-AZ', value: 'Single-AZ', hint: 'One instance' },
@@ -157,7 +157,7 @@ export const RDSConfigPanel = ({ onClose }) => {
             ].map((option) => (
               <label
                 key={option.value}
-                className="flex items-center gap-3 cursor-pointer p-2 rounded hover:bg-gray-50"
+                className="flex items-center gap-3 cursor-pointer p-2 rounded hover:bg-muted/50"
               >
                 <input
                   type="radio"
@@ -168,8 +168,8 @@ export const RDSConfigPanel = ({ onClose }) => {
                   className="w-4 h-4 cursor-pointer"
                 />
                 <div>
-                  <span className="font-medium text-gray-900">{option.label}</span>
-                  <span className="text-xs text-gray-500 ml-2">{option.hint}</span>
+                  <span className="font-medium text-foreground">{option.label}</span>
+                  <span className="text-xs text-muted-foreground ml-2">{option.hint}</span>
                 </div>
               </label>
             ))}
@@ -177,12 +177,12 @@ export const RDSConfigPanel = ({ onClose }) => {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">🖥️ Instance Class</label>
+          <label className="block text-sm font-medium text-foreground/80 mb-2">🖥️ Instance Class</label>
           <select
             value={localConfig.instance_type}
             onChange={(e) => handleChange('instance_type', e.target.value)}
             disabled={typesLoading || instanceTypes.length === 0}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-yellow-500 disabled:opacity-50"
+            className="w-full px-3 py-2 border border-input bg-background text-foreground rounded-md focus:ring-2 focus:ring-ring/40 disabled:opacity-50"
           >
             {instanceTypes.length === 0 && (
               <option value={localConfig.instance_type}>
@@ -193,11 +193,11 @@ export const RDSConfigPanel = ({ onClose }) => {
               <option key={type} value={type}>{type}</option>
             ))}
           </select>
-          <p className="text-xs text-gray-500 mt-1">💡 On-demand pricing, no license required engines</p>
+          <p className="text-xs text-muted-foreground mt-1">💡 On-demand pricing, no license required engines</p>
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">Number of DB Instances</label>
+          <label className="block text-sm font-medium text-foreground/80 mb-2">Number of DB Instances</label>
           <input
             type="number"
             min="1"
@@ -205,12 +205,12 @@ export const RDSConfigPanel = ({ onClose }) => {
             onChange={(e) =>
               handleChange('instance_count', e.target.value === '' ? '' : parseInt(e.target.value))
             }
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-yellow-500"
+            className="w-full px-3 py-2 border border-input bg-background text-foreground rounded-md focus:ring-2 focus:ring-ring/40"
           />
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">Hours per Month (each instance)</label>
+          <label className="block text-sm font-medium text-foreground/80 mb-2">Hours per Month (each instance)</label>
           <input
             type="number"
             min="1"
@@ -219,13 +219,13 @@ export const RDSConfigPanel = ({ onClose }) => {
             onChange={(e) =>
               handleChange('hours_per_month', e.target.value === '' ? '' : parseFloat(e.target.value))
             }
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-yellow-500"
+            className="w-full px-3 py-2 border border-input bg-background text-foreground rounded-md focus:ring-2 focus:ring-ring/40"
           />
-          <p className="text-xs text-gray-500 mt-1">💡 730 hours = running 24/7 for a month</p>
+          <p className="text-xs text-muted-foreground mt-1">💡 730 hours = running 24/7 for a month</p>
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">Allocated Storage (GB per instance)</label>
+          <label className="block text-sm font-medium text-foreground/80 mb-2">Allocated Storage (GB per instance)</label>
           <input
             type="number"
             min="0"
@@ -233,38 +233,38 @@ export const RDSConfigPanel = ({ onClose }) => {
             onChange={(e) =>
               handleChange('storage_gb', e.target.value === '' ? '' : parseFloat(e.target.value))
             }
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-yellow-500"
+            className="w-full px-3 py-2 border border-input bg-background text-foreground rounded-md focus:ring-2 focus:ring-ring/40"
           />
-          <p className="text-xs text-gray-500 mt-1">💡 Priced at the General Purpose SSD rate</p>
+          <p className="text-xs text-muted-foreground mt-1">💡 Priced at the General Purpose SSD rate</p>
         </div>
 
         {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 text-sm rounded-md p-3">
+          <div className="bg-destructive/10 border border-destructive/30 text-destructive text-sm rounded-md p-3">
             ⚠️ {error}
           </div>
         )}
 
         {cost && (
-          <div className="bg-gray-50 p-4 rounded-md border border-gray-200">
-            <p className="text-sm font-semibold text-gray-900 mb-2">💰 Cost Breakdown</p>
+          <div className="bg-muted/50 p-4 rounded-md border border-border">
+            <p className="text-sm font-semibold text-foreground mb-2">💰 Cost Breakdown</p>
             <div className="space-y-1 text-sm">
-              <div className="flex justify-between text-gray-700">
+              <div className="flex justify-between text-foreground/80">
                 <span>Instances:</span>
                 <span className="font-medium">${cost.breakdown.instance_cost.toFixed(2)}</span>
               </div>
-              <div className="flex justify-between text-gray-700">
+              <div className="flex justify-between text-foreground/80">
                 <span>Storage:</span>
                 <span className="font-medium">${cost.breakdown.storage_cost.toFixed(2)}</span>
               </div>
             </div>
-            <div className="border-t border-gray-300 pt-2 mt-2 flex justify-between text-sm font-semibold">
+            <div className="border-t border-input pt-2 mt-2 flex justify-between text-sm font-semibold">
               <span>Total:</span>
-              <span className="text-yellow-600">${cost.breakdown.total_cost.toFixed(2)}/month</span>
+              <span className="text-primary">${cost.breakdown.total_cost.toFixed(2)}/month</span>
             </div>
             {cost.notes && cost.notes.length > 0 && (
-              <div className="mt-2 pt-2 border-t border-gray-200">
+              <div className="mt-2 pt-2 border-t border-border">
                 {cost.notes.map((note, i) => (
-                  <p key={i} className="text-xs text-gray-500">⚠️ {note}</p>
+                  <p key={i} className="text-xs text-muted-foreground">⚠️ {note}</p>
                 ))}
               </div>
             )}
@@ -275,13 +275,13 @@ export const RDSConfigPanel = ({ onClose }) => {
           <button
             onClick={handleCalculate}
             disabled={loading || typesLoading}
-            className="flex-1 bg-yellow-500 hover:bg-yellow-600 text-white font-semibold py-2 px-4 rounded-md transition disabled:opacity-50"
+            className="flex-1 bg-primary hover:bg-primary/90 text-primary-foreground font-semibold py-2 px-4 rounded-md transition disabled:opacity-50"
           >
             {loading ? 'Calculating...' : 'Calculate'}
           </button>
           <button
             onClick={onClose}
-            className="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-900 font-semibold py-2 px-4 rounded-md transition"
+            className="flex-1 bg-secondary hover:bg-muted text-secondary-foreground font-semibold py-2 px-4 rounded-md transition"
           >
             Close
           </button>

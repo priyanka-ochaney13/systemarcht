@@ -99,34 +99,34 @@ export const CaseStudyDetail = ({ caseStudyId }) => {
   if (!caseStudy) {
     return (
       <div className="flex items-center justify-center h-screen">
-        <p className="text-gray-500">Case study not found</p>
+        <p className="text-muted-foreground">Case study not found</p>
       </div>
     );
   }
 
   return (
-    <div className="w-full h-screen flex flex-col bg-gray-50">
+    <div className="w-full h-screen flex flex-col bg-background">
       {/* Header */}
-      <div className="bg-white border-b border-gray-200 p-6">
+      <div className="bg-background border-b border-border p-6">
         <div className="max-w-full mx-auto">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">{caseStudy.title}</h1>
-          <p className="text-gray-600 mb-4">{caseStudy.description}</p>
+          <h1 className="text-3xl font-bold text-foreground mb-2">{caseStudy.title}</h1>
+          <p className="text-muted-foreground mb-4">{caseStudy.description}</p>
           <div className="grid grid-cols-4 gap-4">
             <div>
-              <p className="text-xs text-gray-500 font-semibold uppercase mb-1">Scale</p>
-              <p className="text-sm font-semibold text-gray-900">{caseStudy.scale}</p>
+              <p className="text-xs text-muted-foreground font-semibold uppercase mb-1">Scale</p>
+              <p className="text-sm font-semibold text-foreground">{caseStudy.scale}</p>
             </div>
             <div>
-              <p className="text-xs text-gray-500 font-semibold uppercase mb-1">Cost</p>
-              <p className="text-sm font-semibold text-yellow-600">{caseStudy.cost}</p>
+              <p className="text-xs text-muted-foreground font-semibold uppercase mb-1">Cost</p>
+              <p className="text-sm font-semibold text-primary">{caseStudy.cost}</p>
             </div>
             <div>
-              <p className="text-xs text-gray-500 font-semibold uppercase mb-1">Key Insight</p>
-              <p className="text-sm text-gray-900 line-clamp-1">{caseStudy.keyInsight}</p>
+              <p className="text-xs text-muted-foreground font-semibold uppercase mb-1">Key Insight</p>
+              <p className="text-sm text-foreground line-clamp-1">{caseStudy.keyInsight}</p>
             </div>
             <div>
-              <p className="text-xs text-gray-500 font-semibold uppercase mb-1">Services</p>
-              <p className="text-sm font-semibold text-gray-900">{selectedServices.length}</p>
+              <p className="text-xs text-muted-foreground font-semibold uppercase mb-1">Services</p>
+              <p className="text-sm font-semibold text-foreground">{selectedServices.length}</p>
             </div>
           </div>
         </div>
@@ -135,7 +135,7 @@ export const CaseStudyDetail = ({ caseStudyId }) => {
       {/* Main Content */}
       <div ref={containerRef} className="flex-1 flex overflow-hidden relative">
         {/* LEFT: Service Guide Panel (Resizable) */}
-        <div style={{ width: `${guideWidth}px` }} className="flex flex-col border-r border-gray-200 bg-white overflow-hidden">
+        <div style={{ width: `${guideWidth}px` }} className="flex flex-col border-r border-border bg-card overflow-hidden">
           <ServiceGuidePanel caseStudyId={caseStudyId} selectedServices={selectedServices} />
         </div>
 
@@ -143,8 +143,8 @@ export const CaseStudyDetail = ({ caseStudyId }) => {
         <div
           ref={resizeDividerRef}
           onMouseDown={handleResizeStart}
-          className={`w-1 bg-gray-300 hover:bg-yellow-500 cursor-col-resize transition-colors ${
-            isResizing ? 'bg-yellow-500' : ''
+          className={`w-1 bg-muted hover:bg-primary cursor-col-resize transition-colors ${
+            isResizing ? 'bg-primary' : ''
           }`}
           style={{ userSelect: isResizing ? 'none' : 'auto' }}
         />
@@ -156,7 +156,7 @@ export const CaseStudyDetail = ({ caseStudyId }) => {
 
         {/* RIGHT: Config Panel (slides in from right) */}
         <div
-          className={`border-l border-gray-200 bg-white overflow-y-auto transition-all duration-300 ease-in-out ${
+          className={`border-l border-border bg-card overflow-y-auto transition-all duration-300 ease-in-out ${
             openConfigPanel ? 'w-96 shadow-lg' : 'w-0'
           }`}
           style={{
@@ -165,15 +165,15 @@ export const CaseStudyDetail = ({ caseStudyId }) => {
         >
           {openConfigPanel && (
             <>
-              <div className="bg-gradient-to-r from-yellow-50 to-white border-b border-gray-200 p-3 flex items-center justify-between sticky top-0 z-50">
-                <span className="font-semibold text-gray-900 text-sm">
+              <div className="bg-muted/70 border-b border-border p-3 flex items-center justify-between sticky top-0 z-50">
+                <span className="font-semibold text-foreground text-sm">
                   {openConfigPanel === 'api_gateway' && 'API Gateway'}
                   {openConfigPanel === 'lambda' && 'Lambda'}
                   {openConfigPanel === 's3' && 'S3 Bucket'}
                 </span>
                 <button
                   onClick={() => setOpenConfigPanel(null)}
-                  className="p-1 hover:bg-gray-200 rounded transition"
+                  className="p-1 hover:bg-muted rounded transition"
                 >
                   <X className="w-4 h-4" />
                 </button>

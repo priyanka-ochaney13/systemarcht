@@ -34,14 +34,14 @@ export default function LearningModulePage() {
 
   if (!module) {
     return (
-      <main className="min-h-screen bg-white text-gray-900 px-6 py-10">
+      <main className="min-h-screen bg-background text-foreground px-6 py-10">
         <div className="max-w-4xl mx-auto">
 
           <h1 className="text-2xl font-bold mb-3">
             Module not found
           </h1>
 
-          <p className="text-gray-600 mb-6">
+          <p className="text-muted-foreground mb-6">
             The requested learning module does not exist.
           </p>
 
@@ -51,8 +51,8 @@ export default function LearningModulePage() {
               inline-flex
               items-center
               gap-2
-              text-amber-600
-              hover:text-amber-700
+              text-primary
+              hover:text-primary
             "
           >
             <ArrowLeft className="w-4 h-4" />
@@ -78,7 +78,7 @@ export default function LearningModulePage() {
   const services = module.services || [];
 
   return (
-    <main className="min-h-screen bg-white text-gray-900">
+    <main className="min-h-screen bg-background text-foreground">
 
       <div className="max-w-5xl mx-auto px-6 py-10">
 
@@ -90,8 +90,8 @@ export default function LearningModulePage() {
             items-center
             gap-2
             text-sm
-            text-gray-500
-            hover:text-gray-800
+            text-muted-foreground
+            hover:text-foreground
             mb-8
             transition
           "
@@ -110,15 +110,15 @@ export default function LearningModulePage() {
 
             <div>
 
-              <p className="text-sm text-amber-600 font-medium mb-2">
+              <p className="text-sm text-primary font-medium mb-2">
                 MODULE {module.moduleNumber}
               </p>
 
-              <h1 className="text-3xl md:text-4xl font-bold mb-4 text-gray-900">
+              <h1 className="text-3xl md:text-4xl font-bold mb-4 text-foreground">
                 {module.title}
               </h1>
 
-              <p className="text-gray-600 max-w-3xl leading-relaxed">
+              <p className="text-muted-foreground max-w-3xl leading-relaxed">
                 {module.description}
               </p>
 
@@ -131,14 +131,14 @@ export default function LearningModulePage() {
                 w-12
                 h-12
                 rounded-xl
-                bg-amber-50
-                border border-amber-200
+                bg-accent
+                border border-primary/30
                 items-center
                 justify-center
                 flex-shrink-0
               "
             >
-              <BookOpen className="w-5 h-5 text-amber-600" />
+              <BookOpen className="w-5 h-5 text-primary" />
             </div>
 
           </div>
@@ -149,16 +149,16 @@ export default function LearningModulePage() {
             className="
               mt-6
               rounded-xl
-              border border-gray-200
-              bg-gray-50
+              border border-border
+              bg-muted/50
               p-5
             "
           >
-            <p className="text-xs uppercase tracking-wide text-gray-500 mb-2">
+            <p className="text-xs uppercase tracking-wide text-muted-foreground mb-2">
               Learning Objective
             </p>
 
-            <p className="text-sm text-gray-700 leading-relaxed">
+            <p className="text-sm text-foreground/80 leading-relaxed">
               {module.objective}
             </p>
           </div>
@@ -173,28 +173,28 @@ export default function LearningModulePage() {
           className="
             mb-10
             rounded-xl
-            border border-gray-200
-            bg-gray-50
+            border border-border
+            bg-muted/50
             p-4
           "
         >
 
           <div className="flex items-center justify-between mb-3">
 
-            <span className="text-sm font-medium text-gray-700">
+            <span className="text-sm font-medium text-foreground/80">
               Module Progress
             </span>
 
-            <span className="text-xs text-gray-500">
+            <span className="text-xs text-muted-foreground">
               {completedSections.length} completed
             </span>
 
           </div>
 
-          <div className="h-2 rounded-full bg-gray-200 overflow-hidden">
+          <div className="h-2 rounded-full bg-border overflow-hidden">
 
             <div
-              className="h-full bg-amber-500 transition-all duration-300"
+              className="h-full bg-primary transition-all duration-300"
               style={{
                 width: `${
                   completedSections.length === 0
@@ -223,20 +223,20 @@ export default function LearningModulePage() {
           <div
             className="
               rounded-2xl
-              border border-gray-200
-              bg-white
+              border border-border
+              bg-card
               shadow-sm
               p-6
             "
           >
 
-            <p className="text-gray-700 leading-relaxed mb-6">
+            <p className="text-foreground/80 leading-relaxed mb-6">
               {module.scenario.description}
             </p>
 
             <div>
 
-              <p className="text-xs uppercase tracking-wide text-gray-500 mb-3">
+              <p className="text-xs uppercase tracking-wide text-muted-foreground mb-3">
                 Requirements
               </p>
 
@@ -246,7 +246,7 @@ export default function LearningModulePage() {
 
                   <div
                     key={requirement}
-                    className="flex items-start gap-2.5 text-sm text-gray-600"
+                    className="flex items-start gap-2.5 text-sm text-muted-foreground"
                   >
                     <CheckCircle2
                       className="
@@ -290,8 +290,8 @@ export default function LearningModulePage() {
                 key={lesson.id}
                 className="
                   rounded-2xl
-                  border border-gray-200
-                  bg-white
+                  border border-border
+                  bg-card
                   shadow-sm
                   p-6
                 "
@@ -304,13 +304,13 @@ export default function LearningModulePage() {
                       w-8
                       h-8
                       rounded-lg
-                      bg-amber-50
-                      border border-amber-200
+                      bg-accent
+                      border border-primary/30
                       flex items-center
                       justify-center
                       text-xs
                       font-semibold
-                      text-amber-600
+                      text-primary
                       flex-shrink-0
                     "
                   >
@@ -319,30 +319,30 @@ export default function LearningModulePage() {
 
                   <div className="flex-1">
 
-                    <h3 className="text-lg font-semibold mb-3 text-gray-900">
+                    <h3 className="text-lg font-semibold mb-3 text-foreground">
                       {lesson.title}
                     </h3>
 
-                    <p className="text-sm text-gray-600 leading-relaxed">
+                    <p className="text-sm text-muted-foreground leading-relaxed">
                       {lesson.content}
                     </p>
 
                     {/* Table */}
 
                     {lesson.table && (
-                      <div className="mt-5 overflow-hidden rounded-lg border border-gray-200">
+                      <div className="mt-5 overflow-hidden rounded-lg border border-border">
 
                         <table className="w-full text-sm">
 
-                          <thead className="bg-gray-50">
+                          <thead className="bg-muted/50">
 
                             <tr>
 
-                              <th className="text-left px-4 py-3 text-gray-700">
+                              <th className="text-left px-4 py-3 text-foreground/80">
                                 Resource
                               </th>
 
-                              <th className="text-left px-4 py-3 text-gray-700">
+                              <th className="text-left px-4 py-3 text-foreground/80">
                                 Purpose
                               </th>
 
@@ -356,14 +356,14 @@ export default function LearningModulePage() {
 
                               <tr
                                 key={row.resource}
-                                className="border-t border-gray-200"
+                                className="border-t border-border"
                               >
 
-                                <td className="px-4 py-3 text-gray-700">
+                                <td className="px-4 py-3 text-foreground/80">
                                   {row.resource}
                                 </td>
 
-                                <td className="px-4 py-3 text-gray-600">
+                                <td className="px-4 py-3 text-muted-foreground">
                                   {row.purpose}
                                 </td>
 
@@ -389,17 +389,17 @@ export default function LearningModulePage() {
                             key={point.term}
                             className="
                               rounded-lg
-                              bg-gray-50
-                              border border-gray-200
+                              bg-muted/50
+                              border border-border
                               p-4
                             "
                           >
 
-                            <p className="text-sm font-semibold text-gray-800 mb-1">
+                            <p className="text-sm font-semibold text-foreground mb-1">
                               {point.term}
                             </p>
 
-                            <p className="text-sm text-gray-600">
+                            <p className="text-sm text-muted-foreground">
                               {point.description}
                             </p>
 
@@ -444,8 +444,8 @@ export default function LearningModulePage() {
           <div
             className="
               rounded-2xl
-              border border-gray-200
-              bg-white
+              border border-border
+              bg-card
               shadow-sm
               p-6
             "
@@ -465,11 +465,11 @@ export default function LearningModulePage() {
                         px-4
                         py-3
                         rounded-xl
-                        border border-gray-200
-                        bg-gray-50
+                        border border-border
+                        bg-muted/50
                         text-sm
                         font-medium
-                        text-gray-800
+                        text-foreground
                       "
                     >
                       {service}
@@ -477,7 +477,7 @@ export default function LearningModulePage() {
 
                     {index <
                       module.exploreActivity.architecture.length - 1 && (
-                      <ArrowRight className="w-4 h-4 text-amber-500" />
+                      <ArrowRight className="w-4 h-4 text-primary" />
                     )}
 
                   </React.Fragment>
@@ -497,17 +497,17 @@ export default function LearningModulePage() {
                   key={service.id}
                   className="
                     rounded-xl
-                    border border-gray-200
-                    bg-gray-50
+                    border border-border
+                    bg-muted/50
                     p-4
                   "
                 >
 
-                  <h3 className="font-semibold text-gray-800 mb-2">
+                  <h3 className="font-semibold text-foreground mb-2">
                     {service.name}
                   </h3>
 
-                  <p className="text-sm text-gray-600">
+                  <p className="text-sm text-muted-foreground">
                     {service.description}
                   </p>
 
@@ -536,19 +536,19 @@ export default function LearningModulePage() {
                           w-5
                           h-5
                           rounded-full
-                          bg-amber-50
-                          border border-amber-200
+                          bg-accent
+                          border border-primary/30
                           flex items-center
                           justify-center
                           flex-shrink-0
                         "
                       >
-                        <span className="text-[10px] text-amber-600">
+                        <span className="text-[10px] text-primary">
                           {index + 1}
                         </span>
                       </div>
 
-                      <p className="text-sm text-gray-600 leading-relaxed">
+                      <p className="text-sm text-muted-foreground leading-relaxed">
                         {item}
                       </p>
 
@@ -579,19 +579,19 @@ export default function LearningModulePage() {
                           w-5
                           h-5
                           rounded-full
-                          bg-amber-50
-                          border border-amber-200
+                          bg-accent
+                          border border-primary/30
                           flex items-center
                           justify-center
                           flex-shrink-0
                         "
                       >
-                        <span className="text-[10px] text-amber-600">
+                        <span className="text-[10px] text-primary">
                           {index + 1}
                         </span>
                       </div>
 
-                      <p className="text-sm text-gray-600">
+                      <p className="text-sm text-muted-foreground">
                         {item}
                       </p>
 
@@ -629,8 +629,8 @@ export default function LearningModulePage() {
           <div
             className="
               rounded-2xl
-              border border-amber-200
-              bg-amber-50
+              border border-primary/30
+              bg-accent
               p-6
             "
           >
@@ -642,23 +642,23 @@ export default function LearningModulePage() {
                   w-10
                   h-10
                   rounded-xl
-                  bg-white
-                  border border-amber-200
+                  bg-card
+                  border border-primary/30
                   flex items-center
                   justify-center
                   flex-shrink-0
                 "
               >
-                <Play className="w-5 h-5 text-amber-600" />
+                <Play className="w-5 h-5 text-primary" />
               </div>
 
               <div>
 
-                <h3 className="font-semibold text-gray-900 mb-2">
+                <h3 className="font-semibold text-foreground mb-2">
                   Build this architecture yourself
                 </h3>
 
-                <p className="text-sm text-gray-600 leading-relaxed">
+                <p className="text-sm text-muted-foreground leading-relaxed">
                   Open the SystemArcht Playground and construct the
                   architecture you just explored.
                 </p>
@@ -669,7 +669,7 @@ export default function LearningModulePage() {
 
             <div className="mb-6">
 
-              <p className="text-xs uppercase tracking-wide text-gray-500 mb-3">
+              <p className="text-xs uppercase tracking-wide text-muted-foreground mb-3">
                 Required Services
               </p>
 
@@ -684,10 +684,10 @@ export default function LearningModulePage() {
                         px-3
                         py-1.5
                         rounded-full
-                        bg-white
-                        border border-gray-200
+                        bg-card
+                        border border-border
                         text-xs
-                        text-gray-700
+                        text-foreground/80
                       "
                     >
                       {service}
@@ -702,7 +702,7 @@ export default function LearningModulePage() {
 
             <div className="mb-6">
 
-              <p className="text-xs uppercase tracking-wide text-gray-500 mb-3">
+              <p className="text-xs uppercase tracking-wide text-muted-foreground mb-3">
                 Required Connections
               </p>
 
@@ -721,24 +721,24 @@ export default function LearningModulePage() {
                           px-3
                           py-1.5
                           rounded-lg
-                          bg-white
-                          border border-gray-200
-                          text-gray-700
+                          bg-card
+                          border border-border
+                          text-foreground/80
                         "
                       >
                         {connection.source}
                       </span>
 
-                      <ArrowRight className="w-4 h-4 text-amber-500" />
+                      <ArrowRight className="w-4 h-4 text-primary" />
 
                       <span
                         className="
                           px-3
                           py-1.5
                           rounded-lg
-                          bg-white
-                          border border-gray-200
-                          text-gray-700
+                          bg-card
+                          border border-border
+                          text-foreground/80
                         "
                       >
                         {connection.target}
@@ -768,9 +768,9 @@ export default function LearningModulePage() {
                 px-5
                 py-3
                 rounded-xl
-                bg-amber-500
-                hover:bg-amber-400
-                text-gray-950
+                bg-primary
+                hover:bg-primary/90
+                text-primary-foreground
                 font-semibold
                 text-sm
                 transition
@@ -780,7 +780,7 @@ export default function LearningModulePage() {
               <ExternalLink className="w-4 h-4" />
             </button>
 
-            <p className="mt-3 text-xs text-gray-500">
+            <p className="mt-3 text-xs text-muted-foreground">
               Your Playground will open with this module context.
             </p>
 
@@ -810,8 +810,8 @@ export default function LearningModulePage() {
           <div
             className="
               rounded-2xl
-              border border-gray-200
-              bg-white
+              border border-border
+              bg-card
               shadow-sm
               p-6
             "
@@ -824,22 +824,22 @@ export default function LearningModulePage() {
                   w-10
                   h-10
                   rounded-xl
-                  bg-gray-50
-                  border border-gray-200
+                  bg-muted/50
+                  border border-border
                   flex items-center
                   justify-center
                 "
               >
-                <Calculator className="w-5 h-5 text-amber-600" />
+                <Calculator className="w-5 h-5 text-primary" />
               </div>
 
               <div>
 
-                <h3 className="font-semibold text-gray-900 mb-2">
+                <h3 className="font-semibold text-foreground mb-2">
                   Explore how usage affects cost
                 </h3>
 
-                <p className="text-sm text-gray-600 leading-relaxed">
+                <p className="text-sm text-muted-foreground leading-relaxed">
                   {module.costChallenge.description}
                 </p>
 
@@ -882,17 +882,17 @@ export default function LearningModulePage() {
                       key={scenario.name}
                       className="
                         rounded-xl
-                        border border-gray-200
-                        bg-gray-50
+                        border border-border
+                        bg-muted/50
                         p-5
                       "
                     >
 
-                      <p className="font-semibold text-gray-800 mb-2">
+                      <p className="font-semibold text-foreground mb-2">
                         {scenario.name}
                       </p>
 
-                      <p className="text-sm text-gray-600">
+                      <p className="text-sm text-muted-foreground">
                         {scenario.description}
                       </p>
 
@@ -909,14 +909,14 @@ export default function LearningModulePage() {
                 mt-6
                 p-4
                 rounded-xl
-                bg-amber-50
-                border border-amber-200
+                bg-accent
+                border border-primary/30
               "
             >
 
-              <p className="text-sm text-gray-700">
+              <p className="text-sm text-foreground/80">
 
-                <span className="font-semibold text-amber-700">
+                <span className="font-semibold text-primary">
                   Activity:
                 </span>{' '}
 
@@ -948,8 +948,8 @@ export default function LearningModulePage() {
             <div
               className="
                 rounded-2xl
-                border border-amber-200
-                bg-amber-50
+                border border-primary/30
+                bg-accent
                 p-6
               "
             >
@@ -961,22 +961,22 @@ export default function LearningModulePage() {
                     w-10
                     h-10
                     rounded-xl
-                    bg-white
-                    border border-amber-200
+                    bg-card
+                    border border-primary/30
                     flex items-center
                     justify-center
                   "
                 >
-                  <Bot className="w-5 h-5 text-amber-600" />
+                  <Bot className="w-5 h-5 text-primary" />
                 </div>
 
                 <div>
 
-                  <h3 className="font-semibold text-gray-900 mb-2">
+                  <h3 className="font-semibold text-foreground mb-2">
                     Ask ArchBot
                   </h3>
 
-                  <p className="text-sm text-gray-600 leading-relaxed">
+                  <p className="text-sm text-muted-foreground leading-relaxed">
                     Use ArchBot as a learning assistant. The AI can
                     explain architectural choices and suggest
                     alternatives, while SystemArcht remains responsible
@@ -990,18 +990,18 @@ export default function LearningModulePage() {
               <div
                 className="
                   rounded-xl
-                  border border-gray-200
-                  bg-white
+                  border border-border
+                  bg-card
                   p-5
                   mb-5
                 "
               >
 
-                <p className="text-xs uppercase tracking-wide text-gray-500 mb-2">
+                <p className="text-xs uppercase tracking-wide text-muted-foreground mb-2">
                   Suggested Question
                 </p>
 
-                <p className="text-sm text-gray-800 leading-relaxed">
+                <p className="text-sm text-foreground leading-relaxed">
                   "{module.aiActivity.prompt}"
                 </p>
 
@@ -1016,9 +1016,9 @@ export default function LearningModulePage() {
                   px-5
                   py-3
                   rounded-xl
-                  bg-amber-500
-                  hover:bg-amber-400
-                  text-gray-950
+                  bg-primary
+                  hover:bg-primary/90
+                  text-primary-foreground
                   font-semibold
                   text-sm
                   transition
@@ -1029,9 +1029,9 @@ export default function LearningModulePage() {
               </Link>
 
               {module.aiActivity.compareWithStudentArchitecture && (
-                <div className="mt-5 flex items-start gap-2 text-xs text-gray-500">
+                <div className="mt-5 flex items-start gap-2 text-xs text-muted-foreground">
 
-                  <Lightbulb className="w-4 h-4 text-amber-600 flex-shrink-0" />
+                  <Lightbulb className="w-4 h-4 text-primary flex-shrink-0" />
 
                   <p>
                     Compare ArchBot's recommendation with your own
@@ -1072,8 +1072,8 @@ export default function LearningModulePage() {
         <section
           className="
             rounded-2xl
-            border border-gray-200
-            bg-gray-50
+            border border-border
+            bg-muted/50
             p-6
             text-center
           "
@@ -1093,7 +1093,7 @@ export default function LearningModulePage() {
             Module {module.moduleNumber}
           </h2>
 
-          <p className="text-sm text-gray-600 mb-6">
+          <p className="text-sm text-muted-foreground mb-6">
             Complete the learning activities and quick check to
             finish this module.
           </p>
@@ -1105,8 +1105,8 @@ export default function LearningModulePage() {
               items-center
               gap-2
               text-sm
-              text-amber-600
-              hover:text-amber-700
+              text-primary
+              hover:text-primary
             "
           >
             Back to all modules
@@ -1131,17 +1131,17 @@ function SectionHeading({ number, label, title }) {
 
       <div className="flex items-center gap-3 mb-2">
 
-        <span className="text-xs font-mono text-amber-600">
+        <span className="text-xs font-mono text-primary">
           {number}
         </span>
 
-        <span className="text-xs uppercase tracking-widest text-gray-500">
+        <span className="text-xs uppercase tracking-widest text-muted-foreground">
           {label}
         </span>
 
       </div>
 
-      <h2 className="text-2xl font-semibold text-gray-900">
+      <h2 className="text-2xl font-semibold text-foreground">
         {title}
       </h2>
 
@@ -1169,7 +1169,7 @@ function CompleteButton({ completed, onClick, children }) {
         ${
           completed
             ? 'border-emerald-200 bg-emerald-50 text-emerald-700'
-            : 'border-gray-200 bg-white text-gray-500 hover:text-gray-800 hover:border-gray-300'
+            : 'border-border bg-card text-muted-foreground hover:text-foreground hover:border-input'
         }
       `}
     >
@@ -1191,17 +1191,17 @@ function UsageCard({ label, value }) {
     <div
       className="
         rounded-xl
-        border border-gray-200
-        bg-gray-50
+        border border-border
+        bg-muted/50
         p-5
       "
     >
 
-      <p className="text-xs uppercase tracking-wide text-gray-500 mb-2">
+      <p className="text-xs uppercase tracking-wide text-muted-foreground mb-2">
         {label}
       </p>
 
-      <p className="text-xl font-semibold text-gray-900">
+      <p className="text-xl font-semibold text-foreground">
         {value}
       </p>
 
@@ -1228,14 +1228,14 @@ function Quiz({ questions }) {
           key={question.id}
           className="
             rounded-2xl
-            border border-gray-200
-            bg-white
+            border border-border
+            bg-card
             shadow-sm
             p-6
           "
         >
 
-          <p className="text-sm font-semibold text-gray-800 mb-4">
+          <p className="text-sm font-semibold text-foreground mb-4">
             {index + 1}. {question.question}
           </p>
 
@@ -1274,8 +1274,8 @@ function Quiz({ questions }) {
                       correct
                         ? 'border-emerald-300 bg-emerald-50 text-emerald-700'
                         : selected
-                          ? 'border-amber-300 bg-amber-50 text-amber-700'
-                          : 'border-gray-200 bg-gray-50 text-gray-600 hover:border-gray-300 hover:text-gray-900'
+                          ? 'border-amber-300 bg-accent text-primary'
+                          : 'border-border bg-muted/50 text-muted-foreground hover:border-input hover:text-foreground'
                     }
                   `}
                 >
@@ -1294,12 +1294,12 @@ function Quiz({ questions }) {
                 mt-4
                 p-4
                 rounded-xl
-                bg-gray-50
-                border border-gray-200
+                bg-muted/50
+                border border-border
               "
             >
 
-              <p className="text-sm text-gray-700 mb-1">
+              <p className="text-sm text-foreground/80 mb-1">
 
                 <span className="font-semibold">
                   Answer:
@@ -1309,7 +1309,7 @@ function Quiz({ questions }) {
 
               </p>
 
-              <p className="text-sm text-gray-500">
+              <p className="text-sm text-muted-foreground">
                 {question.explanation}
               </p>
 
@@ -1332,9 +1332,9 @@ function Quiz({ questions }) {
             px-5
             py-3
             rounded-xl
-            bg-amber-500
-            hover:bg-amber-400
-            text-gray-950
+            bg-primary
+            hover:bg-primary/90
+            text-primary-foreground
             font-semibold
             text-sm
             disabled:opacity-40
@@ -1350,17 +1350,17 @@ function Quiz({ questions }) {
         <div
           className="
             rounded-xl
-            border border-gray-200
-            bg-gray-50
+            border border-border
+            bg-muted/50
             p-5
           "
         >
 
-          <p className="text-lg font-semibold text-gray-900 mb-1">
+          <p className="text-lg font-semibold text-foreground mb-1">
             Score: {score} / {questions.length}
           </p>
 
-          <p className="text-sm text-gray-600">
+          <p className="text-sm text-muted-foreground">
             Review the explanations above and then continue
             exploring the architecture.
           </p>

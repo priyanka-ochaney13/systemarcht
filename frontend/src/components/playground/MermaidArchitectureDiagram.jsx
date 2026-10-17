@@ -47,6 +47,6 @@ export function MermaidArchitectureDiagram({ mermaidSource, valid = false }) {
   }, [mermaidSource, valid]);
 
   if (!valid || !mermaidSource) return null;
-  if (error) return <p className="p-4 text-sm text-red-600">{error}</p>;
+  if (error) return <p className="p-4 text-sm text-destructive">{error}</p>;
   return <div className="h-full w-full overflow-auto p-4" dangerouslySetInnerHTML={{ __html: svg }} />;
 }

@@ -39,6 +39,7 @@ import {
 } from '@/api/client';
 import { useArchitectureStore } from '@/store';
 import { MermaidArchitectureDiagram } from '@/components/playground/MermaidArchitectureDiagram';
+import { ThemeToggle } from '@/components/theme/ThemeToggle';
 
 const SUGGESTED_PROMPTS = [
   {
@@ -313,31 +314,31 @@ export default function AIArchitectPage() {
   };
 
   return (
-    <div className="flex h-screen w-screen overflow-hidden bg-zinc-950 text-zinc-100 font-sans">
+    <div className="flex h-screen w-screen overflow-hidden bg-background text-foreground font-sans">
       {/* ============================================================ */}
       {/* SIDEBAR: CHAT HISTORY & CONVERSATION MANAGEMENT */}
       {/* ============================================================ */}
       <aside
         className={`${
           sidebarOpen ? 'w-80' : 'w-0'
-        } transition-all duration-300 ease-in-out shrink-0 bg-zinc-900/90 border-r border-zinc-800 flex flex-col overflow-hidden relative z-20`}
+        } transition-all duration-300 ease-in-out shrink-0 bg-sidebar border-r border-border flex flex-col overflow-hidden relative z-20`}
       >
         {/* Brand / Logo */}
-        <div className="p-4 border-b border-zinc-800/80 flex items-center justify-between">
+        <div className="p-4 border-b border-border flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2.5 group">
-            <div className="w-8 h-8 rounded-lg bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-400 group-hover:scale-105 transition">
-              <Zap className="w-4 h-4 fill-amber-400" />
+            <div className="w-8 h-8 rounded-lg bg-primary/20 border border-primary/40 flex items-center justify-center text-primary group-hover:scale-105 transition">
+              <Zap className="w-4 h-4 fill-primary" />
             </div>
             <div>
-              <span className="font-bold text-sm tracking-tight text-zinc-100 group-hover:text-amber-400 transition">
+              <span className="font-bold text-sm tracking-tight text-foreground group-hover:text-primary transition">
                 SystemArcht
               </span>
-              <span className="block text-[10px] text-amber-400 font-medium">AI Architect</span>
+              <span className="block text-[10px] text-primary font-medium">AI Architect</span>
             </div>
           </Link>
           <button
             onClick={() => setSidebarOpen(false)}
-            className="text-zinc-400 hover:text-zinc-200 p-1.5 rounded-lg hover:bg-zinc-800 lg:hidden"
+            className="text-muted-foreground hover:text-foreground p-1.5 rounded-lg hover:bg-muted lg:hidden"
           >
             <X className="w-4 h-4" />
           </button>
@@ -347,7 +348,7 @@ export default function AIArchitectPage() {
         <div className="p-3">
           <button
             onClick={handleNewChat}
-            className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-zinc-950 font-semibold text-sm shadow-lg shadow-amber-500/20 transition hover:shadow-amber-500/30"
+            className="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground font-semibold text-sm shadow-lg shadow-primary/20 transition hover:shadow-primary/20"
           >
             <Plus className="w-4 h-4" />
             New Architecture
@@ -356,7 +357,7 @@ export default function AIArchitectPage() {
 
         {/* Conversation List */}
         <div className="flex-1 overflow-y-auto px-3 py-2 space-y-1">
-          <p className="px-2 pb-1.5 text-[11px] font-semibold uppercase tracking-wider text-zinc-500">
+          <p className="px-2 pb-1.5 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
             Recent Architectures
           </p>
           {conversations.map((c) => {
@@ -369,8 +370,8 @@ export default function AIArchitectPage() {
                 onClick={() => selectConversation(c.id)}
                 className={`group flex items-center justify-between px-3 py-2.5 rounded-xl text-xs cursor-pointer transition ${
                   isActive
-                    ? 'bg-zinc-800 text-amber-300 font-medium border border-amber-500/30 shadow-sm'
-                    : 'text-zinc-400 hover:bg-zinc-800/50 hover:text-zinc-200'
+                    ? 'bg-muted text-primary font-medium border border-primary/30 shadow-sm'
+                    : 'text-muted-foreground hover:bg-muted/60 hover:text-foreground'
                 }`}
               >
                 {isEditing ? (
@@ -381,17 +382,17 @@ export default function AIArchitectPage() {
                       onChange={(e) => setEditedTitle(e.target.value)}
                       onKeyDown={(e) => e.key === 'Enter' && handleSaveTitle(c.id)}
                       autoFocus
-                      className="bg-zinc-950 border border-amber-500/60 rounded px-2 py-0.5 text-xs text-zinc-100 outline-none w-full"
+                      className="bg-background border border-primary/60 rounded px-2 py-0.5 text-xs text-foreground outline-none w-full"
                     />
                     <button
                       onClick={() => handleSaveTitle(c.id)}
-                      className="text-emerald-400 hover:text-emerald-300 p-0.5"
+                      className="text-success-foreground hover:text-success-foreground p-0.5"
                     >
                       <Check className="w-3.5 h-3.5" />
                     </button>
                     <button
                       onClick={() => setEditingTitleId(null)}
-                      className="text-zinc-500 hover:text-zinc-400 p-0.5"
+                      className="text-muted-foreground hover:text-muted-foreground p-0.5"
                     >
                       <X className="w-3.5 h-3.5" />
                     </button>
@@ -407,14 +408,14 @@ export default function AIArchitectPage() {
                           setEditingTitleId(c.id);
                           setEditedTitle(c.title || '');
                         }}
-                        className="text-zinc-500 hover:text-amber-400 p-1 rounded"
+                        className="text-muted-foreground hover:text-primary p-1 rounded"
                       >
                         <Edit2 className="w-3 h-3" />
                       </button>
                       <button
                         title="Delete Chat"
                         onClick={(e) => handleDeleteConversation(e, c.id)}
-                        className="text-zinc-500 hover:text-rose-400 p-1 rounded"
+                        className="text-muted-foreground hover:text-rose-400 p-1 rounded"
                       >
                         <Trash2 className="w-3 h-3" />
                       </button>
@@ -427,28 +428,28 @@ export default function AIArchitectPage() {
         </div>
 
         {/* Footer info & Links */}
-        <div className="p-3 border-t border-zinc-800/80 bg-zinc-950/40 space-y-2">
-          <div className="flex items-center justify-between text-[11px] text-zinc-400 px-1">
+        <div className="p-3 border-t border-border bg-background/40 space-y-2">
+          <div className="flex items-center justify-between text-[11px] text-muted-foreground px-1">
             <span className="flex items-center gap-1.5">
               <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-              Engine: <strong className="text-zinc-200">Groq / Grok API</strong>
+              Engine: <strong className="text-foreground">Groq / Grok API</strong>
             </span>
-            <span className="text-zinc-500 text-[10px]">Fast</span>
+            <span className="text-muted-foreground text-[10px]">Fast</span>
           </div>
 
           <div className="grid grid-cols-2 gap-1.5 pt-1">
             <Link
               href="/playground"
-              className="flex items-center justify-center gap-1.5 py-1.5 px-2 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-300 text-[11px] font-medium transition"
+              className="flex items-center justify-center gap-1.5 py-1.5 px-2 rounded-lg bg-muted hover:bg-muted text-foreground/80 text-[11px] font-medium transition"
             >
-              <Layout className="w-3 h-3 text-amber-400" />
+              <Layout className="w-3 h-3 text-primary" />
               Playground
             </Link>
             <Link
               href="/learning"
-              className="flex items-center justify-center gap-1.5 py-1.5 px-2 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-300 text-[11px] font-medium transition"
+              className="flex items-center justify-center gap-1.5 py-1.5 px-2 rounded-lg bg-muted hover:bg-muted text-foreground/80 text-[11px] font-medium transition"
             >
-              <Layers className="w-3 h-3 text-amber-400" />
+              <Layers className="w-3 h-3 text-primary" />
               Modules
             </Link>
           </div>
@@ -458,22 +459,22 @@ export default function AIArchitectPage() {
       {/* ============================================================ */}
       {/* MAIN VIEWPORT */}
       {/* ============================================================ */}
-      <main className="flex-1 flex flex-col min-w-0 bg-zinc-950 relative">
+      <main className="flex-1 flex flex-col min-w-0 bg-background relative">
         {/* Top Header */}
-        <header className="h-14 border-b border-zinc-800 bg-zinc-900/50 backdrop-blur-md px-4 flex items-center justify-between shrink-0 z-10">
+        <header className="h-14 border-b border-border bg-card/70 backdrop-blur-md px-4 flex items-center justify-between shrink-0 z-10">
           <div className="flex items-center gap-3 min-w-0">
             {!sidebarOpen && (
               <button
                 onClick={() => setSidebarOpen(true)}
-                className="p-1.5 rounded-lg text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800 transition"
+                className="p-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition"
                 title="Open Sidebar"
               >
                 <Menu className="w-5 h-5" />
               </button>
             )}
             <div className="min-w-0">
-              <h1 className="text-sm font-semibold text-zinc-100 truncate flex items-center gap-2">
-                <Sparkles className="w-4 h-4 text-amber-400 shrink-0" />
+              <h1 className="text-sm font-semibold text-foreground truncate flex items-center gap-2">
+                <Sparkles className="w-4 h-4 text-primary shrink-0" />
                 <span className="truncate">{activeConversation?.title || 'AI Architecture Assistant'}</span>
               </h1>
             </div>
@@ -482,18 +483,19 @@ export default function AIArchitectPage() {
           <div className="flex items-center gap-2">
             <Link
               href="/playground"
-              className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-zinc-800/80 hover:bg-zinc-800 border border-zinc-700 text-xs text-amber-300 font-medium transition"
+              className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-muted/80 hover:bg-muted border border-border text-xs text-primary font-medium transition"
             >
               <Layout className="w-3.5 h-3.5" />
               Open Playground
             </Link>
             <Link
               href="/"
-              className="p-1.5 rounded-lg text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800 text-xs flex items-center gap-1 transition"
+              className="p-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted text-xs flex items-center gap-1 transition"
             >
               <ChevronLeft className="w-4 h-4" />
               Exit
             </Link>
+            <ThemeToggle />
           </div>
         </header>
 
@@ -503,13 +505,13 @@ export default function AIArchitectPage() {
           {(!activeConversation?.messages || activeConversation.messages.length === 0) && (
             <div className="max-w-3xl mx-auto py-8">
               <div className="text-center space-y-3 mb-10">
-                <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-amber-400 shadow-xl shadow-amber-500/5">
+                <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-primary/10 border border-primary/20 text-primary shadow-xl shadow-primary/10">
                   <Sparkles className="w-7 h-7" />
                 </div>
-                <h2 className="text-2xl md:text-3xl font-bold tracking-tight text-zinc-100">
+                <h2 className="text-2xl md:text-3xl font-bold tracking-tight text-foreground">
                   AWS Architecture Assistant
                 </h2>
-                <p className="text-sm text-zinc-400 max-w-lg mx-auto">
+                <p className="text-sm text-muted-foreground max-w-lg mx-auto">
                   Describe any workload or problem statement. I will generate a complete AWS architecture,
                   interactive Mermaid diagram, Python SDK code, and Terraform templates ready to tune.
                 </p>
@@ -521,16 +523,16 @@ export default function AIArchitectPage() {
                   <button
                     key={idx}
                     onClick={() => handleSendMessage(item.prompt)}
-                    className="text-left p-4 rounded-2xl bg-zinc-900/60 hover:bg-zinc-900 border border-zinc-800 hover:border-amber-500/40 transition group relative overflow-hidden"
+                    className="text-left p-4 rounded-2xl bg-card/80 hover:bg-card border border-border hover:border-primary/40 transition group relative overflow-hidden"
                   >
                     <div className="flex items-center justify-between mb-1.5">
-                      <span className="text-xs font-semibold text-amber-400 group-hover:text-amber-300 transition">
+                      <span className="text-xs font-semibold text-primary group-hover:text-primary transition">
                         {item.title}
                       </span>
-                      <ArrowRight className="w-3.5 h-3.5 text-zinc-500 group-hover:text-amber-400 group-hover:translate-x-0.5 transition" />
+                      <ArrowRight className="w-3.5 h-3.5 text-muted-foreground group-hover:text-primary group-hover:translate-x-0.5 transition" />
                     </div>
-                    <p className="text-xs text-zinc-300 leading-relaxed mb-2">{item.prompt}</p>
-                    <span className="text-[10px] text-zinc-500 font-mono">{item.tag}</span>
+                    <p className="text-xs text-foreground/80 leading-relaxed mb-2">{item.prompt}</p>
+                    <span className="text-[10px] text-muted-foreground font-mono">{item.tag}</span>
                   </button>
                 ))}
               </div>
@@ -550,23 +552,23 @@ export default function AIArchitectPage() {
                 {isUser ? (
                   <div className="max-w-2xl group relative">
                     {isEditing ? (
-                      <div className="bg-zinc-900 border border-amber-500/60 rounded-2xl p-3 shadow-xl w-full min-w-[320px]">
+                      <div className="bg-card border border-primary/60 rounded-2xl p-3 shadow-xl w-full min-w-[320px]">
                         <textarea
                           value={editedPromptText}
                           onChange={(e) => setEditedPromptText(e.target.value)}
                           rows={3}
-                          className="w-full bg-transparent text-sm text-zinc-100 outline-none resize-none"
+                          className="w-full bg-transparent text-sm text-foreground outline-none resize-none"
                         />
-                        <div className="flex justify-end gap-2 mt-2 pt-2 border-t border-zinc-800">
+                        <div className="flex justify-end gap-2 mt-2 pt-2 border-t border-border">
                           <button
                             onClick={() => setEditingMessageId(null)}
-                            className="px-2.5 py-1 rounded-lg text-xs text-zinc-400 hover:text-zinc-200"
+                            className="px-2.5 py-1 rounded-lg text-xs text-muted-foreground hover:text-foreground"
                           >
                             Cancel
                           </button>
                           <button
                             onClick={() => handleEditSubmit(msg.id)}
-                            className="px-3 py-1 rounded-lg text-xs font-semibold bg-amber-500 text-zinc-950 hover:bg-amber-400 transition"
+                            className="px-3 py-1 rounded-lg text-xs font-semibold bg-primary text-primary-foreground hover:bg-primary/90 transition"
                           >
                             Save & Regenerate
                           </button>
@@ -579,12 +581,12 @@ export default function AIArchitectPage() {
                             setEditingMessageId(msg.id);
                             setEditedPromptText(msg.content);
                           }}
-                          className="opacity-0 group-hover:opacity-100 p-1.5 rounded-lg text-zinc-500 hover:text-amber-400 hover:bg-zinc-900 transition self-center"
+                          className="opacity-0 group-hover:opacity-100 p-1.5 rounded-lg text-muted-foreground hover:text-primary hover:bg-card transition self-center"
                           title="Edit Prompt"
                         >
                           <Edit2 className="w-3.5 h-3.5" />
                         </button>
-                        <div className="rounded-2xl rounded-tr-sm bg-gradient-to-r from-amber-500 to-amber-600 px-4 py-2.5 text-zinc-950 text-sm font-medium shadow-md">
+                        <div className="rounded-2xl rounded-tr-sm bg-primary px-4 py-2.5 text-primary-foreground text-sm font-medium shadow-xs">
                           {msg.content}
                         </div>
                       </div>
@@ -592,27 +594,27 @@ export default function AIArchitectPage() {
                   </div>
                 ) : (
                   /* ASSISTANT MESSAGE CARD */
-                  <div className="w-full rounded-2xl border border-zinc-800 bg-zinc-900/70 overflow-hidden shadow-2xl">
+                  <div className="w-full rounded-2xl border border-border bg-card/80 overflow-hidden shadow-2xl">
                     {/* Architecture Card Header */}
-                    <div className="p-5 border-b border-zinc-800/80 bg-zinc-900/90 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div className="p-5 border-b border-border bg-sidebar flex flex-col md:flex-row md:items-center justify-between gap-4">
                       <div>
                         <div className="flex items-center gap-2 mb-1">
-                          <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold tracking-wide uppercase bg-amber-500/10 text-amber-400 border border-amber-500/30">
+                          <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold tracking-wide uppercase bg-primary/10 text-primary border border-primary/30">
                             AWS Architecture
                           </span>
-                          <span className="text-xs text-zinc-400 font-mono">
+                          <span className="text-xs text-muted-foreground font-mono">
                             {arch?.services?.length || 0} Services Involved
                           </span>
                         </div>
-                        <h3 className="text-lg font-bold text-zinc-100">{arch?.title || msg.content}</h3>
-                        {arch?.summary && <p className="text-xs text-zinc-400 mt-1">{arch.summary}</p>}
+                        <h3 className="text-lg font-bold text-foreground">{arch?.title || msg.content}</h3>
+                        {arch?.summary && <p className="text-xs text-muted-foreground mt-1">{arch.summary}</p>}
                       </div>
 
                       {/* "TUNE IN PLAYGROUND" ACTION BUTTON */}
                       {arch && (
                         <button
                           onClick={() => handleOpenInPlayground(arch)}
-                          className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-zinc-950 font-semibold text-xs tracking-wide shadow-lg shadow-amber-500/20 hover:shadow-amber-500/30 transition shrink-0 transform hover:-translate-y-0.5"
+                          className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground font-semibold text-xs tracking-wide shadow-lg shadow-primary/20 hover:shadow-primary/20 transition shrink-0 transform hover:-translate-y-0.5"
                         >
                           <Layout className="w-4 h-4" />
                           Tune in Playground
@@ -623,12 +625,12 @@ export default function AIArchitectPage() {
 
                     {/* Services Chips */}
                     {arch?.services && (
-                      <div className="px-5 py-2.5 bg-zinc-950/40 border-b border-zinc-800/60 flex items-center gap-2 overflow-x-auto text-[11px]">
-                        <span className="text-zinc-500 font-medium shrink-0">Services:</span>
+                      <div className="px-5 py-2.5 bg-background/40 border-b border-border/60 flex items-center gap-2 overflow-x-auto text-[11px]">
+                        <span className="text-muted-foreground font-medium shrink-0">Services:</span>
                         {arch.services.map((svc) => (
                           <span
                             key={svc}
-                            className="px-2.5 py-0.5 rounded-md bg-zinc-800 text-zinc-300 font-mono border border-zinc-700/60 uppercase text-[10px]"
+                            className="px-2.5 py-0.5 rounded-md bg-muted text-foreground/80 font-mono border border-border uppercase text-[10px]"
                           >
                             {svc.replace('_', ' ')}
                           </span>
@@ -638,22 +640,22 @@ export default function AIArchitectPage() {
 
                     {/* Visual Diagram Section */}
                     {msg.diagram_mermaid && (
-                      <div className="p-4 bg-zinc-950/60 border-b border-zinc-800">
+                      <div className="p-4 bg-background/60 border-b border-border">
                         <div className="flex items-center justify-between mb-2 px-1">
-                          <span className="text-xs font-semibold text-zinc-400 uppercase tracking-wider flex items-center gap-1.5">
-                            <Layers className="w-3.5 h-3.5 text-amber-400" />
+                          <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-1.5">
+                            <Layers className="w-3.5 h-3.5 text-primary" />
                             Visual Architecture Flow
                           </span>
-                          <span className="text-[10px] text-zinc-500 font-mono">Mermaid.js</span>
+                          <span className="text-[10px] text-muted-foreground font-mono">Mermaid.js</span>
                         </div>
-                        <div className="rounded-xl border border-zinc-800 bg-zinc-900/60 p-2 overflow-x-auto min-h-[140px] flex items-center justify-center">
+                        <div className="rounded-xl border border-border bg-card/80 p-2 overflow-x-auto min-h-[140px] flex items-center justify-center">
                           <MermaidArchitectureDiagram mermaidSource={msg.diagram_mermaid} valid={true} />
                         </div>
                       </div>
                     )}
 
                     {/* Resource Tabs (Explanation / SDK Code / Terraform) */}
-                    <div className="border-b border-zinc-800 bg-zinc-900/80 px-4 flex items-center justify-between text-xs">
+                    <div className="border-b border-border bg-card/80 px-4 flex items-center justify-between text-xs">
                       <div className="flex items-center gap-1">
                         <button
                           onClick={() =>
@@ -661,8 +663,8 @@ export default function AIArchitectPage() {
                           }
                           className={`flex items-center gap-1.5 py-3 px-3 font-medium border-b-2 transition ${
                             currentTab === 'explanation'
-                              ? 'border-amber-400 text-amber-400'
-                              : 'border-transparent text-zinc-400 hover:text-zinc-200'
+                              ? 'border-amber-400 text-primary'
+                              : 'border-transparent text-muted-foreground hover:text-foreground'
                           }`}
                         >
                           <Info className="w-3.5 h-3.5" />
@@ -676,8 +678,8 @@ export default function AIArchitectPage() {
                             }
                             className={`flex items-center gap-1.5 py-3 px-3 font-medium border-b-2 transition ${
                               currentTab === 'sdk'
-                                ? 'border-amber-400 text-amber-400'
-                                : 'border-transparent text-zinc-400 hover:text-zinc-200'
+                                ? 'border-amber-400 text-primary'
+                                : 'border-transparent text-muted-foreground hover:text-foreground'
                             }`}
                           >
                             <Code2 className="w-3.5 h-3.5" />
@@ -692,8 +694,8 @@ export default function AIArchitectPage() {
                             }
                             className={`flex items-center gap-1.5 py-3 px-3 font-medium border-b-2 transition ${
                               currentTab === 'terraform'
-                                ? 'border-amber-400 text-amber-400'
-                                : 'border-transparent text-zinc-400 hover:text-zinc-200'
+                                ? 'border-amber-400 text-primary'
+                                : 'border-transparent text-muted-foreground hover:text-foreground'
                             }`}
                           >
                             <FileCode className="w-3.5 h-3.5" />
@@ -709,12 +711,12 @@ export default function AIArchitectPage() {
                             const code = currentTab === 'sdk' ? msg.sdk_code : msg.terraform_code;
                             handleCopy(`${msg.id}-${currentTab}`, code);
                           }}
-                          className="flex items-center gap-1.5 text-xs text-zinc-400 hover:text-amber-400 py-1 px-2 rounded-md hover:bg-zinc-800 transition"
+                          className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-primary py-1 px-2 rounded-md hover:bg-muted transition"
                         >
                           {copiedState[`${msg.id}-${currentTab}`] ? (
                             <>
-                              <CheckCheck className="w-3.5 h-3.5 text-emerald-400" />
-                              <span className="text-emerald-400">Copied</span>
+                              <CheckCheck className="w-3.5 h-3.5 text-success-foreground" />
+                              <span className="text-success-foreground">Copied</span>
                             </>
                           ) : (
                             <>
@@ -729,14 +731,14 @@ export default function AIArchitectPage() {
                     {/* Tab Body */}
                     <div className="p-5">
                       {currentTab === 'explanation' && (
-                        <div className="prose prose-invert prose-sm max-w-none text-zinc-300 text-xs md:text-sm leading-relaxed space-y-3 whitespace-pre-line">
+                        <div className="prose prose-invert prose-sm max-w-none text-foreground/80 text-xs md:text-sm leading-relaxed space-y-3 whitespace-pre-line">
                           {msg.explanation || msg.content}
                         </div>
                       )}
 
                       {currentTab === 'sdk' && (
                         <div className="relative">
-                          <pre className="p-4 rounded-xl bg-zinc-950 font-mono text-xs text-zinc-200 overflow-x-auto leading-relaxed border border-zinc-800/80">
+                          <pre className="p-4 rounded-xl bg-background font-mono text-xs text-foreground overflow-x-auto leading-relaxed border border-border">
                             <code>{msg.sdk_code}</code>
                           </pre>
                         </div>
@@ -744,11 +746,11 @@ export default function AIArchitectPage() {
 
                       {currentTab === 'terraform' && (
                         <div className="relative">
-                          <div className="mb-2 p-2.5 rounded-lg bg-amber-500/10 border border-amber-500/20 text-[11px] text-amber-300 flex items-center justify-between">
+                          <div className="mb-2 p-2.5 rounded-lg bg-primary/10 border border-primary/20 text-[11px] text-primary flex items-center justify-between">
                             <span>Ready for Terraform engineering & deployment.</span>
-                            <span className="font-mono text-[10px] text-zinc-400">main.tf</span>
+                            <span className="font-mono text-[10px] text-muted-foreground">main.tf</span>
                           </div>
-                          <pre className="p-4 rounded-xl bg-zinc-950 font-mono text-xs text-zinc-200 overflow-x-auto leading-relaxed border border-zinc-800/80">
+                          <pre className="p-4 rounded-xl bg-background font-mono text-xs text-foreground overflow-x-auto leading-relaxed border border-border">
                             <code>{msg.terraform_code}</code>
                           </pre>
                         </div>
@@ -762,11 +764,11 @@ export default function AIArchitectPage() {
 
           {/* Loading Indicator */}
           {isGenerating && (
-            <div className="max-w-4xl mx-auto flex items-center gap-3 p-4 rounded-2xl bg-zinc-900/60 border border-zinc-800">
-              <Loader2 className="w-5 h-5 text-amber-400 animate-spin" />
-              <div className="text-xs text-zinc-300">
-                <span className="font-semibold text-amber-400">Engineering AWS Architecture...</span>
-                <p className="text-[11px] text-zinc-500 mt-0.5">
+            <div className="max-w-4xl mx-auto flex items-center gap-3 p-4 rounded-2xl bg-card/80 border border-border">
+              <Loader2 className="w-5 h-5 text-primary animate-spin" />
+              <div className="text-xs text-foreground/80">
+                <span className="font-semibold text-primary">Engineering AWS Architecture...</span>
+                <p className="text-[11px] text-muted-foreground mt-0.5">
                   Analyzing scale, selecting services, calculating connections, and generating SDK & Terraform code.
                 </p>
               </div>
@@ -774,7 +776,7 @@ export default function AIArchitectPage() {
           )}
 
           {errorMessage && (
-            <div className="max-w-4xl mx-auto p-3 rounded-xl bg-red-950/40 border border-red-900/80 text-xs text-red-300">
+            <div className="max-w-4xl mx-auto p-3 rounded-xl bg-destructive/10 border border-destructive/40/80 text-xs text-destructive">
               {errorMessage}
             </div>
           )}
@@ -783,7 +785,7 @@ export default function AIArchitectPage() {
         </div>
 
         {/* Input Bar */}
-        <div className="p-4 border-t border-zinc-800 bg-zinc-900/70 backdrop-blur-md">
+        <div className="p-4 border-t border-border bg-card/80 backdrop-blur-md">
           <form
             onSubmit={(e) => {
               e.preventDefault();
@@ -791,7 +793,7 @@ export default function AIArchitectPage() {
             }}
             className="max-w-4xl mx-auto flex gap-2 items-end"
           >
-            <div className="flex-1 bg-zinc-900 rounded-2xl border border-zinc-700/80 focus-within:border-amber-500/80 transition shadow-xl p-2.5 flex items-center gap-2">
+            <div className="flex-1 bg-card rounded-2xl border border-border/80 focus-within:border-amber-500/80 transition shadow-xl p-2.5 flex items-center gap-2">
               <textarea
                 ref={inputRef}
                 value={inputMessage}
@@ -804,22 +806,22 @@ export default function AIArchitectPage() {
                 }}
                 rows={1}
                 placeholder="Ask for an architecture (e.g., 'infra to deploy a static img upload site with 1M request/hr')..."
-                className="w-full bg-transparent text-sm text-zinc-100 placeholder:text-zinc-500 outline-none resize-none max-h-32 min-h-[28px] py-1 px-1.5"
+                className="w-full bg-transparent text-sm text-foreground placeholder:text-muted-foreground outline-none resize-none max-h-32 min-h-[28px] py-1 px-1.5"
               />
             </div>
 
             <button
               type="submit"
               disabled={isGenerating || !inputMessage.trim()}
-              className="p-3.5 rounded-2xl bg-amber-500 hover:bg-amber-400 text-zinc-950 font-bold shadow-lg shadow-amber-500/20 disabled:opacity-40 disabled:cursor-not-allowed transition shrink-0"
+              className="p-3.5 rounded-2xl bg-primary hover:bg-primary/90 text-primary-foreground font-bold shadow-lg shadow-primary/20 disabled:opacity-40 disabled:cursor-not-allowed transition shrink-0"
               title="Send Message"
             >
               {isGenerating ? <Loader2 className="w-5 h-5 animate-spin" /> : <Send className="w-5 h-5" />}
             </button>
           </form>
 
-          <p className="text-center text-[11px] text-zinc-500 mt-2">
-            Engineered with fast Groq / Grok API • Click <span className="text-amber-400">Tune in Playground</span> to simulate live costs
+          <p className="text-center text-[11px] text-muted-foreground mt-2">
+            Engineered with fast Groq / Grok API • Click <span className="text-primary">Tune in Playground</span> to simulate live costs
           </p>
         </div>
       </main>

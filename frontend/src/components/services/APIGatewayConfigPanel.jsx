@@ -52,16 +52,16 @@ export const APIGatewayConfigPanel = ({ onClose }) => {
   const showMessageFields = localConfig.api_type === 'WEBSOCKET';
 
   return (
-    <div className="bg-white rounded-lg border border-gray-200 w-full max-w-md shadow-lg">
+    <div className="bg-card rounded-lg border border-border w-full max-w-md shadow-sm">
       {/* Header */}
-      <div className="flex items-center justify-between bg-gradient-to-r from-gray-50 to-gray-100 px-6 py-4 border-b">
+      <div className="flex items-center justify-between bg-muted/70 px-6 py-4 border-b">
         <div className="flex items-center gap-2">
           <Cloud className="w-5 h-5" style={{ color: '#FF9900' }} />
-          <h3 className="font-semibold text-gray-900">API Gateway Configuration</h3>
+          <h3 className="font-semibold text-foreground">API Gateway Configuration</h3>
         </div>
         <button
           onClick={onClose}
-          className="text-gray-400 hover:text-gray-600"
+          className="text-muted-foreground hover:text-foreground"
         >
           <X className="w-5 h-5" />
         </button>
@@ -71,13 +71,13 @@ export const APIGatewayConfigPanel = ({ onClose }) => {
       <div className="p-6 space-y-6">
         {/* Region */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm font-medium text-foreground/80 mb-2">
             📍 Region
           </label>
           <select
             value={localConfig.region}
             onChange={(e) => handleChange('region', e.target.value)}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500"
+            className="w-full px-3 py-2 border border-input bg-background text-foreground rounded-md focus:ring-2 focus:ring-ring/40 focus:border-yellow-500"
           >
             {Object.entries(REGIONS).map(([name, value]) => (
               <option key={value} value={value}>{name}</option>
@@ -87,7 +87,7 @@ export const APIGatewayConfigPanel = ({ onClose }) => {
 
         {/* API Type */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-3">
+          <label className="block text-sm font-medium text-foreground/80 mb-3">
             ⚙️ API TYPE
           </label>
           <div className="space-y-2">
@@ -96,7 +96,7 @@ export const APIGatewayConfigPanel = ({ onClose }) => {
               { label: 'REST API', value: 'REST', hint: '$3.50/million' },
               { label: 'WebSocket API', value: 'WEBSOCKET', hint: '$1.00/million' }
             ].map(option => (
-              <label key={option.value} className="flex items-center gap-3 cursor-pointer p-2 rounded hover:bg-gray-50">
+              <label key={option.value} className="flex items-center gap-3 cursor-pointer p-2 rounded hover:bg-muted/50">
                 <input
                   type="radio"
                   name="api_type"
@@ -106,8 +106,8 @@ export const APIGatewayConfigPanel = ({ onClose }) => {
                   className="w-4 h-4 cursor-pointer"
                 />
                 <div>
-                  <span className="font-medium text-gray-900">{option.label}</span>
-                  <span className="text-xs text-gray-500 ml-2">{option.hint}</span>
+                  <span className="font-medium text-foreground">{option.label}</span>
+                  <span className="text-xs text-muted-foreground ml-2">{option.hint}</span>
                 </div>
               </label>
             ))}
@@ -116,41 +116,41 @@ export const APIGatewayConfigPanel = ({ onClose }) => {
 
         {/* Requests per Month */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm font-medium text-foreground/80 mb-2">
             Requests per Month
           </label>
           <input
             type="number"
             value={localConfig.requests_per_month}
             onChange={(e) => handleChange('requests_per_month', parseInt(e.target.value))}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-yellow-500"
+            className="w-full px-3 py-2 border border-input bg-background text-foreground rounded-md focus:ring-2 focus:ring-ring/40"
           />
-          <p className="text-xs text-gray-500 mt-1">💡 Each request billable regardless of success</p>
+          <p className="text-xs text-muted-foreground mt-1">💡 Each request billable regardless of success</p>
         </div>
 
         {/* HTTP-specific fields */}
         {showDataTransferFields && (
           <>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-foreground/80 mb-2">
                 Average Request Size (KB)
               </label>
               <input
                 type="number"
                 value={localConfig.request_size_kb || 10}
                 onChange={(e) => handleChange('request_size_kb', parseFloat(e.target.value))}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-yellow-500"
+                className="w-full px-3 py-2 border border-input bg-background text-foreground rounded-md focus:ring-2 focus:ring-ring/40"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-foreground/80 mb-2">
                 Average Response Size (KB)
               </label>
               <input
                 type="number"
                 value={localConfig.response_size_kb || 5}
                 onChange={(e) => handleChange('response_size_kb', parseFloat(e.target.value))}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-yellow-500"
+                className="w-full px-3 py-2 border border-input bg-background text-foreground rounded-md focus:ring-2 focus:ring-ring/40"
               />
             </div>
           </>
@@ -167,19 +167,19 @@ export const APIGatewayConfigPanel = ({ onClose }) => {
                   onChange={(e) => handleChange('enable_caching', e.target.checked)}
                   className="w-4 h-4 cursor-pointer"
                 />
-                <span className="text-sm font-medium text-gray-700">Enable Caching</span>
+                <span className="text-sm font-medium text-foreground/80">Enable Caching</span>
               </label>
-              <p className="text-xs text-gray-500 mt-1">⚠️ Costs $14-$5,472/month 24/7</p>
+              <p className="text-xs text-muted-foreground mt-1">⚠️ Costs $14-$5,472/month 24/7</p>
             </div>
             {localConfig.enable_caching && (
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-foreground/80 mb-2">
                   Cache Size (GB)
                 </label>
                 <select
                   value={localConfig.cache_size_gb || '0.5'}
                   onChange={(e) => handleChange('cache_size_gb', e.target.value)}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-yellow-500"
+                  className="w-full px-3 py-2 border border-input bg-background text-foreground rounded-md focus:ring-2 focus:ring-ring/40"
                 >
                   {CACHE_SIZES.map(size => (
                     <option key={size} value={size}>{size} GB</option>
@@ -194,25 +194,25 @@ export const APIGatewayConfigPanel = ({ onClose }) => {
         {showMessageFields && (
           <>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-foreground/80 mb-2">
                 Messages per Month
               </label>
               <input
                 type="number"
                 value={localConfig.requests_per_month}
                 onChange={(e) => handleChange('requests_per_month', parseInt(e.target.value))}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-yellow-500"
+                className="w-full px-3 py-2 border border-input bg-background text-foreground rounded-md focus:ring-2 focus:ring-ring/40"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-foreground/80 mb-2">
                 Connection Minutes per Month
               </label>
               <input
                 type="number"
                 value={localConfig.connection_minutes || 100000}
                 onChange={(e) => handleChange('connection_minutes', parseInt(e.target.value))}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-yellow-500"
+                className="w-full px-3 py-2 border border-input bg-background text-foreground rounded-md focus:ring-2 focus:ring-ring/40"
               />
             </div>
           </>
@@ -220,17 +220,17 @@ export const APIGatewayConfigPanel = ({ onClose }) => {
 
         {/* Cost Breakdown */}
         {cost && (
-          <div className="bg-gray-50 p-4 rounded-md border border-gray-200">
-            <p className="text-sm font-semibold text-gray-900 mb-2">💰 Cost Breakdown</p>
+          <div className="bg-muted/50 p-4 rounded-md border border-border">
+            <p className="text-sm font-semibold text-foreground mb-2">💰 Cost Breakdown</p>
             {Object.entries(cost.breakdown || {}).map(([key, value]) => (
-              <div key={key} className="flex justify-between text-sm text-gray-700 mb-1">
+              <div key={key} className="flex justify-between text-sm text-foreground/80 mb-1">
                 <span className="capitalize">{key.replace(/_/g, ' ')}:</span>
                 <span className="font-medium">${value.toFixed(2)}</span>
               </div>
             ))}
-            <div className="border-t border-gray-300 pt-2 mt-2 flex justify-between text-sm font-semibold">
+            <div className="border-t border-input pt-2 mt-2 flex justify-between text-sm font-semibold">
               <span>Total:</span>
-              <span className="text-yellow-600">${cost.breakdown.total_cost.toFixed(2)}/month</span>
+              <span className="text-primary">${cost.breakdown.total_cost.toFixed(2)}/month</span>
             </div>
           </div>
         )}
@@ -240,13 +240,13 @@ export const APIGatewayConfigPanel = ({ onClose }) => {
           <button
             onClick={handleCalculate}
             disabled={loading}
-            className="flex-1 bg-yellow-500 hover:bg-yellow-600 text-white font-semibold py-2 px-4 rounded-md transition disabled:opacity-50"
+            className="flex-1 bg-primary hover:bg-primary/90 text-primary-foreground font-semibold py-2 px-4 rounded-md transition disabled:opacity-50"
           >
             {loading ? 'Calculating...' : 'Calculate'}
           </button>
           <button
             onClick={onClose}
-            className="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-900 font-semibold py-2 px-4 rounded-md transition"
+            className="flex-1 bg-secondary hover:bg-muted text-secondary-foreground font-semibold py-2 px-4 rounded-md transition"
           >
             Close
           </button>
