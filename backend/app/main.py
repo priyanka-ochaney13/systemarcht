@@ -16,6 +16,7 @@ from app.routers.cloudfront import router as cloudfront_router
 from app.routers.elasticache import router as elasticache_router
 from app.routers.sqs import router as sqs_router
 from app.routers.ai_chat import router as ai_chat_router
+from app.routers.ai_architect import router as ai_architect_router
 import logging
 
 logging.basicConfig(level=logging.INFO)
@@ -49,6 +50,7 @@ app.include_router(cloudwatch_router)
 app.include_router(cloudfront_router)
 app.include_router(elasticache_router)
 app.include_router(sqs_router)
+app.include_router(ai_architect_router)
 
 @app.get("/")
 def root():

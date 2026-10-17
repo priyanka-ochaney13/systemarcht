@@ -2,7 +2,7 @@
 
 import { ArchitectChatbot } from '@/components/chatbot';
 import Link from 'next/link';
-import { ChevronLeft, ExternalLink } from 'lucide-react';
+import { ChevronLeft, ExternalLink, Sparkles } from 'lucide-react';
 
 export default function ChatbotPage() {
   return (
@@ -23,12 +23,21 @@ export default function ChatbotPage() {
           </div>
         </div>
 
-        <Link href="/playground">
-          <button className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/20 hover:border-amber-500/40 transition">
-            <ExternalLink className="w-3 h-3" />
-            Open Playground
-          </button>
-        </Link>
+        <div className="flex items-center gap-3">
+          <Link href="/ai-architect">
+            <button className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-zinc-950 font-bold transition">
+              <Sparkles className="w-3 h-3 fill-zinc-950" />
+              AI Architect
+            </button>
+          </Link>
+
+          <Link href="/playground">
+            <button className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-full bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/20 hover:border-amber-500/40 transition">
+              <ExternalLink className="w-3 h-3" />
+              Open Playground
+            </button>
+          </Link>
+        </div>
       </header>
 
       {/* Chatbot fills the remaining space */}

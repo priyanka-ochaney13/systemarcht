@@ -1,6 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
-import { Zap, Layout, Gauge, Lightbulb, ArrowRight, MessageSquare, BookOpen } from 'lucide-react';
+import { Zap, Layout, Gauge, Lightbulb, ArrowRight, MessageSquare, BookOpen, Sparkles } from 'lucide-react';
 
 export const LandingPage = () => {
   return (
@@ -135,10 +135,37 @@ export const LandingPage = () => {
   </a>
 
   <Link
+    href="/playground"
+    className="text-gray-700 hover:text-yellow-600 transition font-medium"
+  >
+    Playground
+  </Link>
+
+  <Link
     href="/learning"
     className="text-gray-700 hover:text-yellow-600 transition font-medium"
   >
     Learning
+  </Link>
+
+  <Link href="/ai-architect">
+    <button
+      className="
+        flex items-center gap-1.5
+        px-3.5 py-1.5
+        rounded-full
+        bg-gradient-to-r from-amber-500 to-amber-600
+        hover:from-amber-400 hover:to-amber-500
+        text-zinc-950
+        text-sm
+        font-bold
+        shadow-sm hover:shadow-md
+        transition
+      "
+    >
+      <Sparkles className="w-3.5 h-3.5 fill-zinc-950" />
+      AI Architect
+    </button>
   </Link>
 
   <Link href="/chatbot">
@@ -230,6 +257,32 @@ export const LandingPage = () => {
     >
       <Layout className="w-5 h-5" />
       Start Building
+    </button>
+  </Link>
+
+  {/* AI Architect */}
+  <Link href="/ai-architect">
+    <button
+      className="
+        px-8 py-4
+        bg-gradient-to-r from-amber-500 to-amber-600
+        hover:from-amber-400 hover:to-amber-500
+        text-zinc-950
+        font-bold
+        rounded-lg
+        transition
+        text-lg
+        flex items-center
+        gap-2
+        justify-center
+        md:justify-start
+        shadow-xl shadow-amber-500/20
+        transform
+        hover:scale-105
+      "
+    >
+      <Sparkles className="w-5 h-5 fill-zinc-950" />
+      AI Architect
     </button>
   </Link>
 

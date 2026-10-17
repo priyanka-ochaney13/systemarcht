@@ -33,15 +33,27 @@ export const PlaygroundCanvas = ({ onNodeSelect }) => {
   const [selectedNodeId, setSelectedNodeId] = useState(null);
 
   // Sync architecture store to ReactFlow
+  const connections = useArchitectureStore(s => s.connections);
   React.useEffect(() => {
     const rfNodesData = nodes.map(node => ({
       id: node.id,
-      data: { label: node.label, serviceType: node.serviceType },
-      position: node.position,
+      data: { label: node.label || node.name || node.serviceType?.toUpperCase(), serviceType: node.serviceType },
+      position: node.position || { x: 100, y: 100 },
       type: 'serviceNode',
     }));
     setRfNodes(rfNodesData);
   }, [nodes, setRfNodes]);
+
+  React.useEffect(() => {
+    const rfEdgesData = (connections || []).map(conn => ({
+      id: conn.id || `${conn.source}-${conn.target}`,
+      source: conn.source,
+      target: conn.target,
+      animated: true,
+      style: { stroke: '#FF9900', strokeWidth: 2 },
+    }));
+    setRfEdges(rfEdgesData);
+  }, [connections, setRfEdges]);
 
   const onConnect = useCallback(
     (connection) => {

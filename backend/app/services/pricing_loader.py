@@ -33,8 +33,10 @@ class PricingLoader:
         pricing_file = Path(__file__).parent.parent.parent / "pricing_data" / f"{self.service_name}.json"
         
         if not pricing_file.exists():
-            logger.error(f"Pricing file not found: {pricing_file}")
-            raise FileNotFoundError(f"Pricing file not found: {pricing_file}")
+            logger.warning(f"Pricing file not found: {pricing_file}. Using empty pricing data (fallbacks will apply).")
+            self.pricing_data = {}
+            self._build_index()
+            return
         
         try:
             logger.info(f"Loading {self.service_name} pricing data from {pricing_file}")

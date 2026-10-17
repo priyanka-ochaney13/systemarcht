@@ -5,6 +5,8 @@ import {
   BookOpen,
   ArrowRight,
   CheckCircle2,
+  ChevronLeft,
+  Sparkles,
 } from 'lucide-react';
 
 import { learningModules } from '@/lib/learningModules';
@@ -13,6 +15,23 @@ export default function LearningPage() {
   return (
     <main className="min-h-screen bg-white text-gray-900 px-6 py-10">
       <div className="max-w-6xl mx-auto">
+
+        {/* Top bar with back and nav */}
+        <div className="flex items-center justify-between pb-6 mb-8 border-b border-gray-200">
+          <Link href="/" className="flex items-center gap-1.5 text-sm text-gray-600 hover:text-gray-900 transition font-medium">
+            <ChevronLeft className="w-4 h-4" />
+            Back to Home
+          </Link>
+          <div className="flex items-center gap-3">
+            <Link href="/ai-architect" className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-zinc-950 font-bold text-xs transition">
+              <Sparkles className="w-3.5 h-3.5 fill-zinc-950" />
+              AI Architect
+            </Link>
+            <Link href="/playground" className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-800 font-semibold text-xs transition">
+              Playground
+            </Link>
+          </div>
+        </div>
 
         {/* Header */}
         <div className="mb-10">

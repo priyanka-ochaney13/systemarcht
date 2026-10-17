@@ -11,6 +11,7 @@ import {
   CheckCircle,
   AlertCircle,
   Info,
+  Sparkles,
 } from 'lucide-react';
 
 import { learningModules } from '@/lib/learningModules';
@@ -35,10 +36,7 @@ import { ElastiCacheConfigPanel } from '@/components/services/ElastiCacheConfigP
 import { SQSConfigPanel } from '@/components/services/SQSConfigPanel';
 
 import { ArchitectChatbot } from '@/components/chatbot';
-import { MermaidArchitectureDiagram } from '@/components/playground/MermaidArchitectureDiagram';
-import { usePricingStore } from '@/store';
-import Link from 'next/link';
-import { ChevronLeft, MessageSquare, X } from 'lucide-react';
+
 
 export default function PlaygroundPage() {
   const searchParams = useSearchParams();
@@ -486,6 +484,28 @@ export default function PlaygroundPage() {
 
             </div>
           )}
+
+          {/* AI ARCHITECT */}
+          <Link href="/ai-architect">
+            <button
+              className="
+                flex items-center gap-1.5
+                px-3.5 py-2
+                rounded-lg
+                font-semibold
+                text-sm
+                bg-gradient-to-r from-amber-500 to-amber-600
+                hover:from-amber-400 hover:to-amber-500
+                text-zinc-950
+                shadow-sm hover:shadow-md
+                transition-all
+              "
+              title="Design new architecture with AI"
+            >
+              <Sparkles className="w-4 h-4 fill-zinc-950" />
+              <span>AI Architect</span>
+            </button>
+          </Link>
 
           {/* ARCHBOT */}
 
@@ -948,12 +968,6 @@ export default function PlaygroundPage() {
 
         <div className="flex-1 flex flex-col min-w-0">
           <PlaygroundCanvas onNodeSelect={handleNodeSelect} />
-          {architectureDiagram && (
-            <MermaidArchitectureDiagram
-              mermaidSource={architectureDiagram.mermaid}
-              valid={architectureDiagram.valid === true}
-            />
-          )}
         </div>
 
         {/* CONFIG PANEL */}
