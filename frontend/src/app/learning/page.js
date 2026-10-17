@@ -5,16 +5,54 @@ import {
   BookOpen,
   ArrowRight,
   CheckCircle2,
+  Circle,
 } from 'lucide-react';
 
 import { learningModules } from '@/lib/learningModules';
-import { SiteHeader } from '@/components/layout/SiteHeader';
+import { useLearningStore } from '@/store';
+import { SiteHeader } from '@/components/common/SiteHeader';
 
 export default function LearningPage() {
+  const modulesProgress = useLearningStore((state) => state.modules);
+  const activeModuleId = useLearningStore((state) => state.activeModuleId);
+
+  const getProgress = (module) => {
+    const progress = modulesProgress[module.id] || {};
+    const totalActivities = module.aiActivity ? 6 : 5;
+    const completedActivities =
+      (progress.completedSections || []).length;
+
+    return {
+      totalActivities,
+      completedActivities: Math.min(completedActivities, totalActivities),
+      percent: Math.round(
+        (Math.min(completedActivities, totalActivities) / totalActivities) * 100
+      ),
+      started: Boolean(
+        progress.buildStarted ||
+          progress.completedSections?.length ||
+          progress.quizCompleted
+      ),
+    };
+  };
+
+  const storedActiveModule = learningModules.find(
+    (module) => module.id === activeModuleId
+  );
+  const activeModule =
+    (storedActiveModule && getProgress(storedActiveModule).percent < 100
+      ? storedActiveModule
+      : null) ||
+    learningModules.find((module) => getProgress(module).percent < 100) ||
+    storedActiveModule ||
+    learningModules[0];
+  const activeModuleProgress = getProgress(activeModule);
+
   return (
-    <main className="min-h-screen bg-background text-foreground">
+    <>
       <SiteHeader />
-      <div className="max-w-6xl mx-auto px-6 py-10">
+      <main className="min-h-screen bg-white text-gray-900 px-6 py-10">
+        <div className="max-w-6xl mx-auto">
 
         {/* Header */}
         <div className="mb-10">
@@ -38,48 +76,27 @@ export default function LearningPage() {
         {/* Learning Flow */}
         <div className="mb-10 p-5 rounded-xl border border-border bg-muted/50">
 
-          <h2 className="text-sm font-semibold text-foreground mb-4">
-            Your Learning Journey
-          </h2>
-
-          <div className="flex flex-wrap items-center gap-2 text-sm">
-
-            {[
-              'Learn',
-              'Explore',
-              'Build',
-              'Calculate',
-              'Ask ArchBot',
-              'Optimize',
-              'Validate',
-            ].map((step, index) => (
-              <div
-                key={step}
-                className="flex items-center gap-2"
-              >
-
-                <span
-                  className="
-                    px-3 py-1.5
-                    rounded-full
-                    bg-card
-                    border border-border
-                    text-foreground/80
-                    font-medium
-                  "
-                >
-                  {step}
-                </span>
-
-                {index < 6 && (
-                  <ArrowRight className="w-4 h-4 text-muted-foreground" />
-                )}
-
-              </div>
-            ))}
-
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <h2 className="text-sm font-semibold text-gray-800">
+                {activeModuleProgress.started
+                  ? 'Continue your learning journey'
+                  : 'Start your learning journey'}
+              </h2>
+              <p className="mt-1 text-sm text-gray-600">
+                {activeModule.title}
+              </p>
+            </div>
+            <Link
+              href={`/learning/${activeModule.id}`}
+              className="inline-flex items-center justify-center gap-2 rounded-lg bg-amber-500 px-4 py-2.5 text-sm font-semibold text-gray-950 hover:bg-amber-400"
+            >
+              {activeModuleProgress.started
+                ? 'Continue Module'
+                : `Start Module ${activeModule.moduleNumber}`}
+              <ArrowRight className="h-4 w-4" />
+            </Link>
           </div>
-
         </div>
 
         {/* Modules */}
@@ -227,6 +244,35 @@ export default function LearningPage() {
                   {/* Learning stages */}
                   <div className="border-t border-border pt-5">
 
+                    {(() => {
+                      const progress = getProgress(module);
+                      return (
+                        <div className="mb-4">
+                          <div className="mb-2 flex items-center justify-between text-xs">
+                            <span className="font-medium text-gray-700">
+                              {progress.started ? 'Your progress' : 'Not started'}
+                            </span>
+                            <span className="text-gray-500">
+                              {progress.completedActivities}/{progress.totalActivities} activities · {progress.percent}%
+                            </span>
+                          </div>
+                          <div
+                            className="h-1.5 overflow-hidden rounded-full bg-gray-100"
+                            role="progressbar"
+                            aria-label={`${module.title} progress`}
+                            aria-valuenow={progress.percent}
+                            aria-valuemin={0}
+                            aria-valuemax={100}
+                          >
+                            <div
+                              className="h-full rounded-full bg-amber-500 transition-all"
+                              style={{ width: `${progress.percent}%` }}
+                            />
+                          </div>
+                        </div>
+                      );
+                    })()}
+
                     <div
                       className="
                         flex
@@ -238,27 +284,23 @@ export default function LearningPage() {
                       "
                     >
 
-                      <span className="flex items-center gap-1 text-foreground/80">
-
-                        <CheckCircle2 className="w-3.5 h-3.5 text-success-foreground" />
-
-                        Learn
-
-                      </span>
-
-                      <span>Explore</span>
-
-                      <span>Build</span>
-
-                      <span>Cost Activity</span>
-
-                      {module.aiActivity && (
-                        <span className="text-primary font-medium">
-                          Ask ArchBot
+                      {[
+                        ['learn', 'Learn'],
+                        ['explore', 'Explore'],
+                        ['build', 'Build'],
+                        ['cost', 'Cost Activity'],
+                        ...(module.aiActivity ? [['ai-assist', 'Ask ArchBot']] : []),
+                        ['quiz', 'Quick Check'],
+                      ].map(([stepId, step]) => (
+                        <span key={step} className="flex items-center gap-1 text-gray-600">
+                          {(modulesProgress[module.id]?.completedSections || []).includes(stepId) ? (
+                            <CheckCircle2 className="h-3.5 w-3.5 text-green-600" />
+                          ) : (
+                            <Circle className="h-3.5 w-3.5 text-gray-300" />
+                          )}
+                          {step}
                         </span>
-                      )}
-
-                      <span>Quick Check</span>
+                      ))}
 
                     </div>
 
@@ -274,7 +316,7 @@ export default function LearningPage() {
                         text-primary
                       "
                     >
-                      Start Module
+                      {getProgress(module).started ? 'Continue Module' : 'Start Module'}
                     </span>
 
                     <ArrowRight
@@ -298,7 +340,8 @@ export default function LearningPage() {
 
         </div>
 
-      </div>
-    </main>
+        </div>
+      </main>
+    </>
   );
 }

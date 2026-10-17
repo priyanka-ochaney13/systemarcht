@@ -105,7 +105,7 @@ export const CaseStudyDetail = ({ caseStudyId }) => {
   }
 
   return (
-    <div className="w-full h-screen flex flex-col bg-background">
+    <div className="w-full h-[calc(100dvh-50px)] flex flex-col bg-gray-50">
       {/* Header */}
       <div className="bg-background border-b border-border p-6">
         <div className="max-w-full mx-auto">

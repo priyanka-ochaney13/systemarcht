@@ -1,8 +1,7 @@
 'use client';
 
 import { CaseStudyDetail } from '@/components/case-studies/CaseStudyDetail';
-import Link from 'next/link';
-import { ChevronLeft } from 'lucide-react';
+import { SiteHeader } from '@/components/common/SiteHeader';
 import { useParams } from 'next/navigation';
 
 export default function CaseStudyDetailPage() {

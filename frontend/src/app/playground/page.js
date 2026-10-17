@@ -1,5 +1,5 @@
 'use client';
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 
@@ -21,7 +21,7 @@ import {
   useLearningStore,
 } from '@/store';
 
-import { evaluateRules } from '@/lib/architectureRules';
+import { validateModuleArchitecture } from '@/lib/architectureValidation';
 
 import { PlaygroundCanvas } from '@/components/playground/PlaygroundCanvas';
 
@@ -41,6 +41,230 @@ import { RDSConfigPanel } from '@/components/services/RDSConfigPanel';
 
 import { ArchitectChatbot } from '@/components/chatbot';
 import { MermaidArchitectureDiagram } from '@/components/playground/MermaidArchitectureDiagram';
+
+function ModuleInstructions({
+  module,
+  getServiceName,
+  panelWidth,
+  validationResult,
+  onDismissValidation,
+}) {
+  return (
+    <div
+      className="w-full md:flex-none md:w-[var(--instruction-panel-width)] max-h-48 md:max-h-none md:h-full flex-shrink-0 overflow-y-auto border-b md:border-b-0 border-blue-200 bg-blue-50"
+      style={{ '--instruction-panel-width': `${panelWidth}px` }}
+    >
+      <div className="px-5 py-4">
+        <div className="max-w-5xl">
+          <div className="flex items-start gap-3">
+            <Info className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" />
+
+            <div className="flex-1">
+              <h2 className="font-semibold text-blue-900">
+                Module {module.moduleNumber} Build Activity
+              </h2>
+
+              <p className="text-sm text-blue-800 mt-1">
+                {module.buildActivity?.title}
+              </p>
+
+              <p className="text-sm text-blue-700 mt-2">
+                Build the required architecture on the canvas, connect the
+                services correctly, configure them if needed, and then click
+                <strong> Validate Architecture</strong>.
+              </p>
+
+              {module.buildActivity?.requiredServices?.length > 0 && (
+                <div className="mt-3">
+                  <p className="text-xs font-semibold text-blue-900 mb-2">
+                    Required Services
+                  </p>
+
+                  <div className="flex flex-wrap gap-2">
+                    {module.buildActivity.requiredServices.map((service) => (
+                      <span
+                        key={service}
+                        className="px-3 py-1 rounded-full bg-white border border-blue-200 text-xs text-blue-800 font-medium"
+                      >
+                        {getServiceName(service)}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {module.buildActivity?.requiredConnections?.length > 0 && (
+                <div className="mt-3">
+                  <p className="text-xs font-semibold text-blue-900 mb-2">
+                    Required Connections
+                  </p>
+
+                  <div className="flex flex-wrap gap-2">
+                    {module.buildActivity.requiredConnections.map(
+                      (connection, index) => (
+                        <span
+                          key={`${connection.source}-${connection.target}-${index}`}
+                          className="px-3 py-1 rounded-full bg-white border border-blue-200 text-xs text-blue-800 font-medium"
+                        >
+                          {getServiceName(connection.source)} →{' '}
+                          {getServiceName(connection.target)}
+                        </span>
+                      )
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {Object.keys(module.buildActivity?.minServiceCounts || {})
+                .length > 0 && (
+                <div className="mt-3">
+                  <p className="text-xs font-semibold text-blue-900 mb-2">
+                    Minimum Instances
+                  </p>
+
+                  <div className="flex flex-wrap gap-2">
+                    {Object.entries(module.buildActivity.minServiceCounts).map(
+                      ([service, count]) => (
+                        <span
+                          key={service}
+                          className="px-3 py-1 rounded-full bg-white border border-blue-200 text-xs text-blue-800 font-medium"
+                        >
+                          At least {count} × {getServiceName(service)}
+                        </span>
+                      )
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {module.buildActivity?.rules?.length > 0 && (
+                <div className="mt-3">
+                  <p className="text-xs font-semibold text-blue-900 mb-2">
+                    Design Requirements
+                  </p>
+
+                  <ul className="space-y-1 text-xs text-blue-800 list-disc pl-4">
+                    {module.buildActivity.rules.map((rule) => (
+                      <li key={rule.id}>{rule.label}</li>
+                    ))}
+                  </ul>
+
+                  {module.buildActivity.monthlyBudgetUSD && (
+                    <p className="text-xs text-blue-700 mt-2">
+                      Monthly budget: $
+                      {module.buildActivity.monthlyBudgetUSD.toLocaleString(
+                        'en-US'
+                      )}
+                    </p>
+                  )}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {validationResult && (
+          <ValidationFeedback
+            result={validationResult}
+            module={module}
+            getServiceName={getServiceName}
+            onDismiss={onDismissValidation}
+          />
+        )}
+      </div>
+    </div>
+  );
+}
+
+function ValidationFeedback({ result, module, getServiceName, onDismiss }) {
+  const isValid = result.valid;
+  const issues = [
+    ...(result.missingServices || []).map((service) =>
+      `Add ${getServiceName(service)}`
+    ),
+    ...(result.missingConnections || []).map(
+      (connection) =>
+        `Connect ${getServiceName(connection.source)} to ${getServiceName(connection.target)}`
+    ),
+    ...(result.missingCounts || []).map(
+      (item) =>
+        `Add ${item.required - item.found} more ${getServiceName(item.service)}`
+    ),
+    ...(result.ruleResults || [])
+      .filter((rule) => !rule.passed)
+      .map((rule) => rule.detail ? `${rule.label}: ${rule.detail}` : rule.label),
+  ];
+
+  return (
+    <section
+      aria-live="polite"
+      className={`mt-5 rounded-lg border p-3 ${
+        isValid
+          ? 'border-green-200 bg-green-50'
+          : 'border-red-200 bg-red-50'
+      }`}
+    >
+      <div className="flex items-start gap-2">
+        {isValid ? (
+          <CheckCircle className="mt-0.5 h-4 w-4 flex-shrink-0 text-green-600" />
+        ) : (
+          <AlertCircle className="mt-0.5 h-4 w-4 flex-shrink-0 text-red-600" />
+        )}
+        <div className="min-w-0 flex-1">
+          <h3
+            className={`text-sm font-semibold ${
+              isValid ? 'text-green-800' : 'text-red-800'
+            }`}
+          >
+            {isValid ? 'Architecture validated' : 'Architecture incomplete'}
+          </h3>
+          <p
+            className={`mt-1 text-xs ${
+              isValid ? 'text-green-700' : 'text-red-700'
+            }`}
+          >
+            {isValid
+              ? 'All requirements for this module are satisfied.'
+              : 'Fix the items below, then validate again.'}
+          </p>
+        </div>
+        <button
+          type="button"
+          onClick={onDismiss}
+          aria-label="Dismiss validation result"
+          className="inline-flex items-center gap-1 rounded px-2 py-1 text-xs font-medium text-gray-600 hover:bg-white/70 hover:text-gray-900"
+        >
+          <X className="h-4 w-4" />
+          <span>Dismiss</span>
+        </button>
+      </div>
+
+      {!isValid && issues.length > 0 && (
+        <ul className="mt-3 space-y-1 border-t border-red-200 pt-3 text-xs text-red-800">
+          {issues.map((issue, index) => (
+            <li key={`${issue}-${index}`} className="flex gap-2">
+              <span aria-hidden="true">•</span>
+              <span>{issue}</span>
+            </li>
+          ))}
+        </ul>
+      )}
+
+      {isValid && module?.buildActivity?.requiredServices?.length > 0 && (
+        <div className="mt-3 flex flex-wrap gap-1.5">
+          {module.buildActivity.requiredServices.map((service) => (
+            <span
+              key={service}
+              className="rounded border border-green-200 bg-white px-2 py-1 text-xs text-green-800"
+            >
+              ✓ {getServiceName(service)}
+            </span>
+          ))}
+        </div>
+      )}
+    </section>
+  );
+}
 import { ThemeToggle } from '@/components/theme/ThemeToggle';
 
 export default function PlaygroundPage() {
@@ -82,6 +306,58 @@ export default function PlaygroundPage() {
 
   const [validationResult, setValidationResult] =
     useState(null);
+  const [instructionsPanelWidth, setInstructionsPanelWidth] = useState(320);
+  const [isResizingInstructions, setIsResizingInstructions] = useState(false);
+  const mainContentRef = useRef(null);
+
+  useEffect(() => {
+    if (!isResizingInstructions) {
+      return undefined;
+    }
+
+    const handlePointerMove = (event) => {
+      const container = mainContentRef.current;
+      if (!container) {
+        return;
+      }
+
+      const { left, width } = container.getBoundingClientRect();
+      const maximumWidth = Math.min(520, width * 0.5);
+      const minimumWidth = Math.min(240, maximumWidth);
+      const nextWidth = Math.min(
+        maximumWidth,
+        Math.max(minimumWidth, event.clientX - left)
+      );
+
+      setInstructionsPanelWidth(nextWidth);
+    };
+
+    const handlePointerUp = () => setIsResizingInstructions(false);
+
+    window.addEventListener('pointermove', handlePointerMove);
+    window.addEventListener('pointerup', handlePointerUp);
+
+    return () => {
+      window.removeEventListener('pointermove', handlePointerMove);
+      window.removeEventListener('pointerup', handlePointerUp);
+    };
+  }, [isResizingInstructions]);
+
+  const resizeInstructionsPanel = (direction) => {
+    const containerWidth = mainContentRef.current?.getBoundingClientRect().width;
+    if (!containerWidth) {
+      return;
+    }
+
+    const maximumWidth = Math.min(520, containerWidth * 0.5);
+    const minimumWidth = Math.min(240, maximumWidth);
+    setInstructionsPanelWidth((currentWidth) =>
+      Math.min(
+        maximumWidth,
+        Math.max(minimumWidth, currentWidth + direction * 16)
+      )
+    );
+  };
 
   // ============================================================
   // PRICING
@@ -308,187 +584,17 @@ export default function PlaygroundPage() {
   // ============================================================
 
   const validateArchitecture = () => {
-    // ----------------------------------------------------------
-    // No module = normal free-play playground
-    // ----------------------------------------------------------
-
     if (!module?.buildActivity) {
-      const result = {
-        valid: true,
-        missingServices: [],
-        missingConnections: [],
-        extraServices: [],
-      };
-
-      setValidationResult(result);
-
-      return result;
+      return null;
     }
 
-    // ----------------------------------------------------------
-    // Required architecture from module
-    // ----------------------------------------------------------
-
-    const requiredServices =
-      module.buildActivity.requiredServices || [];
-
-    const requiredConnections =
-      module.buildActivity.requiredConnections || [];
-
-    // ----------------------------------------------------------
-    // Student services
-    // ----------------------------------------------------------
-
-    const studentServices =
-      architectureNodes
-        .map(
-          (node) =>
-            node.serviceType ||
-            node.data?.serviceType
-        )
-        .filter(Boolean);
-
-    // ----------------------------------------------------------
-    // Missing services
-    // ----------------------------------------------------------
-
-    const missingServices =
-      requiredServices.filter(
-        (requiredService) =>
-          !studentServices.includes(requiredService)
-      );
-
-    // ----------------------------------------------------------
-    // Extra services
-    // ----------------------------------------------------------
-
-    const extraServices =
-      studentServices.filter(
-        (service) =>
-          !requiredServices.includes(service)
-      );
-
-    // ----------------------------------------------------------
-    // Missing connections
-    // ----------------------------------------------------------
-
-    const missingConnections =
-      requiredConnections.filter(
-        (requiredConnection) => {
-          const connectionExists =
-            architectureConnections.some(
-              (connection) => {
-                const sourceNode =
-                  architectureNodes.find(
-                    (node) =>
-                      node.id === connection.source
-                  );
-
-                const targetNode =
-                  architectureNodes.find(
-                    (node) =>
-                      node.id === connection.target
-                  );
-
-                if (
-                  !sourceNode ||
-                  !targetNode
-                ) {
-                  return false;
-                }
-
-                const sourceService =
-                  sourceNode.serviceType ||
-                  sourceNode.data?.serviceType;
-
-                const targetService =
-                  targetNode.serviceType ||
-                  targetNode.data?.serviceType;
-
-                return (
-                  sourceService ===
-                    requiredConnection.source &&
-                  targetService ===
-                    requiredConnection.target
-                );
-              }
-            );
-
-          return !connectionExists;
-        }
-      );
-
-    // ----------------------------------------------------------
-    // Minimum counts (for example at least 2 EC2 nodes)
-    // ----------------------------------------------------------
-
-    const missingCounts = Object.entries(
-      module.buildActivity.minServiceCounts || {}
-    )
-      .map(([service, required]) => ({
-        service,
-        required,
-        found: studentServices.filter((item) => item === service).length,
-      }))
-      .filter((item) => item.found < item.required);
-
-    // ----------------------------------------------------------
-    // Rule-based checks (used by the capstone)
-    // ----------------------------------------------------------
-
-    const connectionPairs = architectureConnections
-      .map((connection) => {
-        const sourceNode = architectureNodes.find(
-          (node) => node.id === connection.source
-        );
-        const targetNode = architectureNodes.find(
-          (node) => node.id === connection.target
-        );
-
-        return {
-          source: sourceNode?.serviceType || sourceNode?.data?.serviceType,
-          target: targetNode?.serviceType || targetNode?.data?.serviceType,
-        };
-      })
-      .filter((pair) => pair.source && pair.target);
-
-    const ruleResults = evaluateRules(module.buildActivity.rules || [], {
-      serviceTypes: studentServices,
-      connectionPairs,
-      totalCost,
-      budget: module.buildActivity.monthlyBudgetUSD,
-    });
-
-    const failedRules = ruleResults.filter((rule) => !rule.passed);
-
-    // ----------------------------------------------------------
-    // Extras: skip optional services, and skip entirely for
-    // rule-based modules where nothing is strictly required
-    // ----------------------------------------------------------
-
-    const optionalServices = module.buildActivity.optionalServices || [];
-
-    const visibleExtraServices =
-      requiredServices.length === 0
-        ? []
-        : [...new Set(extraServices)].filter(
-            (service) => !optionalServices.includes(service)
-          );
-
-    const valid =
-      missingServices.length === 0 &&
-      missingConnections.length === 0 &&
-      missingCounts.length === 0 &&
-      failedRules.length === 0;
-
-    const result = {
-      valid,
-      missingServices,
-      missingConnections,
-      missingCounts,
-      ruleResults,
-      extraServices: visibleExtraServices,
-    };
+    const { nodes, connections } = useArchitectureStore.getState();
+    const result = validateModuleArchitecture(
+      module,
+      nodes,
+      connections,
+      totalCost
+    );
 
     console.log(
       'Architecture Validation Result:',
@@ -496,10 +602,17 @@ export default function PlaygroundPage() {
     );
 
     setValidationResult(result);
-
-    updateModuleProgress(module.id, { architectureValidated: valid });
-
+    updateModuleProgress(module.id, {
+      architectureValidated: result.valid,
+    });
     return result;
+  };
+
+  const handleArchitectureChange = () => {
+    setValidationResult(null);
+    if (module?.id) {
+      updateModuleProgress(module.id, { architectureValidated: false });
+    }
   };
 
   // ============================================================
@@ -535,17 +648,12 @@ export default function PlaygroundPage() {
 
         <div className="flex items-center gap-4">
 
-          <Link href="/">
-            <button
-              className="
-                flex items-center gap-1
-                text-muted-foreground
-                hover:text-foreground
-              "
-            >
-              <ChevronLeft className="w-5 h-5" />
-              <span>Back</span>
-            </button>
+          <Link
+            href={module ? `/learning/${module.id}` : '/learning'}
+            className="flex items-center gap-1 text-muted-foreground hover:text-foreground"
+          >
+            <ChevronLeft className="w-5 h-5" />
+            <span>{module ? 'Back to Module' : 'Back to Learning'}</span>
           </Link>
 
           <div>
@@ -857,7 +965,7 @@ export default function PlaygroundPage() {
           VALIDATION RESULT
       ======================================================= */}
 
-      {validationResult && (
+      {validationResult && !module && (
         <div className="border-b border-border bg-muted/50 px-6 py-4">
 
           {validationResult.valid ? (
@@ -1150,12 +1258,61 @@ export default function PlaygroundPage() {
           MAIN CONTENT
       ======================================================= */}
 
-      <div className="flex-1 flex overflow-hidden">
+      <div
+        ref={mainContentRef}
+        className={`flex-1 flex overflow-hidden min-h-0 ${
+          module ? 'flex-col md:flex-row' : ''
+        }`}
+      >
+
+        {module && (
+          <ModuleInstructions
+            module={module}
+            getServiceName={getServiceName}
+            panelWidth={instructionsPanelWidth}
+            validationResult={validationResult}
+            onDismissValidation={() => setValidationResult(null)}
+          />
+        )}
+
+        {module && (
+          <div
+            role="separator"
+            aria-label="Resize module instructions panel"
+            aria-orientation="vertical"
+            aria-valuemin={240}
+            aria-valuemax={520}
+            aria-valuenow={Math.round(instructionsPanelWidth)}
+            tabIndex={0}
+            onPointerDown={(event) => {
+              event.preventDefault();
+              setIsResizingInstructions(true);
+            }}
+            onKeyDown={(event) => {
+              if (event.key === 'ArrowLeft') {
+                event.preventDefault();
+                resizeInstructionsPanel(-1);
+              } else if (event.key === 'ArrowRight') {
+                event.preventDefault();
+                resizeInstructionsPanel(1);
+              }
+            }}
+            className={`hidden md:block w-1 flex-shrink-0 cursor-col-resize touch-none transition-colors ${
+              isResizingInstructions
+                ? 'bg-blue-500'
+                : 'bg-gray-200 hover:bg-blue-400'
+            }`}
+            title="Drag to resize instructions"
+          />
+        )}
 
         {/* PLAYGROUND */}
 
-        <div className="flex-1 flex flex-col min-w-0">
-          <PlaygroundCanvas onNodeSelect={handleNodeSelect} />
+        <div className="flex-1 flex flex-col min-w-0 min-h-0">
+          <PlaygroundCanvas
+            onNodeSelect={handleNodeSelect}
+            onArchitectureChange={handleArchitectureChange}
+          />
         </div>
 
         {/* CONFIG PANEL */}

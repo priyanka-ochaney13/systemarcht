@@ -16,12 +16,15 @@ instruct the model not to contradict it.
 from __future__ import annotations
 
 import os
+import logging
 from typing import Protocol
 
 from dotenv import load_dotenv
 from groq import Groq
 
 load_dotenv()
+
+logger = logging.getLogger(__name__)
 
 
 class LLMProvider(Protocol):
@@ -55,10 +58,32 @@ class GroqProvider:
                     {"role": "system", "content": system_prompt},
                     {"role": "user", "content": user_prompt},
                 ],
-                temperature=0.2,
+                temperature=0.65,
             )
-        except Exception as exc:  # groq SDK raises its own APIError subclasses
-            raise RuntimeError(f"Groq API request failed: {exc}") from exc
+        except Exception as exc:  # Groq SDK errors need a safe, actionable client message.
+            logger.exception("Groq chat completion failed")
+            status_code = getattr(exc, "status_code", None)
+            body = getattr(exc, "body", None)
+            error = body.get("error", body) if isinstance(body, dict) else {}
+            error_code = error.get("code") if isinstance(error, dict) else None
+
+            if status_code == 404 or error_code == "model_not_found":
+                message = (
+                    "The configured Groq model is unavailable. Set "
+                    "GROQ_MODEL=openai/gpt-oss-120b in backend/.env and restart "
+                    "the backend."
+                )
+            elif status_code == 401:
+                message = "Groq rejected the API key. Check the backend's GROQ_API_KEY setting."
+            elif status_code == 429:
+                message = "Groq rate limit reached. Please wait a moment and try again."
+            else:
+                message = (
+                    "Groq could not complete the request. Check the backend logs "
+                    "for details, then try again."
+                )
+
+            raise RuntimeError(message) from exc
 
         choice = response.choices[0] if response.choices else None
         content = choice.message.content if choice and choice.message else None

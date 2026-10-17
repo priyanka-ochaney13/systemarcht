@@ -1,7 +1,13 @@
 'use client';
 
-import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { Send, Zap, BarChart2, HelpCircle, RefreshCw, X, ChevronDown } from 'lucide-react';
+import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react';
+import {
+  BarChart2,
+  ChevronDown,
+  RefreshCw,
+  Send,
+  X,
+} from 'lucide-react';
 import { useArchitectureStore, useServiceConfigStore } from '@/store';
 import {
   analyzeArchitectureCost,
@@ -11,7 +17,6 @@ import {
   buildArchitecturePayload,
   isArchitectureAnalyzable,
   parseAnalysisResponse,
-  formatUSD,
 } from '@/lib/chatbotUtils';
 import { ChatMessage } from './ChatMessage';
 import { TypingIndicator } from './TypingIndicator';
@@ -23,63 +28,12 @@ const WELCOME_MESSAGE = {
   role: 'bot',
   type: 'text',
   content:
-    'Hey! I\'m your AWS Architecture Assistant 👋\n\nI can analyze the architecture you\'ve built on the Playground and break down:\n• Monthly cost estimates per service\n• Data transfer costs between services\n• Cost optimization tips\n\nHit "Analyze Architecture" to get started, or ask me anything.',
+    'Hi, I’m ArchBot. I can help you think through the design on your canvas, explain AWS trade-offs, or make sense of a cost estimate. What are you working on?',
   timestamp: Date.now(),
 };
 
-const HELP_CONTENT = `Here's what you can ask me:
-
-📊 "Analyze my architecture" — Full cost breakdown
-💡 "How can I reduce costs?" — Optimization tips
-🔢 "What's the most expensive service?" — Cost ranking
-📐 "Explain my architecture" — Summary of current design
-🔄 "Reset" — Start a fresh conversation
-
-To get a cost analysis, first build your architecture in the Playground, then come back here!`;
-
-const EMPTY_ARCH_MESSAGE = `Your Playground is empty! 🏗️
-
-Head over to the Architecture Playground, add some services (Lambda, API Gateway, etc.), connect them, and then come back here for a cost analysis.
-
-I can analyze any service available in the Playground, including Lambda, API Gateway, S3, DynamoDB, EC2, RDS, ELB, Elastic Beanstalk, CloudFront, CloudWatch, ElastiCache, SQS and Cognito.`;
-
-// ─── Intent matching ──────────────────────────────────────────────────────────
-
-const matchIntent = (text) => {
-  const lower = text.toLowerCase().trim();
-
-  // Only explicit requests to run the deterministic calculator
-  if (/^analyz(e|ing)?\s+(my\s+)?architecture/.test(lower)) {
-    return 'analyze';
-  }
-
-  if (/^(run|calculate|show)\s+(the\s+)?(cost|costs|estimate|breakdown)/.test(lower)) {
-    return 'analyze';
-  }
-
-  // Conversational questions should go to Groq
-  if (/optim|cheap|reduc|sav|improv|tip|expensive|highest|most cost|costing|price|spend|monthly cost|total cost|why|how much/.test(lower)) {
-    return 'ai';
-  }
-
-  if (/explain|describe|summar|architecture|design|build|connected|services/.test(lower)) {
-    return 'ai';
-  }
-
-  if (/help|what can|commands?|options?/.test(lower)) {
-    return 'help';
-  }
-
-  if (/reset|clear|start over|new conv/.test(lower)) {
-    return 'reset';
-  }
-
-  if (/hello|hi|hey|sup|greet/.test(lower)) {
-    return 'greet';
-  }
-
-  return 'ai';
-};
+const EMPTY_ARCH_MESSAGE =
+  'There aren’t any services on the canvas to calculate yet. Add a service in the Playground, then try calculating costs again.';
 
 // ─── Main Component ───────────────────────────────────────────────────────────
 
@@ -87,7 +41,6 @@ export function ArchitectChatbot({ onClose, embedded = false }) {
   const [messages, setMessages] = useState([WELCOME_MESSAGE]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [lastAnalysis, setLastAnalysis] = useState(null);
   const [lastCostResult, setLastCostResult] = useState(null);
   const [isMinimized, setIsMinimized] = useState(false);
 
@@ -111,21 +64,38 @@ export function ArchitectChatbot({ onClose, embedded = false }) {
   const cloudFrontConfig = useServiceConfigStore((s) => s.cloudFrontConfig);
   const elastiCacheConfig = useServiceConfigStore((s) => s.elastiCacheConfig);
   const sqsConfig = useServiceConfigStore((s) => s.sqsConfig);
-  const serviceConfigs = {
-    lambdaConfig,
-    apiGatewayConfig,
-    s3Config,
-    ec2Config,
-    rdsConfig,
-    dynamoDBConfig,
-    elbConfig,
-    cognitoConfig,
-    elasticBeanstalkConfig,
-    cloudWatchConfig,
-    cloudFrontConfig,
-    elastiCacheConfig,
-    sqsConfig,
-  };
+  const serviceConfigs = useMemo(
+    () => ({
+      lambdaConfig,
+      apiGatewayConfig,
+      s3Config,
+      ec2Config,
+      rdsConfig,
+      dynamoDBConfig,
+      elbConfig,
+      cognitoConfig,
+      elasticBeanstalkConfig,
+      cloudWatchConfig,
+      cloudFrontConfig,
+      elastiCacheConfig,
+      sqsConfig,
+    }),
+    [
+      lambdaConfig,
+      apiGatewayConfig,
+      s3Config,
+      ec2Config,
+      rdsConfig,
+      dynamoDBConfig,
+      elbConfig,
+      cognitoConfig,
+      elasticBeanstalkConfig,
+      cloudWatchConfig,
+      cloudFrontConfig,
+      elastiCacheConfig,
+      sqsConfig,
+    ]
+  );
 
   // Auto-scroll on new messages
   useEffect(() => {
@@ -155,19 +125,9 @@ export function ArchitectChatbot({ onClose, embedded = false }) {
       const data = await analyzeArchitectureCost(payload);
       const parsed = parseAnalysisResponse(data);
 
-      setLastAnalysis(parsed);
       setLastCostResult(data);
 
       addMessage({ role: 'bot', type: 'analysis', payload: parsed });
-
-      // Follow-up suggestion
-      setTimeout(() => {
-        addMessage({
-          role: 'bot',
-          type: 'text',
-          content: `Analysis complete! Total monthly estimate: ${formatUSD(parsed.totalCost)}\n\nWant optimization tips? Try asking "How can I reduce costs?" or "What's the most expensive service?"`,
-        });
-      }, 400);
     } catch (err) {
       const status = err?.response?.status;
       const rawDetail = err?.response?.data?.detail;
@@ -198,161 +158,71 @@ export function ArchitectChatbot({ onClose, embedded = false }) {
     }
   }, [architectureNodes, architectureConnections, serviceConfigs, addMessage]);
 
-  // ── Intent Handlers ──────────────────────────────────────────────────────
-
-  const handleOptimize = useCallback(() => {
-    if (!lastAnalysis) {
-      addMessage({
-        role: 'bot',
-        type: 'text',
-        content: "I haven't analyzed your architecture yet. Run an analysis first and then I'll give you tailored optimization tips!",
-      });
-      return;
-    }
-
-    const { services, warnings, totalCost } = lastAnalysis;
-    const tips = [...warnings];
-
-    // Auto-generate tips from service data
-    const lambdaServices = services.filter((s) => s.service_type === 'lambda');
-    if (lambdaServices.length > 1) {
-      tips.push('You have multiple Lambda functions. Consider using ARM64 (Graviton2) architecture — it\'s ~20% cheaper with comparable performance.');
-    }
-
-    const expensive = services.sort((a, b) => b.cost - a.cost)[0];
-    if (expensive) {
-      tips.push(`Your most expensive component is "${expensive.name}" at ${formatUSD(expensive.cost)}/mo. Focus optimization efforts here first.`);
-    }
-
-    if (totalCost > 500) {
-      tips.push('Consider using AWS Cost Explorer and Budgets to set alerts when costs exceed thresholds.');
-    }
-
-    if (tips.length === 0) {
-      tips.push('Your architecture appears well-optimized for its current configuration.');
-      tips.push('Consider using Reserved Concurrency on Lambda to cap costs during traffic spikes.');
-    }
-
-    addMessage({
-      role: 'bot',
-      type: 'text',
-      content: `💡 Cost Optimization Tips:\n\n${tips.map((t, i) => `${i + 1}. ${t}`).join('\n\n')}`,
-    });
-  }, [lastAnalysis, addMessage]);
-
-  const handleExplain = useCallback(() => {
-    if (architectureNodes.length === 0) {
-      addMessage({ role: 'bot', type: 'text', content: EMPTY_ARCH_MESSAGE });
-      return;
-    }
-
-    const typeCounts = architectureNodes.reduce((acc, n) => {
-      acc[n.serviceType] = (acc[n.serviceType] || 0) + 1;
-      return acc;
-    }, {});
-
-    const typeList = Object.entries(typeCounts)
-      .map(([type, count]) => `• ${count}x ${type.replace(/_/g, ' ').toUpperCase()}`)
-      .join('\n');
-
-    const connCount = architectureConnections.length;
-
-    addMessage({
-      role: 'bot',
-      type: 'text',
-      content: `📐 Your current architecture has:\n\n${typeList}\n• ${connCount} connection${connCount !== 1 ? 's' : ''} between services\n\nThis looks like a${
-        typeCounts['api_gateway'] ? ' serverless API pattern.' : ' function-based pipeline.'
-      } Run an analysis to see the full cost breakdown!`,
-    });
-  }, [architectureNodes, architectureConnections, addMessage]);
-
-  const handleRank = useCallback(() => {
-    if (!lastAnalysis) {
-      addMessage({
-        role: 'bot',
-        type: 'text',
-        content: "Run an analysis first, then I can rank your services by cost!",
-      });
-      return;
-    }
-
-    const ranked = [...lastAnalysis.services].sort((a, b) => b.cost - a.cost);
-    const list = ranked
-      .map((s, i) => `${i + 1}. ${s.name} — ${formatUSD(s.cost)}/mo`)
-      .join('\n');
-
-    addMessage({
-      role: 'bot',
-      type: 'text',
-      content: `📊 Services ranked by monthly cost:\n\n${list}\n\nTotal: ${formatUSD(lastAnalysis.totalCost)}/mo`,
-    });
-  }, [lastAnalysis, addMessage]);
-
   // ── AI Free-text Chat ────────────────────────────────────────────────────
 
-const handleAIChat = useCallback(async (text) => {
-  setIsLoading(true);
+  const handleAIChat = useCallback(async (text) => {
+    setIsLoading(true);
 
-  try {
-    const architectureSnapshot = buildArchitecturePayload(
-      {
-        nodes: architectureNodes,
-        connections: architectureConnections,
-      },
-      serviceConfigs
-    );
+    try {
+      const architectureSnapshot = architectureNodes.length
+        ? buildArchitecturePayload(
+            {
+              nodes: architectureNodes,
+              connections: architectureConnections,
+            },
+            serviceConfigs
+          )
+        : null;
 
-    const history = messages
-      .filter((msg) => msg.role === 'user' || msg.role === 'bot')
-      .filter((msg) => msg.type === 'text')
-      .slice(-10)
-      .map((msg) => ({
-        role: msg.role === 'bot' ? 'assistant' : 'user',
-        content: msg.content,
-      }));
+      const history = messages
+        .filter((msg) => msg.role === 'user' || msg.role === 'bot')
+        .filter((msg) => msg.type === 'text')
+        .slice(-10)
+        .map((msg) => ({
+          role: msg.role === 'bot' ? 'assistant' : 'user',
+          content: msg.content,
+        }));
 
-    const data = await chatAboutArchitecture({
-      message: text,
-      architectureSnapshot,
-      costResult: lastCostResult,
-      history,
-    });
+      const data = await chatAboutArchitecture({
+        message: text,
+        architectureSnapshot,
+        costResult: lastCostResult,
+        history,
+      });
 
-    addMessage({
-      role: 'bot',
-      type: 'text',
-      content: data.reply,
-    });
-  } catch (err) {
-    const status = err?.response?.status;
-    const rawDetail = err?.response?.data?.detail;
-    const detail =
-      typeof rawDetail === 'string'
-        ? rawDetail
-        : Array.isArray(rawDetail)
+      addMessage({
+        role: 'bot',
+        type: 'text',
+        content: data.reply,
+      });
+    } catch (err) {
+      const status = err?.response?.status;
+      const rawDetail = err?.response?.data?.detail;
+      const errorMessage =
+        typeof rawDetail === 'string' && rawDetail.trim()
           ? rawDetail
-              .map((e) => `${e.loc?.join('.')} — ${e.msg}`)
-              .join(', ')
-          : err.message;
+          : status === 404
+            ? 'The ArchBot endpoint could not be found. Check that the backend is running the current version.'
+            : status
+              ? `ArchBot couldn’t complete that request (HTTP ${status}). Please try again.`
+              : 'I couldn’t reach ArchBot. Check that the backend is running, then try again.';
 
-    addMessage({
-      role: 'bot',
-      type: 'error',
-      content: `❌ ArchBot request failed\n\n${
-        status ? `HTTP ${status}: ` : ''
-      }${detail || 'Unable to reach the AI backend.'}`,
-    });
-  } finally {
-    setIsLoading(false);
-  }
-}, [
-  architectureNodes,
-  architectureConnections,
-  serviceConfigs,
-  messages,
-  lastCostResult,
-  addMessage,
-]);
+      addMessage({
+        role: 'bot',
+        type: 'error',
+        content: errorMessage,
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  }, [
+    architectureNodes,
+    architectureConnections,
+    serviceConfigs,
+    messages,
+    lastCostResult,
+    addMessage,
+  ]);
 
   // ── Message Send ─────────────────────────────────────────────────────────
 
@@ -363,51 +233,8 @@ const handleAIChat = useCallback(async (text) => {
     addMessage({ role: 'user', type: 'text', content: text });
     setInput('');
 
-    const intent = matchIntent(text);
-
-    // Small delay to feel natural
-    await new Promise((r) => setTimeout(r, 300));
-
-    switch (intent) {
-  case 'analyze':
-    await runAnalysis();
-    break;
-
-  case 'help':
-    addMessage({
-      role: 'bot',
-      type: 'text',
-      content: HELP_CONTENT,
-    });
-    break;
-
-  case 'reset':
-    setMessages([WELCOME_MESSAGE]);
-    setLastAnalysis(null);
-    setLastCostResult(null);
-    break;
-
-  case 'greet':
-    addMessage({
-      role: 'bot',
-      type: 'text',
-      content:
-        "Hey there! Ready to analyze your AWS architecture? Hit 'Analyze Architecture' or ask me about costs, optimizations, or your current design.",
-    });
-    break;
-
-  case 'ai':
-  await handleAIChat(text);
-  break;
-
-  default:
     await handleAIChat(text);
-}
-  }, [input,
-  isLoading,
-  addMessage,
-  runAnalysis,
-  handleAIChat,]);
+  }, [input, isLoading, addMessage, handleAIChat]);
 
   const handleKeyDown = (e) => {
     if (e.key === 'Enter' && !e.shiftKey) {
@@ -415,26 +242,6 @@ const handleAIChat = useCallback(async (text) => {
       handleSend();
     }
   };
-
-  // ── Quick Actions ────────────────────────────────────────────────────────
-
-  const QUICK_ACTIONS = [
-  {
-    label: 'Analyze Architecture',
-    icon: <BarChart2 className="w-3.5 h-3.5" />,
-    action: runAnalysis,
-  },
-  {
-    label: 'Optimize Costs',
-    icon: <Zap className="w-3.5 h-3.5" />,
-    action: () => handleAIChat('How can I reduce the cost of my architecture?'),
-  },
-  {
-    label: 'Explain Design',
-    icon: <HelpCircle className="w-3.5 h-3.5" />,
-    action: () => handleAIChat('Explain my current architecture and how the services are connected.'),
-  },
-];
 
   // ── Render ───────────────────────────────────────────────────────────────
 
@@ -454,14 +261,14 @@ const handleAIChat = useCallback(async (text) => {
             <p className="text-sm font-semibold text-foreground leading-none">ArchBot</p>
             <p className="text-[10px] text-success-foreground mt-0.5 flex items-center gap-1">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 inline-block animate-pulse" />
-              AWS Cost Assistant
+              Architecture assistant
             </p>
           </div>
         </div>
 
         <div className="flex items-center gap-1">
           <button
-            onClick={() => { setMessages([WELCOME_MESSAGE]); setLastAnalysis(null); setLastCostResult(null); }}
+            onClick={() => { setMessages([WELCOME_MESSAGE]); setLastCostResult(null); }}
             title="Reset conversation"
             className="p-1.5 rounded-md text-muted-foreground hover:text-foreground/80 hover:bg-muted transition"
           >
@@ -491,7 +298,7 @@ const handleAIChat = useCallback(async (text) => {
       {/* Arch node count badge */}
       {!isMinimized && (
         <div className="px-4 py-2 bg-muted/60 border-b border-border flex-shrink-0">
-          <div className="flex items-center gap-2 text-xs text-muted-foreground">
+          <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
             <span className="font-mono">Playground:</span>
             <span className={`font-semibold ${architectureNodes.length > 0 ? 'text-primary' : 'text-muted-foreground'}`}>
               {architectureNodes.length} node{architectureNodes.length !== 1 ? 's' : ''}
@@ -500,6 +307,15 @@ const handleAIChat = useCallback(async (text) => {
             <span className="font-semibold text-foreground/80">
               {architectureConnections.length} connection{architectureConnections.length !== 1 ? 's' : ''}
             </span>
+            <button
+              type="button"
+              onClick={runAnalysis}
+              disabled={isLoading || !isArchitectureAnalyzable(architectureNodes)}
+              className="ml-auto inline-flex items-center gap-1.5 rounded-md border border-amber-500/30 px-2.5 py-1 text-xs font-medium text-amber-300 transition hover:bg-amber-500/10 disabled:cursor-not-allowed disabled:opacity-40"
+            >
+              <BarChart2 className="h-3.5 w-3.5" />
+              Calculate costs
+            </button>
           </div>
         </div>
       )}
@@ -538,7 +354,7 @@ const handleAIChat = useCallback(async (text) => {
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={handleKeyDown}
-                placeholder="Ask about costs, optimizations, or your design…"
+                placeholder="Ask ArchBot anything about your architecture…"
                 rows={1}
                 disabled={isLoading}
                 className="flex-1 bg-transparent text-sm text-foreground placeholder:text-muted-foreground resize-none outline-none leading-relaxed max-h-24 disabled:opacity-50"

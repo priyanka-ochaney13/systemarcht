@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import { useParams, useRouter } from 'next/navigation';
 
@@ -18,6 +18,11 @@ import {
 } from 'lucide-react';
 
 import { learningModules } from '@/lib/learningModules';
+import { useLearningStore } from '@/store';
+import { SiteHeader } from '@/components/common/SiteHeader';
+
+const EMPTY_QUIZ_ANSWERS = {};
+const EMPTY_MODULE_PROGRESS = {};
 
 export default function LearningModulePage() {
   const params = useParams();
@@ -30,7 +35,19 @@ export default function LearningModulePage() {
     [moduleId]
   );
 
-  const [completedSections, setCompletedSections] = useState([]);
+  const progress = useLearningStore(
+    (state) => state.modules[moduleId] || EMPTY_MODULE_PROGRESS
+  );
+  const completeModuleSection = useLearningStore(
+    (state) => state.completeModuleSection
+  );
+  const startModule = useLearningStore((state) => state.startModule);
+
+  useEffect(() => {
+    if (module?.id) {
+      startModule(module.id);
+    }
+  }, [module?.id, startModule]);
 
   if (!module) {
     return (
@@ -65,20 +82,36 @@ export default function LearningModulePage() {
   }
 
   const markComplete = (sectionId) => {
-    setCompletedSections((previous) =>
-      previous.includes(sectionId)
-        ? previous
-        : [...previous, sectionId]
-    );
+    completeModuleSection(module.id, sectionId);
   };
 
   const isComplete = (sectionId) =>
-    completedSections.includes(sectionId);
+    (progress.completedSections || []).includes(sectionId);
 
   const services = module.services || [];
+  const sectionLinks = [
+    ['scenario', 'Scenario'],
+    ['learn', 'Learn'],
+    ['explore', 'Explore'],
+    ['build', 'Build'],
+    ['cost-activity', 'Cost'],
+    ...(module.aiActivity ? [['ai-assist', 'AI Assist']] : []),
+    ['quick-check', 'Quick Check'],
+  ];
+  const completedCount = (progress.completedSections || []).length;
+  const totalSections = sectionLinks.length - 1;
+  const moduleComplete = completedCount >= totalSections;
+  const nextModule = learningModules.find(
+    (item) => item.moduleNumber === module.moduleNumber + 1
+  );
+  const progressPercent = Math.round(
+    (Math.min(completedCount, totalSections) / totalSections) * 100
+  );
 
   return (
-    <main className="min-h-screen bg-background text-foreground">
+    <>
+      <SiteHeader />
+      <main className="min-h-screen bg-white text-gray-900">
 
       <div className="max-w-5xl mx-auto px-6 py-10">
 
@@ -104,7 +137,7 @@ export default function LearningModulePage() {
             HEADER
         ========================================================= */}
 
-        <section className="mb-10">
+        <section className="mb-10 scroll-mt-28" id="module-overview">
 
           <div className="flex items-start justify-between gap-6">
 
@@ -169,6 +202,23 @@ export default function LearningModulePage() {
             PROGRESS
         ========================================================= */}
 
+        <nav
+          aria-label="Module sections"
+          className="sticky top-[57px] z-30 -mx-6 mb-8 border-y border-gray-200 bg-white/95 px-6 py-3 backdrop-blur"
+        >
+          <div className="mx-auto flex max-w-5xl items-center gap-2 overflow-x-auto">
+            {sectionLinks.slice(1).map(([sectionId, label]) => (
+              <a
+                key={sectionId}
+                href={`#${sectionId}`}
+                className="flex-shrink-0 rounded-full border border-gray-200 px-3 py-1.5 text-xs font-medium text-gray-600 hover:border-amber-300 hover:bg-amber-50 hover:text-amber-800"
+              >
+                {label}
+              </a>
+            ))}
+          </div>
+        </nav>
+
         <section
           className="
             mb-10
@@ -185,8 +235,8 @@ export default function LearningModulePage() {
               Module Progress
             </span>
 
-            <span className="text-xs text-muted-foreground">
-              {completedSections.length} completed
+            <span className="text-xs text-gray-500">
+              {completedCount} of {totalSections} activities · {progressPercent}%
             </span>
 
           </div>
@@ -196,11 +246,7 @@ export default function LearningModulePage() {
             <div
               className="h-full bg-primary transition-all duration-300"
               style={{
-                width: `${
-                  completedSections.length === 0
-                    ? 0
-                    : (completedSections.length / 3) * 100
-                }%`,
+                width: `${progressPercent}%`,
               }}
             />
 
@@ -212,7 +258,7 @@ export default function LearningModulePage() {
             SCENARIO
         ========================================================= */}
 
-        <section className="mb-10">
+        <section className="mb-10 scroll-mt-28" id="scenario">
 
           <SectionHeading
             number="01"
@@ -274,7 +320,7 @@ export default function LearningModulePage() {
             LEARN
         ========================================================= */}
 
-        <section className="mb-10">
+        <section className="mb-10 scroll-mt-28" id="learn">
 
           <SectionHeading
             number="02"
@@ -433,7 +479,7 @@ export default function LearningModulePage() {
             EXPLORE
         ========================================================= */}
 
-        <section className="mb-10">
+        <section className="mb-10 scroll-mt-28" id="explore">
 
           <SectionHeading
             number="03"
@@ -638,7 +684,7 @@ export default function LearningModulePage() {
             BUILD
         ========================================================= */}
 
-        <section className="mb-10">
+        <section className="mb-10 scroll-mt-28" id="build">
 
           <SectionHeading
             number="04"
@@ -831,7 +877,7 @@ export default function LearningModulePage() {
             COST CHALLENGE
         ========================================================= */}
 
-        <section className="mb-10">
+        <section className="mb-10 scroll-mt-28" id="cost-activity">
 
           <SectionHeading
             number="05"
@@ -989,6 +1035,13 @@ export default function LearningModulePage() {
 
           </div>
 
+          <CompleteButton
+            completed={isComplete('cost')}
+            onClick={() => markComplete('cost')}
+          >
+            Mark Cost Activity Complete
+          </CompleteButton>
+
         </section>
 
         {/* =========================================================
@@ -996,7 +1049,7 @@ export default function LearningModulePage() {
         ========================================================= */}
 
         {module.aiActivity && (
-          <section className="mb-10">
+          <section className="mb-10 scroll-mt-28" id="ai-assist">
 
             <SectionHeading
               number="06"
@@ -1060,8 +1113,8 @@ export default function LearningModulePage() {
                   Suggested Question
                 </p>
 
-                <p className="text-sm text-foreground leading-relaxed">
-                  "{module.aiActivity.prompt}"
+                <p className="text-sm text-gray-800 leading-relaxed">
+                  &quot;{module.aiActivity.prompt}&quot;
                 </p>
 
               </div>
@@ -1102,7 +1155,7 @@ export default function LearningModulePage() {
                   <Lightbulb className="w-4 h-4 text-primary flex-shrink-0" />
 
                   <p>
-                    Compare ArchBot's recommendation with your own
+                    Compare ArchBot&apos;s recommendation with your own
                     architecture. Do not automatically accept the AI
                     recommendation.
                   </p>
@@ -1112,6 +1165,13 @@ export default function LearningModulePage() {
 
             </div>
 
+            <CompleteButton
+              completed={isComplete('ai-assist')}
+              onClick={() => markComplete('ai-assist')}
+            >
+              Mark AI Assist Complete
+            </CompleteButton>
+
           </section>
         )}
 
@@ -1119,7 +1179,7 @@ export default function LearningModulePage() {
             QUICK CHECK
         ========================================================= */}
 
-        <section className="mb-10">
+        <section className="mb-10 scroll-mt-28" id="quick-check">
 
           <SectionHeading
             number={module.aiActivity ? '07' : '06'}
@@ -1129,6 +1189,7 @@ export default function LearningModulePage() {
 
           <Quiz
             questions={module.quiz}
+            moduleId={module.id}
           />
 
         </section>
@@ -1158,34 +1219,41 @@ export default function LearningModulePage() {
           />
 
           <h2 className="text-xl font-semibold mb-2">
-            Module {module.moduleNumber}
+            {moduleComplete
+              ? 'Module complete!'
+              : `Module ${module.moduleNumber}`}
           </h2>
 
-          <p className="text-sm text-muted-foreground mb-6">
-            Complete the learning activities and quick check to
-            finish this module.
+          <p className="text-sm text-gray-600 mb-6">
+            {moduleComplete
+              ? 'Great work. Your progress is saved and you can continue to the next module.'
+              : 'Complete the learning activities and quick check to finish this module.'}
           </p>
 
-          <Link
-            href="/learning"
-            className="
-              inline-flex
-              items-center
-              gap-2
-              text-sm
-              text-primary
-              hover:text-primary
-            "
-          >
-            Back to all modules
-            <ArrowRight className="w-4 h-4" />
-          </Link>
+          <div className="flex flex-wrap items-center justify-center gap-4">
+            {moduleComplete && nextModule && (
+              <Link
+                href={`/learning/${nextModule.id}`}
+                className="inline-flex items-center gap-2 rounded-xl bg-amber-500 px-5 py-3 text-sm font-semibold text-gray-950 hover:bg-amber-400"
+              >
+                Continue to Module {nextModule.moduleNumber}
+                <ArrowRight className="h-4 w-4" />
+              </Link>
+            )}
+            <Link
+              href="/learning"
+              className="inline-flex items-center gap-2 text-sm text-amber-600 hover:text-amber-700"
+            >
+              Back to all modules
+              <ArrowRight className="h-4 w-4" />
+            </Link>
+          </div>
 
         </section>
 
       </div>
-
-    </main>
+      </main>
+    </>
   );
 }
 
@@ -1277,9 +1345,23 @@ function UsageCard({ label, value }) {
   );
 }
 
-function Quiz({ questions }) {
-  const [answers, setAnswers] = useState({});
-  const [submitted, setSubmitted] = useState(false);
+function Quiz({ questions, moduleId }) {
+  const answers = useLearningStore(
+    (state) =>
+      state.modules[moduleId]?.quizAnswers || EMPTY_QUIZ_ANSWERS
+  );
+  const submitted = useLearningStore(
+    (state) => Boolean(state.modules[moduleId]?.quizCompleted)
+  );
+  const updateQuizAnswer = useLearningStore(
+    (state) => state.updateQuizAnswer
+  );
+  const updateModuleProgress = useLearningStore(
+    (state) => state.updateModuleProgress
+  );
+  const completeModuleSection = useLearningStore(
+    (state) => state.completeModuleSection
+  );
 
   const score = questions.reduce(
     (total, question) =>
@@ -1322,10 +1404,7 @@ function Quiz({ questions }) {
                   key={option}
                   onClick={() =>
                     !submitted &&
-                    setAnswers((previous) => ({
-                      ...previous,
-                      [question.id]: option,
-                    }))
+                    updateQuizAnswer(moduleId, question.id, option)
                   }
                   disabled={submitted}
                   className={`
@@ -1392,7 +1471,10 @@ function Quiz({ questions }) {
       {!submitted ? (
 
         <button
-          onClick={() => setSubmitted(true)}
+          onClick={() => {
+            updateModuleProgress(moduleId, { quizCompleted: true });
+            completeModuleSection(moduleId, 'quiz');
+          }}
           disabled={
             Object.keys(answers).length !== questions.length
           }

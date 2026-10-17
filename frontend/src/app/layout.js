@@ -1,9 +1,10 @@
 import { Suspense } from 'react';
-import { Geist, Geist_Mono } from 'next/font/google';
-import { CustomLoader } from '@/components/common/CustomLoader';
+import { Geist, Geist_Mono } from "next/font/google";
+import { CustomLoader } from "@/components/common/CustomLoader";
 import { ThemeProvider } from '@/components/theme/ThemeProvider';
 import { THEME_STORAGE_KEY } from '@/lib/theme';
-import './globals.css';
+import { LearningProgressHydration } from "@/components/common/LearningProgressHydration";
+import "./globals.css";
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -45,7 +46,8 @@ export default function RootLayout({ children }) {
       </head>
       <body className="min-h-full flex flex-col bg-background text-foreground">
         <ThemeProvider>
-          <Suspense fallback={<CustomLoader />}>
+          <LearningProgressHydration />
+        <Suspense fallback={<CustomLoader />}>
             {children}
           </Suspense>
         </ThemeProvider>

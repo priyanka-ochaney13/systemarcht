@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useCallback, useMemo } from 'react';
+import React, { useState, useCallback, useId, useRef } from 'react';
 import ReactFlow, {
   addEdge,
   useNodesState,
@@ -8,29 +8,56 @@ import ReactFlow, {
   Controls,
   Background,
   MiniMap,
-  Connection,
 } from 'reactflow';
 import 'reactflow/dist/style.css';
 import { useArchitectureStore } from '@/store';
 import { ServiceNode } from './ServiceNode';
-import { Trash2, RotateCw } from 'lucide-react';
+import {
+  ChevronDown,
+  ChevronUp,
+  RotateCw,
+  Search,
+  Trash2,
+} from 'lucide-react';
+
+const SERVICES = [
+  { type: 'api_gateway', label: 'API Gateway', category: 'Compute', color: 'bg-yellow-500 hover:bg-yellow-600' },
+  { type: 'lambda', label: 'Lambda', category: 'Compute', color: 'bg-yellow-500 hover:bg-yellow-600' },
+  { type: 'ec2', label: 'EC2', category: 'Compute', color: 'bg-amber-500 hover:bg-amber-600' },
+  { type: 'elastic_beanstalk', label: 'Elastic Beanstalk', category: 'Compute', color: 'bg-orange-500 hover:bg-orange-600' },
+  { type: 's3', label: 'S3', category: 'Storage', color: 'bg-yellow-500 hover:bg-yellow-600' },
+  { type: 'dynamodb', label: 'DynamoDB', category: 'Data', color: 'bg-yellow-500 hover:bg-yellow-600' },
+  { type: 'rds', label: 'RDS', category: 'Data', color: 'bg-blue-600 hover:bg-blue-700' },
+  { type: 'elasticache', label: 'ElastiCache', category: 'Data', color: 'bg-fuchsia-500 hover:bg-fuchsia-600' },
+  { type: 'cognito', label: 'Cognito', category: 'Identity', color: 'bg-yellow-500 hover:bg-yellow-600' },
+  { type: 'elb', label: 'ELB', category: 'Networking', color: 'bg-yellow-500 hover:bg-yellow-600' },
+  { type: 'cloudfront', label: 'CloudFront', category: 'Networking', color: 'bg-purple-500 hover:bg-purple-600' },
+  { type: 'sqs', label: 'SQS', category: 'Messaging', color: 'bg-rose-500 hover:bg-rose-600' },
+  { type: 'cloudwatch', label: 'CloudWatch', category: 'Monitoring', color: 'bg-pink-500 hover:bg-pink-600' },
+];
 
 // Define nodeTypes outside component to avoid React Flow warning
 const nodeTypesConfig = {
   serviceNode: ServiceNode,
 };
 
-export const PlaygroundCanvas = ({ onNodeSelect }) => {
+export const PlaygroundCanvas = ({ onNodeSelect, onArchitectureChange }) => {
   const nodes = useArchitectureStore(s => s.nodes);
   const addNode = useArchitectureStore(s => s.addNode);
   const addConnection = useArchitectureStore(s => s.addConnection);
+  const updateNode = useArchitectureStore(s => s.updateNode);
   const removeNode = useArchitectureStore(s => s.removeNode);
-  const removeConnection = useArchitectureStore(s => s.removeConnection);
   const clearArchitecture = useArchitectureStore(s => s.clearArchitecture);
 
   const [rfNodes, setRfNodes, onNodesChange] = useNodesState([]);
   const [rfEdges, setRfEdges, onEdgesChange] = useEdgesState([]);
   const [selectedNodeId, setSelectedNodeId] = useState(null);
+  const [serviceMenuOpen, setServiceMenuOpen] = useState(false);
+  const [serviceSearch, setServiceSearch] = useState('');
+  const [serviceCategory, setServiceCategory] = useState('All');
+  const [confirmClear, setConfirmClear] = useState(false);
+  const nodeIdPrefix = useId().replace(/:/g, '');
+  const nodeIdCounter = useRef(0);
 
   // Sync architecture store to ReactFlow
   const connections = useArchitectureStore(s => s.connections);
@@ -64,9 +91,19 @@ export const PlaygroundCanvas = ({ onNodeSelect }) => {
       };
       setRfEdges((eds) => addEdge(connection, eds));
       addConnection(newEdge);
+      onArchitectureChange?.();
     },
-    [addConnection, setRfEdges]
+    [addConnection, onArchitectureChange, setRfEdges]
   );
+
+  const handleNodesChange = useCallback((changes) => {
+    onNodesChange(changes);
+    changes.forEach((change) => {
+      if (change.type === 'position' && change.position && change.dragging === false) {
+        updateNode(change.id, { position: change.position });
+      }
+    });
+  }, [onNodesChange, updateNode]);
 
   const onNodeClick = (event, node) => {
     console.log('onNodeClick triggered:', { nodeId: node.id, node });
@@ -75,33 +112,61 @@ export const PlaygroundCanvas = ({ onNodeSelect }) => {
   };
 
   const handleAddNode = (serviceType) => {
+    const occupiedPositions = new Set(
+      nodes.map((node) => {
+        const position = node.position || { x: 100, y: 100 };
+        return `${position.x},${position.y}`;
+      })
+    );
+    let positionIndex = nodes.length;
+    let position = {
+      x: 100 + (positionIndex % 3) * 240,
+      y: 100 + Math.floor(positionIndex / 3) * 170,
+    };
+
+    while (occupiedPositions.has(`${position.x},${position.y}`)) {
+      positionIndex += 1;
+      position = {
+        x: 100 + (positionIndex % 3) * 240,
+        y: 100 + Math.floor(positionIndex / 3) * 170,
+      };
+    }
+
     const newNode = {
-      id: `${serviceType}-${Date.now()}`,
+      id: `${serviceType}-${nodeIdPrefix}-${nodeIdCounter.current++}`,
       label: serviceType.replace(/_/g, ' ').toUpperCase(),
       serviceType,
-      position: {
-        x: Math.random() * 500,
-        y: Math.random() * 500,
-      },
+      position,
     };
     addNode(newNode);
+    onArchitectureChange?.();
   };
 
   const handleDeleteSelected = () => {
     if (selectedNodeId) {
       removeNode(selectedNodeId);
       setSelectedNodeId(null);
+      onArchitectureChange?.();
     }
   };
 
   const handleClear = () => {
-    if (window.confirm('Are you sure you want to clear the architecture?')) {
-      clearArchitecture();
-      setRfNodes([]);
-      setRfEdges([]);
-      setSelectedNodeId(null);
-    }
+    clearArchitecture();
+    setRfNodes([]);
+    setRfEdges([]);
+    setSelectedNodeId(null);
+    setConfirmClear(false);
+    onArchitectureChange?.();
   };
+
+  const visibleServices = SERVICES.filter((service) => {
+    const matchesSearch = service.label
+      .toLowerCase()
+      .includes(serviceSearch.trim().toLowerCase());
+    const matchesCategory =
+      serviceCategory === 'All' || service.category === serviceCategory;
+    return matchesSearch && matchesCategory;
+  });
 
   return (
     <div className="w-full h-full flex flex-col bg-background">
@@ -195,14 +260,14 @@ export const PlaygroundCanvas = ({ onNodeSelect }) => {
           
           {/* Action buttons on the right */}
           <div className="flex-1" />
-          <div className="flex gap-2">
+          <div className="flex items-center gap-2">
             <button
               onClick={handleDeleteSelected}
               disabled={!selectedNodeId}
               className="px-3 py-2 text-sm bg-destructive text-destructive-foreground hover:bg-destructive/90 rounded-md transition disabled:opacity-50 flex items-center gap-1 whitespace-nowrap"
               title="Delete selected service"
             >
-              <Trash2 className="w-4 h-4" />
+              <Trash2 className="h-4 w-4" />
               Delete
             </button>
             <button
@@ -215,14 +280,69 @@ export const PlaygroundCanvas = ({ onNodeSelect }) => {
             </button>
           </div>
         </div>
+
+        {serviceMenuOpen && (
+          <div className="mt-3 space-y-3">
+            <div className="flex flex-col gap-2 sm:flex-row">
+              <label className="relative min-w-0 flex-1">
+                <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+                <input
+                  type="search"
+                  value={serviceSearch}
+                  onChange={(event) => setServiceSearch(event.target.value)}
+                  placeholder="Search AWS services"
+                  aria-label="Search AWS services"
+                  className="w-full rounded-md border border-gray-300 bg-white py-2 pl-9 pr-3 text-sm outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-100"
+                />
+              </label>
+              <label className="sr-only" htmlFor="service-category">
+                Filter services by category
+              </label>
+              <select
+                id="service-category"
+                value={serviceCategory}
+                onChange={(event) => setServiceCategory(event.target.value)}
+                className="rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-700"
+              >
+                {['All', ...new Set(SERVICES.map((service) => service.category))].map(
+                  (category) => (
+                    <option key={category} value={category}>
+                      {category === 'All' ? 'All categories' : category}
+                    </option>
+                  )
+                )}
+              </select>
+            </div>
+            <div className="grid max-h-36 grid-cols-2 gap-2 overflow-y-auto sm:grid-cols-3 lg:grid-cols-4">
+              {visibleServices.map((service) => (
+                <button
+                  key={service.type}
+                  type="button"
+                  onClick={() => handleAddNode(service.type)}
+                  className={`rounded-md px-3 py-2 text-left text-sm text-white transition ${service.color}`}
+                >
+                  + {service.label}
+                  <span className="ml-2 text-xs text-white/75">
+                    {service.category}
+                  </span>
+                </button>
+              ))}
+              {visibleServices.length === 0 && (
+                <p className="col-span-full py-3 text-center text-sm text-gray-500">
+                  No services match that search.
+                </p>
+              )}
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Canvas */}
-      <div className="flex-1">
+      <div className="relative min-h-0 flex-1">
         <ReactFlow
           nodes={rfNodes}
           edges={rfEdges}
-          onNodesChange={onNodesChange}
+          onNodesChange={handleNodesChange}
           onEdgesChange={onEdgesChange}
           onConnect={onConnect}
           onNodeClick={onNodeClick}
@@ -232,6 +352,26 @@ export const PlaygroundCanvas = ({ onNodeSelect }) => {
           <Background />
           <Controls />
           <MiniMap />
+          {nodes.length === 0 && (
+            <div className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center">
+              <div className="pointer-events-auto mx-4 max-w-sm rounded-xl border border-gray-200 bg-white/95 p-5 text-center shadow-lg">
+                <h2 className="font-semibold text-gray-900">
+                  Start building your architecture
+                </h2>
+                <p className="mt-2 text-sm text-gray-600">
+                  Add services, drag them into place, then connect the handles
+                  to show how requests flow.
+                </p>
+                <button
+                  type="button"
+                  onClick={() => setServiceMenuOpen(true)}
+                  className="mt-4 rounded-lg bg-amber-500 px-4 py-2 text-sm font-semibold text-gray-950 hover:bg-amber-400"
+                >
+                  Browse services
+                </button>
+              </div>
+            </div>
+          )}
         </ReactFlow>
       </div>
     </div>

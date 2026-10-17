@@ -2,10 +2,12 @@ import React from 'react';
 import Link from 'next/link';
 import { CASE_STUDIES } from '@/lib/constants';
 import { ArrowRight, Zap } from 'lucide-react';
+import { SiteHeader } from '@/components/common/SiteHeader';
 
 export const CaseStudyList = () => {
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-white">
+      <SiteHeader />
       {/* Header */}
       <div className="bg-foreground text-background py-16 px-4">
         <div className="max-w-6xl mx-auto">
