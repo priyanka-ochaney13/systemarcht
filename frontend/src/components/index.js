@@ -6,4 +6,8 @@ export { ServiceNode } from './playground/ServiceNode';
 export { APIGatewayConfigPanel } from './services/APIGatewayConfigPanel';
 export { LambdaConfigPanel } from './services/LambdaConfigPanel';
 export { S3ConfigPanel } from './services/S3ConfigPanel';
+export { CloudWatchConfigPanel } from './services/CloudWatchConfigPanel';
+export { CloudFrontConfigPanel } from './services/CloudFrontConfigPanel';
+export { ElastiCacheConfigPanel } from './services/ElastiCacheConfigPanel';
+export { SQSConfigPanel } from './services/SQSConfigPanel';
 export { ArchitectChatbot, ChatMessage, TypingIndicator } from './chatbot';

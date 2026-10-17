@@ -1,6 +1,6 @@
 import React from 'react';
 import { Handle, Position } from 'reactflow';
-import { Cloud, Zap, Database, Lock, Globe, Server } from 'lucide-react';
+import { Cloud, Zap, Database, Lock, Globe, Server, Activity, Globe2, ListOrdered } from 'lucide-react';
 
 const SERVICE_ICONS = {
   api_gateway: Cloud,
@@ -10,6 +10,10 @@ const SERVICE_ICONS = {
   dynamodb: Database,
   elb: Globe,
   elastic_beanstalk: Server,
+  cloudwatch: Activity,
+  cloudfront: Globe2,
+  elasticache: Zap,
+  sqs: ListOrdered,
 };
 
 const SERVICE_COLORS = {
@@ -20,6 +24,10 @@ const SERVICE_COLORS = {
   dynamodb: '#FF4444',
   elb: '#FF9900',
   elastic_beanstalk: '#FF6633',
+  cloudwatch: '#E7157B',
+  cloudfront: '#8C4FFF',
+  elasticache: '#C925D1',
+  sqs: '#FF4F8B',
 };
 
 export const ServiceNode = ({ data, isConnecting, isSelected }) => {
