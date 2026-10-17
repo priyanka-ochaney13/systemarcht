@@ -10,8 +10,8 @@ and ArchitectureCalculator are untouched by this file.
 from __future__ import annotations
 
 from fastapi import APIRouter, HTTPException
-
-from ai.chat_prompts import CHAT_SYSTEM_PROMPT, build_chat_user_prompt
+# app/routers/archbot_chat.py
+from ai.chat_prompts import SYSTEM_PROMPT as CHAT_SYSTEM_PROMPT, build_chat_prompt as build_chat_user_prompt
 from ai.chat_schemas import ChatRequest, ChatResponse
 from ai.llm_provider import get_llm_provider
 

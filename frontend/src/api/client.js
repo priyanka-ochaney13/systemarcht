@@ -148,6 +148,28 @@ export const getSQSRegions = async () => {
   return response.data;
 };
 
+export const calculateEC2Cost = async (params) => {
+  const response = await apiClient.post('/ec2/calculate', params);
+  return response.data;
+};
+
+export const getEC2InstanceTypes = async (region) => {
+  const response = await apiClient.get('/ec2/instance-types', { params: { region } });
+  return response.data;
+};
+
+export const calculateRDSCost = async (params) => {
+  const response = await apiClient.post('/rds/calculate', params);
+  return response.data;
+};
+
+export const getRDSInstanceTypes = async (region, engine, deployment) => {
+  const response = await apiClient.get('/rds/instance-types', {
+    params: { region, engine, deployment },
+  });
+  return response.data;
+};
+
 // ============================================================
 // AI ARCHITECT ASSISTANT APIS (Conversations & Architecture Generation)
 // ============================================================

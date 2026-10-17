@@ -4,9 +4,11 @@ from typing import List, Optional, Literal, Any, Dict
 from app.models.base import BaseCostBreakdown
 
 
-# Supported service types (extend as you add more services)
-ServiceType = Literal["lambda", "api_gateway", "s3", "dynamodb", "elb"]
-
+ServiceType = Literal[
+    "lambda", "api_gateway", "s3", "dynamodb", "elb",
+    "cognito", "elastic_beanstalk", "cloudwatch", "cloudfront", "elasticache", "sqs",
+    "ec2", "rds",
+]
 
 class ServiceNode(BaseModel):
     """A service node in the architecture"""

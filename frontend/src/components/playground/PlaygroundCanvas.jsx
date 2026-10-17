@@ -179,6 +179,18 @@ export const PlaygroundCanvas = ({ onNodeSelect }) => {
             >
               + SQS
             </button>
+            <button
+              onClick={() => handleAddNode('ec2')}
+              className="px-3 py-2 text-sm bg-amber-500 hover:bg-amber-600 text-white rounded-md transition whitespace-nowrap"
+            >
+              + EC2
+            </button>
+            <button
+              onClick={() => handleAddNode('rds')}
+              className="px-3 py-2 text-sm bg-blue-600 hover:bg-blue-700 text-white rounded-md transition whitespace-nowrap"
+            >
+              + RDS
+            </button>
           </div>
           
           {/* Action buttons on the right */}
