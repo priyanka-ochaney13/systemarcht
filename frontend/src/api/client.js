@@ -108,18 +108,6 @@ export const generateArchitectureDiagram = async (architecture) => {
   return response.data;
 };
 
-// Module 1 AI assistant API (kept separate from the Playground chatbot).
-export const chatWithArchitectureAssistant = async (message) => {
-  const response = await apiClient.post('/ai/chat', { message });
-  return response.data;
-};
-
-// Module 5 Mermaid diagram API. The backend validates the architecture first.
-export const generateArchitectureDiagram = async (architecture) => {
-  const response = await apiClient.post('/ai/architecture/diagram', { architecture });
-  return response.data;
-};
-
 export const calculateCloudWatchCost = async (params) => {
   const response = await apiClient.post('/cloudwatch/calculate', params);
   return response.data;
@@ -160,42 +148,24 @@ export const getSQSRegions = async () => {
   return response.data;
 };
 
-export const calculateCloudWatchCost = async (params) => {
-  const response = await apiClient.post('/cloudwatch/calculate', params);
+export const calculateEC2Cost = async (params) => {
+  const response = await apiClient.post('/ec2/calculate', params);
   return response.data;
 };
 
-export const getCloudWatchRegions = async () => {
-  const response = await apiClient.get('/cloudwatch/regions');
+export const getEC2InstanceTypes = async (region) => {
+  const response = await apiClient.get('/ec2/instance-types', { params: { region } });
   return response.data;
 };
 
-export const calculateCloudFrontCost = async (params) => {
-  const response = await apiClient.post('/cloudfront/calculate', params);
+export const calculateRDSCost = async (params) => {
+  const response = await apiClient.post('/rds/calculate', params);
   return response.data;
 };
 
-export const getCloudFrontRegions = async () => {
-  const response = await apiClient.get('/cloudfront/regions');
-  return response.data;
-};
-
-export const calculateElastiCacheCost = async (params) => {
-  const response = await apiClient.post('/elasticache/calculate', params);
-  return response.data;
-};
-
-export const getElastiCacheRegions = async () => {
-  const response = await apiClient.get('/elasticache/regions');
-  return response.data;
-};
-
-export const calculateSQSCost = async (params) => {
-  const response = await apiClient.post('/sqs/calculate', params);
-  return response.data;
-};
-
-export const getSQSRegions = async () => {
-  const response = await apiClient.get('/sqs/regions');
+export const getRDSInstanceTypes = async (region, engine, deployment) => {
+  const response = await apiClient.get('/rds/instance-types', {
+    params: { region, engine, deployment },
+  });
   return response.data;
 };

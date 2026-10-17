@@ -9,6 +9,7 @@ from app.models.architecture import (
     ServiceNode,
     ServiceConnection
 )
+import importlib
 from app.models.lambda_function import LambdaRequest
 from app.models.api_gateway import APIGatewayRequest
 from app.models.s3 import S3Request
@@ -19,6 +20,8 @@ from app.services.api_gateway.calculator import APIGatewayCalculator
 from app.services.architecture.data_transfer_pricing import DataTransferPricing
 from app.core.base_calculator import BaseCalculator
 import logging
+from app.models.ec2 import EC2Request
+from app.models.rds import RDSRequest
 
 logger = logging.getLogger(__name__)
 
@@ -31,18 +34,50 @@ class ArchitectureCalculator:
         from app.services.s3.calculator import S3Calculator
         from app.services.dynamodb.calculator import DynamoDBCalculator
         from app.services.elb.calculator import ELBCalculator
-        
+        from app.services.ec2.calculator import EC2Calculator
+        from app.services.rds.calculator import RDSCalculator
+        from app.services.cognito_service.calculator import CognitoCalculator
+        from app.services.elastic_beanstalk.calculator import ElasticBeanstalkCalculator
+        from app.services.cloudwatch.calculator import CloudWatchCalculator
+        from app.services.cloudfront.calculator import CloudFrontCalculator
+        from app.services.elasticache.calculator import ElastiCacheCalculator
+        from app.services.sqs.calculator import SQSCalculator
+        from app.models.cognito import CognitoRequest
+        from app.models.elastic_beanstalk import ElasticBeanstalkRequest
+        from app.models.cloudwatch import CloudWatchRequest
+        from app.models.cloudfront import CloudFrontRequest
+        from app.models.elasticache import ElastiCacheRequest
+        from app.models.sqs import SQSRequest
+
         self._calculators: Dict[str, BaseCalculator] = {
             "lambda": LambdaCalculator(),
             "api_gateway": APIGatewayCalculator(),
             "s3": S3Calculator(),
             "dynamodb": DynamoDBCalculator(),
             "elb": ELBCalculator(),
+            "ec2": EC2Calculator(),
+            "rds": RDSCalculator(),
+            "cognito": CognitoCalculator(),
+            "elastic_beanstalk": ElasticBeanstalkCalculator(),
+            "cloudwatch": CloudWatchCalculator(),
+            "cloudfront": CloudFrontCalculator(),
+            "elasticache": ElastiCacheCalculator(),
+            "sqs": SQSCalculator(),
         }
-        
+
+        # Request models for services priced by the generic branch
+        self._request_models: Dict[str, Any] = {
+            "cognito": CognitoRequest,
+            "elastic_beanstalk": ElasticBeanstalkRequest,
+            "cloudwatch": CloudWatchRequest,
+            "cloudfront": CloudFrontRequest,
+            "elasticache": ElastiCacheRequest,
+            "sqs": SQSRequest,
+        }
+
         # Data transfer pricing
         self._transfer_pricing = DataTransferPricing()
-    
+        
     def calculate(self, request: ArchitectureRequest) -> ArchitectureCostResponse:
         """Calculate total architecture cost
         
@@ -239,7 +274,49 @@ class ArchitectureCalculator:
                     "data_processing_cost": result.breakdown.data_processing_cost if hasattr(result.breakdown, 'data_processing_cost') else 0,
                 }
             )
-        
+            
+        elif node.service_type == "ec2":
+            service_request = EC2Request(**config)
+            result = calculator.calculate(service_request)
+            return ServiceCostDetail(
+                node_id=node.id,
+                name=node.name,
+                service_type=node.service_type,
+                region=config.get("region", "us-east-1"),
+                cost=result.breakdown.total_cost,
+                breakdown={
+                    "compute_cost": result.breakdown.compute_cost,
+                }
+            )
+
+        elif node.service_type == "rds":
+            service_request = RDSRequest(**config)
+            result = calculator.calculate(service_request)
+            return ServiceCostDetail(
+                node_id=node.id,
+                name=node.name,
+                service_type=node.service_type,
+                region=config.get("region", "us-east-1"),
+                cost=result.breakdown.total_cost,
+                breakdown={
+                    "instance_cost": result.breakdown.instance_cost,
+                    "storage_cost": result.breakdown.storage_cost,
+                }
+            )
+
+        elif node.service_type in self._request_models:
+            service_request = self._request_models[node.service_type](**config)
+            result = calculator.calculate(service_request)
+            breakdown = result.breakdown.model_dump()
+            return ServiceCostDetail(
+                node_id=node.id,
+                name=node.name,
+                service_type=node.service_type,
+                region=config.get("region", "us-east-1"),
+                cost=breakdown["total_cost"],
+                breakdown={k: v for k, v in breakdown.items() if k != "total_cost"},
+            )
+            
         else:
             raise ValueError(f"Unsupported service type: {node.service_type}")
     
@@ -294,3 +371,4 @@ class ArchitectureCalculator:
     def supported_services(self) -> List[str]:
         """Get list of supported service types"""
         return list(self._calculators.keys())
+    

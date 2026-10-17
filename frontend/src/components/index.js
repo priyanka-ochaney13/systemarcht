@@ -11,3 +11,10 @@ export { CloudFrontConfigPanel } from './services/CloudFrontConfigPanel';
 export { ElastiCacheConfigPanel } from './services/ElastiCacheConfigPanel';
 export { SQSConfigPanel } from './services/SQSConfigPanel';
 export { ArchitectChatbot, ChatMessage, TypingIndicator } from './chatbot';
+export { EC2ConfigPanel } from './services/EC2ConfigPanel';
+export { RDSConfigPanel } from './services/RDSConfigPanel';
+
+export { CognitoConfigPanel } from './services/CognitoConfigPanel';
+export { DynamoDBConfigPanel } from './services/DynamoDBConfigPanel';
+export { ELBConfigPanel } from './services/ELBConfigPanel';
+export { ElasticBeanstalkConfigPanel } from './services/ElasticBeanstalkConfigPanel';

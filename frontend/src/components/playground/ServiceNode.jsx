@@ -14,6 +14,8 @@ const SERVICE_ICONS = {
   cloudfront: Globe2,
   elasticache: Zap,
   sqs: ListOrdered,
+  ec2: Server,
+  rds: Database,
 };
 
 const SERVICE_COLORS = {
@@ -28,6 +30,8 @@ const SERVICE_COLORS = {
   cloudfront: '#8C4FFF',
   elasticache: '#C925D1',
   sqs: '#FF4F8B',
+  ec2: '#FF9900',
+  rds: '#3B48CC',
 };
 
 export const ServiceNode = ({ data, isConnecting, isSelected }) => {

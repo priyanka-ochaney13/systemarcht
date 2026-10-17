@@ -9,3 +9,5 @@ export { CloudWatchConfigPanel } from './CloudWatchConfigPanel';
 export { CloudFrontConfigPanel } from './CloudFrontConfigPanel';
 export { ElastiCacheConfigPanel } from './ElastiCacheConfigPanel';
 export { SQSConfigPanel } from './SQSConfigPanel';
+export { EC2ConfigPanel } from './EC2ConfigPanel';
+export { RDSConfigPanel } from './RDSConfigPanel';

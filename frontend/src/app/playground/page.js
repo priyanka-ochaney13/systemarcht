@@ -1,6 +1,5 @@
 'use client';
-
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 
@@ -33,12 +32,11 @@ import { CloudWatchConfigPanel } from '@/components/services/CloudWatchConfigPan
 import { CloudFrontConfigPanel } from '@/components/services/CloudFrontConfigPanel';
 import { ElastiCacheConfigPanel } from '@/components/services/ElastiCacheConfigPanel';
 import { SQSConfigPanel } from '@/components/services/SQSConfigPanel';
+import { EC2ConfigPanel } from '@/components/services/EC2ConfigPanel';
+import { RDSConfigPanel } from '@/components/services/RDSConfigPanel';
 
 import { ArchitectChatbot } from '@/components/chatbot';
 import { MermaidArchitectureDiagram } from '@/components/playground/MermaidArchitectureDiagram';
-import { usePricingStore } from '@/store';
-import Link from 'next/link';
-import { ChevronLeft, MessageSquare, X } from 'lucide-react';
 
 export default function PlaygroundPage() {
   const searchParams = useSearchParams();
@@ -128,6 +126,8 @@ export default function PlaygroundPage() {
       lambda: 'Lambda',
       s3: 'S3',
       cognito: 'Cognito',
+      ec2: 'EC2',
+      rds: 'RDS',
       dynamodb: 'DynamoDB',
       elb: 'ELB',
       elastic_beanstalk: 'Elastic Beanstalk',
@@ -135,11 +135,40 @@ export default function PlaygroundPage() {
       cloudfront: 'CloudFront',
       elasticache: 'ElastiCache',
       sqs: 'SQS',
+
     };
 
     return names[serviceType] || serviceType;
   };
+  // ============================================================
+  // ARCHITECTURE DIAGRAM (Mermaid)
+  // ============================================================
 
+  const architectureDiagram = useMemo(() => {
+    if (!architectureNodes || architectureNodes.length === 0) {
+      return null;
+    }
+
+    const safeId = (id) => `n_${String(id).replace(/[^a-zA-Z0-9_]/g, '_')}`;
+
+    const lines = ['flowchart LR'];
+
+    architectureNodes.forEach((node) => {
+      const serviceType = node.serviceType || node.data?.serviceType;
+      lines.push(`  ${safeId(node.id)}["${getServiceName(serviceType)}"]`);
+    });
+
+    (architectureConnections || []).forEach((connection) => {
+      lines.push(
+        `  ${safeId(connection.source)} --> ${safeId(connection.target)}`
+      );
+    });
+
+    return {
+      mermaid: lines.join('\n'),
+      valid: validationResult?.valid === true,
+    };
+  }, [architectureNodes, architectureConnections, validationResult]);
   // ============================================================
   // NODE SELECTION
   // ============================================================
@@ -200,6 +229,14 @@ export default function PlaygroundPage() {
 
       case 'sqs':
         setOpenConfigPanel('sqs');
+        break;
+      
+        case 'ec2':
+        setOpenConfigPanel('ec2');
+        break;
+
+      case 'rds':
+        setOpenConfigPanel('rds');
         break;
 
       default:
@@ -1059,6 +1096,17 @@ export default function PlaygroundPage() {
                   onClose={() =>
                     setOpenConfigPanel(null)
                   }
+                />
+              )}
+                            {openConfigPanel === 'ec2' && (
+                <EC2ConfigPanel
+                  onClose={() => setOpenConfigPanel(null)}
+                />
+              )}
+
+              {openConfigPanel === 'rds' && (
+                <RDSConfigPanel
+                  onClose={() => setOpenConfigPanel(null)}
                 />
               )}
 
