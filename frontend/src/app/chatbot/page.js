@@ -78,8 +78,17 @@ export default function ChatbotPage() {
               {[
                 { name: 'AWS Lambda', status: '✓ Analyzed' },
                 { name: 'API Gateway', status: '✓ Analyzed' },
-                { name: 'Amazon S3', status: 'Coming soon' },
-                { name: 'DynamoDB', status: 'Coming soon' },
+                { name: 'Amazon S3', status: '✓ Analyzed' },
+                { name: 'DynamoDB', status: '✓ Analyzed' },
+                { name: 'Amazon EC2', status: '✓ Analyzed' },
+                { name: 'Amazon RDS', status: '✓ Analyzed' },
+                { name: 'ELB', status: '✓ Analyzed' },
+                { name: 'Elastic Beanstalk', status: '✓ Analyzed' },
+                { name: 'CloudFront', status: '✓ Analyzed' },
+                { name: 'CloudWatch', status: '✓ Analyzed' },
+                { name: 'ElastiCache', status: '✓ Analyzed' },
+                { name: 'Amazon SQS', status: '✓ Analyzed' },
+                { name: 'Cognito', status: '✓ Analyzed' },
               ].map((s) => (
                 <div key={s.name} className="flex items-center justify-between text-xs">
                   <span className="text-foreground/80">{s.name}</span>

@@ -189,7 +189,7 @@ export default function LearningPage() {
                         mb-2
                       "
                     >
-                      Services introduced
+                      Services
                     </p>
 
                     <div className="flex flex-wrap gap-2">

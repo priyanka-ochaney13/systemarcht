@@ -41,7 +41,7 @@ const EMPTY_ARCH_MESSAGE = `Your Playground is empty! 🏗️
 
 Head over to the Architecture Playground, add some services (Lambda, API Gateway, etc.), connect them, and then come back here for a cost analysis.
 
-I can only analyze services currently supported: Lambda and API Gateway.`;
+I can analyze any service available in the Playground, including Lambda, API Gateway, S3, DynamoDB, EC2, RDS, ELB, Elastic Beanstalk, CloudFront, CloudWatch, ElastiCache, SQS and Cognito.`;
 
 // ─── Intent matching ──────────────────────────────────────────────────────────
 
@@ -101,7 +101,31 @@ export function ArchitectChatbot({ onClose, embedded = false }) {
   const lambdaConfig = useServiceConfigStore((s) => s.lambdaConfig);
   const apiGatewayConfig = useServiceConfigStore((s) => s.apiGatewayConfig);
   const s3Config = useServiceConfigStore((s) => s.s3Config);
-  const serviceConfigs = { lambdaConfig, apiGatewayConfig, s3Config };
+  const ec2Config = useServiceConfigStore((s) => s.ec2Config);
+  const rdsConfig = useServiceConfigStore((s) => s.rdsConfig);
+  const dynamoDBConfig = useServiceConfigStore((s) => s.dynamoDBConfig);
+  const elbConfig = useServiceConfigStore((s) => s.elbConfig);
+  const cognitoConfig = useServiceConfigStore((s) => s.cognitoConfig);
+  const elasticBeanstalkConfig = useServiceConfigStore((s) => s.elasticBeanstalkConfig);
+  const cloudWatchConfig = useServiceConfigStore((s) => s.cloudWatchConfig);
+  const cloudFrontConfig = useServiceConfigStore((s) => s.cloudFrontConfig);
+  const elastiCacheConfig = useServiceConfigStore((s) => s.elastiCacheConfig);
+  const sqsConfig = useServiceConfigStore((s) => s.sqsConfig);
+  const serviceConfigs = {
+    lambdaConfig,
+    apiGatewayConfig,
+    s3Config,
+    ec2Config,
+    rdsConfig,
+    dynamoDBConfig,
+    elbConfig,
+    cognitoConfig,
+    elasticBeanstalkConfig,
+    cloudWatchConfig,
+    cloudFrontConfig,
+    elastiCacheConfig,
+    sqsConfig,
+  };
 
   // Auto-scroll on new messages
   useEffect(() => {
