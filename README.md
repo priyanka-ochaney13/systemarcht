@@ -1,140 +1,167 @@
 # SystemArcht
 
-SystemArcht is an AWS architecture planning and cost-estimation platform that combines service-by-service pricing analysis with AI-assisted architecture generation.
-
-It helps teams model cloud infrastructure, estimate monthly operating cost, and generate architecture recommendations from natural-language prompts.
-
-## Why this project exists
-
-Managing AWS costs and designing resilient architectures can be time-consuming and error-prone. This project makes that process easier by combining:
-
-- transparent AWS pricing calculations
-- service-based architecture modeling
-- AI-powered design suggestions
-- a frontend for interactive exploration
+SystemArcht is an AWS architecture planning and cost-estimation app. It combines regional, service-specific cost calculations with tools for designing, validating, and visualizing cloud architectures.
 
 ## Features
 
-- Multi-service AWS cost estimation
-- Region-aware pricing assumptions and service configuration data
-- AI architecture generation using a Qwen-compatible backend
-- RAG-supported knowledge retrieval for architecture guidance
-- Mermaid-based architecture visualization support
-- FastAPI backend and Next.js frontend
+- Monthly cost estimates for AWS services, including Lambda, S3, API Gateway, DynamoDB, EC2, RDS, Cognito, CloudFront, CloudWatch, ElastiCache, SQS, Elastic Load Balancing, and Elastic Beanstalk.
+- Architecture modeling and cost estimation across connected services.
+- AI-assisted architecture generation and chat.
+- Architecture validation and Mermaid diagram generation.
+- A Next.js frontend backed by a FastAPI API.
 
-## Supported services
+## Architecture and data
 
-The platform currently covers and integrates pricing/design logic for major AWS service families, including:
+- `backend/app/` contains the FastAPI routes, request/response models, and cost calculators.
+- `backend/ai/` contains the AI, retrieval, and architecture workflows.
+- `backend/pricing_data/` contains JSON pricing sources and configuration fallbacks. Keep this directory until you have verified MongoDB-only operation and no longer need local fallback or migration sources.
+- The MongoDB database stores AWS SKU data in the `pricing` collection and application service settings in the `service_config` collection.
+- `frontend/src/` contains the Next.js UI, API client, and application state.
+- `FORMULAE.md` documents the cost-calculation formulas.
 
-- S3
-- Lambda
-- DynamoDB
-- API Gateway
-- Elastic Load Balancing (ALB, NLB, GWLB, CLB)
-- Elastic Beanstalk
-- Cognito
-- CloudFront
-- CloudWatch
-- ElastiCache
-- EC2
-- RDS
-- SQS
+The pricing loader uses `PRICING_SOURCE=auto` by default: it reads a service's pricing from MongoDB when available and otherwise falls back to that service's JSON file. The service configuration loader similarly uses MongoDB when available and falls back to `backend/pricing_data/service_config.json`.
 
-## Product flow
+## Requirements
 
-The system works in two connected layers:
+- Python 3.10 or newer
+- Node.js and npm
+- MongoDB connection if you want to use MongoDB pricing/configuration
+- Provider credentials or a running local model for the AI features you use
 
-1. Cost estimation layer
-   - Reads service pricing data from `backend/pricing_data/`
-   - Applies service-specific formulas to usage inputs
-   - Returns monthly cost summaries through API endpoints and the frontend UI
+## Run locally
 
-2. AI architecture layer
-   - Retrieves architecture knowledge from the local knowledge base
-   - Uses a Qwen/OpenAI-compatible model to generate architecture recommendations
-   - Structures the output into architecture-ready data that can be visualized
+Run the backend and frontend in **separate terminals**.
 
-## Demo Video
+### 1. Configure and start the backend
 
-Check out the demo for a walkthrough of the platform and its features:
+In PowerShell:
 
-- [View Demo on Google Drive](https://drive.google.com/file/d/135yi-1-oqn24I5IpGFindn2OjHdlB5gT/view?usp=sharing)
-
-## Repository structure
-
-```text
-backend/
-  app/                 FastAPI application and routers
-  ai/                  AI workflows, prompts, retrieval, and model integrations
-  pricing_data/        AWS pricing datasets and JSON service configs
-frontend/
-  src/                 Next.js frontend application and UI logic
-guide/
-  Additional architecture, design, and UI documentation
-README.md
-FORMULAE.md
-formula.md
-```
-
-## Getting started
-
-### Backend
-
-```bash
+```powershell
 cd backend
-python -m venv .venv
-source .venv/bin/activate      # Windows: .venv\Scripts\activate
-pip install -r requirements.txt
-uvicorn app.main:app --reload
+py -m venv .venv
+.\.venv\Scripts\Activate.ps1
+python -m pip install -r requirements.txt
+Copy-Item .env.example .env
 ```
 
-The API will be available at:
+Edit `backend/.env` and set the values you need:
 
-- http://localhost:8000
-- http://localhost:8000/docs
+```dotenv
+MONGODB_URI=mongodb+srv://<username>:<password>@<cluster-host>/
+MONGODB_DB=capstone
+PRICING_SOURCE=auto
+SERVICE_CONFIG_SOURCE=auto
+```
 
-### Frontend
+Keep credentials private; do not commit `.env`. If you want to require MongoDB rather than allow JSON fallbacks, set both source settings to `mongo`:
 
-```bash
+```dotenv
+PRICING_SOURCE=mongo
+SERVICE_CONFIG_SOURCE=mongo
+```
+
+Start the API from the `backend` directory:
+
+```powershell
+uvicorn app.main:app --reload --reload-dir app
+```
+
+The `--reload-dir app` option keeps the development reloader focused on application code rather than watching the virtual environment.
+
+The API is available at:
+
+- Health check: <http://localhost:8000/health>
+- Interactive API docs: <http://localhost:8000/docs>
+- Root service information: <http://localhost:8000/>
+
+### 2. Start the frontend
+
+In a second PowerShell terminal:
+
+```powershell
 cd frontend
-npm install
+npm ci
 npm run dev
 ```
 
-Then open:
+Open <http://localhost:3000>. The frontend uses `http://localhost:8000/api` as its default API base URL. To use a different backend URL, set `NEXT_PUBLIC_API_URL` before starting the Next.js server, for example:
 
-- http://localhost:3000
+```powershell
+$env:NEXT_PUBLIC_API_URL = "http://localhost:8000/api"
+npm run dev
+```
+
+### macOS/Linux command equivalents
+
+Backend setup:
+
+```bash
+cd backend
+python3 -m venv .venv
+source .venv/bin/activate
+python -m pip install -r requirements.txt
+cp .env.example .env
+uvicorn app.main:app --reload --reload-dir app
+```
+
+Frontend setup in a separate terminal:
+
+```bash
+cd frontend
+npm ci
+npm run dev
+```
+
+## MongoDB data migration
+
+Set `MONGODB_URI` and `MONGODB_DB` in `backend/.env` first. Run migration commands from the `backend` directory.
+
+To upload or refresh one AWS service's pricing data from its JSON file:
+
+```powershell
+python -m scripts.migrate_to_mongo cognito
+```
+
+Replace `cognito` with the service filename without `.json`, for example `lambda` or `s3`. The pricing migration replaces the existing documents for that service, so run it only when you intend to refresh that service's MongoDB data.
+
+To upload `service_config.json` to the `service_config` collection:
+
+```powershell
+python -m scripts.migrate_service_config_to_mongo
+```
+
+To compare a service's MongoDB pricing index with the JSON source:
+
+```powershell
+python -m scripts.check_parity app.services.cognito_service.pricing CognitoPricing
+```
+
+Use the corresponding pricing module and class for other services. A `MATCH` result means both sources build the same service pricing index.
 
 ## AI configuration
 
-The architecture-generation pipeline accepts Qwen-compatible settings through environment variables such as:
+AI features depend on the configured integration:
 
-- `QWEN_BASE_URL` (default: `http://localhost:11434/v1`)
-- `QWEN_MODEL` (default: `qwen3:8b`)
-- `QWEN_API_KEY` (optional)
-- `QWEN_TIMEOUT_SECONDS` (default: `60`)
+- Groq-backed features use `GROQ_API_KEY`, `GROQ_MODEL`, and `GROQ_TIMEOUT_SECONDS` in `backend/.env`.
+- Ollama-backed features require Ollama to be running and may use `OLLAMA_BASE_URL`, `OLLAMA_MODEL`, `OLLAMA_TIMEOUT_SECONDS`, `OLLAMA_NUM_CTX`, and `OLLAMA_NUM_PREDICT`.
 
-## Example API call
+Set only the provider configuration needed by the AI feature you are using. Cost calculations do not require an AI provider key.
 
-```bash
-curl -X POST http://localhost:8000/api/ai/architecture/generate \
-  -H "Content-Type: application/json" \
-  -d '{
-    "task": "generate_architecture",
-    "prompt": "Design a photo sharing application for 100,000 users"
-  }'
+## Useful commands
+
+From `frontend/`:
+
+```powershell
+npm run lint
+npm run build
 ```
 
-## Documentation
+From `backend/`:
 
-- [FORMULAE.md](./FORMULAE.md) — pricing formula reference
-- [formula.md](./formula.md) — lightweight alias/reference for the formula guide
-- [guide/](./guide/) — architecture and UI design documentation
+```powershell
+python -m py_compile app\main.py
+```
 
-## Notes
+## Demo
 
-This project is actively evolving. Service coverage, pricing logic, and AI workflows may continue to expand as the platform matures.
-
----
-
-Last updated: October 2026
+[Watch the project demo on Google Drive](https://drive.google.com/file/d/135yi-1-oqn24I5IpGFindn2OjHdlB5gT/view?usp=sharing).
