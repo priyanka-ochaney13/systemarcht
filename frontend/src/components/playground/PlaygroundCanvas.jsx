@@ -215,14 +215,14 @@ export const PlaygroundCanvas = ({ onNodeSelect, onArchitectureChange }) => {
           <div id="service-picker" className="mt-3 space-y-3">
             <div className="flex flex-col gap-2 sm:flex-row">
               <label className="relative min-w-0 flex-1">
-                <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+                <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                 <input
                   type="search"
                   value={serviceSearch}
                   onChange={(event) => setServiceSearch(event.target.value)}
                   placeholder="Search AWS services"
                   aria-label="Search AWS services"
-                  className="w-full rounded-md border border-gray-300 bg-white py-2 pl-9 pr-3 text-sm outline-none focus:border-amber-500 focus:ring-2 focus:ring-amber-100"
+                  className="sa-input py-2 pl-9"
                 />
               </label>
               <label className="sr-only" htmlFor="service-category">
@@ -232,7 +232,7 @@ export const PlaygroundCanvas = ({ onNodeSelect, onArchitectureChange }) => {
                 id="service-category"
                 value={serviceCategory}
                 onChange={(event) => setServiceCategory(event.target.value)}
-                className="rounded-md border border-gray-300 bg-white px-3 py-2 text-sm text-gray-700"
+                className="rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/40"
               >
                 {['All', ...new Set(SERVICES.map((service) => service.category))].map(
                   (category) => (
@@ -263,7 +263,7 @@ export const PlaygroundCanvas = ({ onNodeSelect, onArchitectureChange }) => {
                 </button>
               ))}
               {visibleServices.length === 0 && (
-                <p className="col-span-full py-3 text-center text-sm text-gray-500">
+                <p className="col-span-full py-3 text-center text-sm text-muted-foreground">
                   No services match that search.
                 </p>
               )}
@@ -289,18 +289,18 @@ export const PlaygroundCanvas = ({ onNodeSelect, onArchitectureChange }) => {
           <MiniMap />
           {nodes.length === 0 && (
             <div className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center">
-              <div className="pointer-events-auto mx-4 max-w-sm rounded-xl border border-gray-200 bg-white/95 p-5 text-center shadow-lg">
-                <h2 className="font-semibold text-gray-900">
+              <div className="pointer-events-auto mx-4 max-w-sm rounded-xl border border-border bg-card/95 p-5 text-center shadow-lg">
+                <h2 className="font-semibold text-foreground">
                   Start building your architecture
                 </h2>
-                <p className="mt-2 text-sm text-gray-600">
+                <p className="mt-2 text-sm text-muted-foreground">
                   Add services, drag them into place, then connect the handles
                   to show how requests flow.
                 </p>
                 <button
                   type="button"
                   onClick={() => setServiceMenuOpen(true)}
-                  className="mt-4 rounded-lg bg-amber-500 px-4 py-2 text-sm font-semibold text-gray-950 hover:bg-amber-400"
+                  className="sa-btn-primary mt-4"
                 >
                   Browse services
                 </button>

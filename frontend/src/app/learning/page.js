@@ -52,36 +52,36 @@ export default function LearningPage() {
     return (
       <>
         <SiteHeader />
-        <main className="min-h-screen bg-white px-6 py-10 text-gray-900">
+        <main className="min-h-screen bg-background px-4 py-8 text-foreground sm:px-6 sm:py-10">
           <div className="mx-auto max-w-6xl">
             {isLoading ? (
-              <p role="status" className="text-sm text-gray-600">
+              <p role="status" className="text-sm text-muted-foreground">
                 Loading learning modules...
               </p>
             ) : error ? (
-              <section role="alert" className="max-w-xl rounded-xl border border-red-200 bg-red-50 p-5">
-                <h1 className="text-lg font-semibold text-red-900">
+              <section role="alert" className="max-w-xl rounded-xl border border-destructive/30 bg-destructive/10 p-5">
+                <h1 className="text-lg font-semibold text-foreground">
                   Learning modules are unavailable
                 </h1>
-                <p className="mt-2 text-sm text-red-800">{error}</p>
+                <p className="mt-2 text-sm text-muted-foreground">{error}</p>
                 <button
                   type="button"
                   onClick={retry}
-                  className="mt-4 rounded-lg bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-gray-700"
+                  className="sa-btn-secondary mt-4"
                 >
                   Try again
                 </button>
               </section>
             ) : (
-              <section role="status" className="max-w-xl rounded-xl border border-gray-200 p-5">
+              <section role="status" className="sa-card max-w-xl p-5">
                 <h1 className="text-lg font-semibold">No learning modules found</h1>
-                <p className="mt-2 text-sm text-gray-600">
+                <p className="mt-2 text-sm text-muted-foreground">
                   Seed the learning modules into the configured MongoDB database, then try again.
                 </p>
                 <button
                   type="button"
                   onClick={retry}
-                  className="mt-4 rounded-lg bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-gray-700"
+                  className="sa-btn-secondary mt-4"
                 >
                   Try again
                 </button>
@@ -98,7 +98,7 @@ export default function LearningPage() {
   return (
     <>
       <SiteHeader />
-      <main className="min-h-screen bg-white text-gray-900 px-6 py-10">
+      <main className="min-h-screen bg-background px-4 py-8 text-foreground sm:px-6 sm:py-10">
         <div className="max-w-6xl mx-auto">
 
         {/* Header */}
@@ -125,18 +125,18 @@ export default function LearningPage() {
 
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <h2 className="text-sm font-semibold text-gray-800">
+              <h2 className="text-sm font-semibold text-foreground">
                 {activeModuleProgress.started
                   ? 'Continue your learning journey'
                   : 'Start your learning journey'}
               </h2>
-              <p className="mt-1 text-sm text-gray-600">
+              <p className="mt-1 text-sm text-muted-foreground">
                 {activeModule.title}
               </p>
             </div>
             <Link
               href={`/learning/${activeModule.id}`}
-              className="inline-flex items-center justify-center gap-2 rounded-lg bg-amber-500 px-4 py-2.5 text-sm font-semibold text-gray-950 hover:bg-amber-400"
+              className="sa-btn-primary px-4 py-2.5"
             >
               {activeModuleProgress.started
                 ? 'Continue Module'
@@ -296,15 +296,15 @@ export default function LearningPage() {
                       return (
                         <div className="mb-4">
                           <div className="mb-2 flex items-center justify-between text-xs">
-                            <span className="font-medium text-gray-700">
+                            <span className="font-medium text-foreground">
                               {progress.started ? 'Your progress' : 'Not started'}
                             </span>
-                            <span className="text-gray-500">
+                            <span className="text-muted-foreground">
                               {progress.completedActivities}/{progress.totalActivities} activities · {progress.percent}%
                             </span>
                           </div>
                           <div
-                            className="h-1.5 overflow-hidden rounded-full bg-gray-100"
+                            className="h-1.5 overflow-hidden rounded-full bg-border"
                             role="progressbar"
                             aria-label={`${module.title} progress`}
                             aria-valuenow={progress.percent}
@@ -312,7 +312,7 @@ export default function LearningPage() {
                             aria-valuemax={100}
                           >
                             <div
-                              className="h-full rounded-full bg-amber-500 transition-all"
+                              className="h-full rounded-full bg-primary transition-all"
                               style={{ width: `${progress.percent}%` }}
                             />
                           </div>
@@ -339,11 +339,11 @@ export default function LearningPage() {
                         ...(module.aiActivity ? [['ai-assist', 'Ask ArchBot']] : []),
                         ['quiz', 'Quick Check'],
                       ].map(([stepId, step]) => (
-                        <span key={step} className="flex items-center gap-1 text-gray-600">
+                        <span key={step} className="flex items-center gap-1 text-muted-foreground">
                           {(modulesProgress[module.id]?.completedSections || []).includes(stepId) ? (
-                            <CheckCircle2 className="h-3.5 w-3.5 text-green-600" />
+                            <CheckCircle2 className="h-3.5 w-3.5 text-success-foreground" />
                           ) : (
-                            <Circle className="h-3.5 w-3.5 text-gray-300" />
+                            <Circle className="h-3.5 w-3.5 text-border" />
                           )}
                           {step}
                         </span>

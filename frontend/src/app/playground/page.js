@@ -206,9 +206,9 @@ function ValidationFeedback({ result, module, getServiceName, onDismiss }) {
     >
       <div className="flex items-start gap-2">
         {isValid ? (
-          <CheckCircle className="mt-0.5 h-4 w-4 flex-shrink-0 text-green-600" />
+          <CheckCircle className="mt-0.5 h-4 w-4 flex-shrink-0 text-success-foreground" />
         ) : (
-          <AlertCircle className="mt-0.5 h-4 w-4 flex-shrink-0 text-red-600" />
+          <AlertCircle className="mt-0.5 h-4 w-4 flex-shrink-0 text-destructive" />
         )}
         <div className="min-w-0 flex-1">
           <h3
@@ -281,6 +281,7 @@ export default function PlaygroundPage() {
     error: modulesError,
     retry: retryModules,
   } = useLearningModules(Boolean(moduleId));
+  // eslint-disable-next-line @next/next/no-assign-module-variable
   const module = learningModules.find(
     (item) => item.id === moduleId
   );

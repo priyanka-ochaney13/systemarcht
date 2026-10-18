@@ -36,6 +36,8 @@ export default function LearningModulePage() {
     retry,
   } = useLearningModules();
 
+  // `module` is the domain name used throughout this learning flow.
+  // eslint-disable-next-line @next/next/no-assign-module-variable
   const module = useMemo(
     () => learningModules.find((item) => item.id === moduleId),
     [learningModules, moduleId]
@@ -59,22 +61,22 @@ export default function LearningModulePage() {
     return (
       <>
         <SiteHeader />
-        <main className="min-h-screen bg-background px-6 py-10 text-foreground">
+        <main className="min-h-screen bg-background px-4 py-8 text-foreground sm:px-6 sm:py-10">
           <div className="mx-auto max-w-4xl">
             {isLoading ? (
               <p role="status" className="text-sm text-muted-foreground">
                 Loading learning module...
               </p>
             ) : (
-              <section role="alert" className="max-w-xl rounded-xl border border-red-200 bg-red-50 p-5">
-                <h1 className="text-xl font-bold text-red-900">
+              <section role="alert" className="max-w-xl rounded-xl border border-destructive/30 bg-destructive/10 p-5">
+                <h1 className="text-xl font-bold text-foreground">
                   Learning module is unavailable
                 </h1>
-                <p className="mt-2 text-sm text-red-800">{error}</p>
+                <p className="mt-2 text-sm text-muted-foreground">{error}</p>
                 <button
                   type="button"
                   onClick={retry}
-                  className="mt-4 rounded-lg bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-gray-700"
+                  className="sa-btn-secondary mt-4"
                 >
                   Try again
                 </button>
@@ -152,7 +154,7 @@ export default function LearningModulePage() {
   return (
     <>
       <SiteHeader />
-      <main className="min-h-screen bg-white text-gray-900">
+      <main className="min-h-screen bg-background text-foreground">
 
       <div className="max-w-5xl mx-auto px-6 py-10">
 
@@ -245,14 +247,14 @@ export default function LearningModulePage() {
 
         <nav
           aria-label="Module sections"
-          className="sticky top-[57px] z-30 -mx-6 mb-8 border-y border-gray-200 bg-white/95 px-6 py-3 backdrop-blur"
+          className="sticky top-14 z-30 -mx-4 mb-8 border-y border-border bg-background/95 px-4 py-3 backdrop-blur sm:-mx-6 sm:px-6"
         >
           <div className="mx-auto flex max-w-5xl items-center gap-2 overflow-x-auto">
             {sectionLinks.slice(1).map(([sectionId, label]) => (
               <a
                 key={sectionId}
                 href={`#${sectionId}`}
-                className="flex-shrink-0 rounded-full border border-gray-200 px-3 py-1.5 text-xs font-medium text-gray-600 hover:border-amber-300 hover:bg-amber-50 hover:text-amber-800"
+                className="flex-shrink-0 rounded-full border border-border px-3 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:border-primary/50 hover:bg-accent hover:text-accent-foreground"
               >
                 {label}
               </a>
@@ -276,7 +278,7 @@ export default function LearningModulePage() {
               Module Progress
             </span>
 
-            <span className="text-xs text-gray-500">
+            <span className="text-xs text-muted-foreground">
               {completedCount} of {totalSections} activities · {progressPercent}%
             </span>
 
@@ -556,16 +558,16 @@ export default function LearningModulePage() {
                 {module.exploreActivity.comparisons.map((item) => (
                   <div
                     key={item.title}
-                    className="rounded-xl border border-gray-200 bg-gray-50 p-5"
+                    className="rounded-xl border border-border bg-muted/50 p-5"
                   >
-                    <p className="text-sm font-semibold text-gray-800 mb-4">
+                    <p className="mb-4 text-sm font-semibold text-foreground">
                       {item.title}
                     </p>
 
                     <ArchitectureFlow paths={item.paths} />
 
                     {item.note && (
-                      <p className="mt-4 text-sm text-gray-600 leading-relaxed">
+                      <p className="mt-4 text-sm leading-relaxed text-muted-foreground">
                         {item.note}
                       </p>
                     )}
@@ -581,12 +583,12 @@ export default function LearningModulePage() {
                 {module.exploreActivity.tradeoffs.map((point) => (
                   <div
                     key={point.term}
-                    className="rounded-lg bg-gray-50 border border-gray-200 p-4"
+                    className="rounded-lg border border-border bg-muted/50 p-4"
                   >
-                    <p className="text-sm font-semibold text-gray-800 mb-1">
+                    <p className="mb-1 text-sm font-semibold text-foreground">
                       {point.term}
                     </p>
-                    <p className="text-sm text-gray-600">
+                    <p className="text-sm text-muted-foreground">
                       {point.description}
                     </p>
                   </div>
@@ -776,7 +778,7 @@ export default function LearningModulePage() {
 
             {module.buildActivity.requiredServices.length > 0 && (
               <div className="mb-6">
-                <p className="text-xs uppercase tracking-wide text-gray-500 mb-3">
+                <p className="mb-3 text-xs uppercase tracking-wide text-muted-foreground">
                   Required Services
                 </p>
 
@@ -803,7 +805,7 @@ export default function LearningModulePage() {
 
             {module.buildActivity.minServiceCounts && (
               <div className="mb-6">
-                <p className="text-xs uppercase tracking-wide text-gray-500 mb-3">
+                <p className="mb-3 text-xs uppercase tracking-wide text-muted-foreground">
                   Minimum Instances
                 </p>
 
@@ -812,7 +814,7 @@ export default function LearningModulePage() {
                     ([service, count]) => (
                       <span
                         key={service}
-                        className="px-3 py-1.5 rounded-full bg-white border border-gray-200 text-xs text-gray-700"
+                        className="rounded-full border border-border bg-card px-3 py-1.5 text-xs text-foreground"
                       >
                         At least {count} × {service}
                       </span>
@@ -824,7 +826,7 @@ export default function LearningModulePage() {
 
             {module.buildActivity.requiredConnections.length > 0 && (
               <div className="mb-6">
-                <p className="text-xs uppercase tracking-wide text-gray-500 mb-3">
+                <p className="mb-3 text-xs uppercase tracking-wide text-muted-foreground">
                   Required Connections
                 </p>
 
@@ -853,18 +855,18 @@ export default function LearningModulePage() {
 
             {module.buildActivity.rules && (
               <div className="mb-6">
-                <p className="text-xs uppercase tracking-wide text-gray-500 mb-3">
+                <p className="mb-3 text-xs uppercase tracking-wide text-muted-foreground">
                   Design Requirements
                 </p>
 
-                <ul className="space-y-2 text-sm text-gray-700 list-disc pl-5">
+                <ul className="list-disc space-y-2 pl-5 text-sm text-foreground/80">
                   {module.buildActivity.rules.map((rule) => (
                     <li key={rule.id}>{rule.label}</li>
                   ))}
                 </ul>
 
                 {module.buildActivity.monthlyBudgetUSD && (
-                  <p className="mt-3 text-sm text-gray-600">
+                  <p className="mt-3 text-sm text-muted-foreground">
                     Monthly budget: $
                     {module.buildActivity.monthlyBudgetUSD.toLocaleString('en-US')}
                   </p>
@@ -1028,9 +1030,9 @@ export default function LearningModulePage() {
                 {module.costChallenge.steps.map((step, index) => (
                   <li
                     key={index}
-                    className="flex items-start gap-3 text-sm text-gray-600 leading-relaxed"
+                    className="flex items-start gap-3 text-sm leading-relaxed text-muted-foreground"
                   >
-                    <span className="mt-0.5 w-5 h-5 rounded-full bg-amber-50 border border-amber-200 flex items-center justify-center text-[10px] text-amber-600 flex-shrink-0">
+                    <span className="mt-0.5 flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full border border-primary/30 bg-accent text-[10px] text-accent-foreground">
                       {index + 1}
                     </span>
                     <span>{step}</span>
@@ -1040,11 +1042,11 @@ export default function LearningModulePage() {
             )}
 
             {module.costChallenge.question && (
-              <div className="mt-5 rounded-xl border border-gray-200 bg-gray-50 p-4">
-                <p className="text-xs uppercase tracking-wide text-gray-500 mb-1">
+              <div className="mt-5 rounded-xl border border-border bg-muted/50 p-4">
+                <p className="mb-1 text-xs uppercase tracking-wide text-muted-foreground">
                   Think about it
                 </p>
-                <p className="text-sm text-gray-800">
+                <p className="text-sm text-foreground">
                   {module.costChallenge.question}
                 </p>
               </div>
@@ -1154,15 +1156,15 @@ export default function LearningModulePage() {
                   Suggested Question
                 </p>
 
-                <p className="text-sm text-gray-800 leading-relaxed">
+                <p className="text-sm leading-relaxed text-foreground">
                   &quot;{module.aiActivity.prompt}&quot;
                 </p>
 
               </div>
 
               {module.aiActivity.studentTask && (
-                <p className="mb-5 text-sm text-gray-600 leading-relaxed">
-                  <span className="font-semibold text-amber-700">
+                <p className="mb-5 text-sm leading-relaxed text-muted-foreground">
+                  <span className="font-semibold text-accent-foreground">
                     Your task:
                   </span>{' '}
                   {module.aiActivity.studentTask}
@@ -1265,7 +1267,7 @@ export default function LearningModulePage() {
               : `Module ${module.moduleNumber}`}
           </h2>
 
-          <p className="text-sm text-gray-600 mb-6">
+          <p className="mb-6 text-sm text-muted-foreground">
             {moduleComplete
               ? 'Great work. Your progress is saved and you can continue to the next module.'
               : 'Complete the learning activities and quick check to finish this module.'}
@@ -1275,7 +1277,7 @@ export default function LearningModulePage() {
             {moduleComplete && nextModule && (
               <Link
                 href={`/learning/${nextModule.id}`}
-                className="inline-flex items-center gap-2 rounded-xl bg-amber-500 px-5 py-3 text-sm font-semibold text-gray-950 hover:bg-amber-400"
+                className="sa-btn-primary rounded-xl px-5 py-3"
               >
                 Continue to Module {nextModule.moduleNumber}
                 <ArrowRight className="h-4 w-4" />
@@ -1283,7 +1285,7 @@ export default function LearningModulePage() {
             )}
             <Link
               href="/learning"
-              className="inline-flex items-center gap-2 text-sm text-amber-600 hover:text-amber-700"
+              className="inline-flex items-center gap-2 text-sm text-primary hover:underline"
             >
               Back to all modules
               <ArrowRight className="h-4 w-4" />
@@ -1574,12 +1576,12 @@ function ArchitectureFlow({ paths }) {
         >
           {path.map((service, index) => (
             <React.Fragment key={`${service}-${index}`}>
-              <div className="px-4 py-3 rounded-xl border border-gray-200 bg-white text-sm font-medium text-gray-800">
+              <div className="rounded-xl border border-border bg-card px-4 py-3 text-sm font-medium text-foreground">
                 {service}
               </div>
 
               {index < path.length - 1 && (
-                <ArrowRight className="w-4 h-4 text-amber-500" />
+                <ArrowRight className="h-4 w-4 text-primary" />
               )}
             </React.Fragment>
           ))}

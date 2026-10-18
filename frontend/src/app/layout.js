@@ -44,7 +44,7 @@ export default function RootLayout({ children }) {
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
       </head>
-      <body className="min-h-full flex flex-col bg-background text-foreground">
+      <body className="theme-transition flex min-h-full flex-col bg-background text-foreground">
         <ThemeProvider>
           <LearningProgressHydration />
         <Suspense fallback={<CustomLoader />}>

@@ -311,7 +311,7 @@ export function ArchitectChatbot({ onClose, embedded = false }) {
               type="button"
               onClick={runAnalysis}
               disabled={isLoading || !isArchitectureAnalyzable(architectureNodes)}
-              className="ml-auto inline-flex items-center gap-1.5 rounded-md border border-amber-500/30 px-2.5 py-1 text-xs font-medium text-amber-300 transition hover:bg-amber-500/10 disabled:cursor-not-allowed disabled:opacity-40"
+              className="ml-auto inline-flex items-center gap-1.5 rounded-md border border-primary/30 px-2.5 py-1 text-xs font-medium text-primary transition hover:bg-accent disabled:cursor-not-allowed disabled:opacity-40"
             >
               <BarChart2 className="h-3.5 w-3.5" />
               Calculate costs

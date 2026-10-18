@@ -11,12 +11,12 @@ export function useLearningModules(enabled = true) {
 
   useEffect(() => {
     if (!enabled) {
-      setIsLoading(false);
-      setError(null);
       return undefined;
     }
 
     const controller = new AbortController();
+    // These state updates represent the start of a retryable external request.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setIsLoading(true);
     setError(null);
 

@@ -48,6 +48,7 @@ export function SiteHeader({ showLandingAnchors = false }) {
               <Link
                 key={link.href}
                 href={link.href}
+                aria-current={isActive(link.href) ? 'page' : undefined}
                 className={cn(
                   'inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-sm transition-colors',
                   link.emphasis
@@ -96,8 +97,9 @@ export function SiteHeader({ showLandingAnchors = false }) {
                 key={link.href}
                 href={link.href}
                 onClick={() => setOpen(false)}
+                aria-current={isActive(link.href) ? 'page' : undefined}
                 className={cn(
-                  'rounded-md px-3 py-2 text-sm',
+                  'rounded-md px-3 py-2 text-sm transition-colors',
                   isActive(link.href) ? 'bg-muted font-medium text-foreground' : 'text-foreground hover:bg-muted'
                 )}
               >

@@ -16,18 +16,20 @@ function applyThemeClass(theme) {
 }
 
 export function ThemeProvider({ children }) {
-  const [theme, setThemeState] = useState('light');
+  const [theme, setThemeState] = useState(() => {
+    if (typeof window === 'undefined') return 'light';
+    try {
+      return window.localStorage.getItem(THEME_STORAGE_KEY) === 'dark'
+        ? 'dark'
+        : 'light';
+    } catch {
+      return 'light';
+    }
+  });
 
   useEffect(() => {
-    try {
-      const stored = window.localStorage.getItem(THEME_STORAGE_KEY);
-      const next = stored === 'dark' ? 'dark' : 'light';
-      setThemeState(next);
-      applyThemeClass(next);
-    } catch {
-      applyThemeClass('light');
-    }
-  }, []);
+    applyThemeClass(theme);
+  }, [theme]);
 
   const setTheme = useCallback((next) => {
     const value = next === 'dark' ? 'dark' : 'light';

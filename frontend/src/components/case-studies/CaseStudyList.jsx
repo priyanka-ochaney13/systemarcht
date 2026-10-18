@@ -6,24 +6,27 @@ import { SiteHeader } from '@/components/common/SiteHeader';
 
 export const CaseStudyList = () => {
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-background text-foreground">
       <SiteHeader />
       {/* Header */}
-      <div className="bg-foreground text-background py-16 px-4">
+      <div className="border-b border-border bg-muted/40 px-4 py-14">
         <div className="max-w-6xl mx-auto">
-          <h1 className="text-4xl font-bold mb-4">System Design Case Studies</h1>
-          <p className="text-xl text-background/70">
+          <p className="mb-3 text-xs font-semibold uppercase tracking-[0.18em] text-primary">
+            SystemArcht patterns
+          </p>
+          <h1 className="mb-4 text-3xl font-semibold tracking-tight md:text-4xl">System Design Case Studies</h1>
+          <p className="max-w-2xl text-base text-muted-foreground md:text-lg">
             Learn real-world cloud architectures with interactive simulations
           </p>
         </div>
       </div>
 
       {/* Case Studies Grid */}
-      <div className="max-w-6xl mx-auto py-12 px-4">
+      <div className="mx-auto max-w-6xl px-4 py-10 md:py-12">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {CASE_STUDIES.map((caseStudy) => (
             <Link key={caseStudy.id} href={`/case-studies/${caseStudy.id}`}>
-              <div className="h-full bg-card border border-border rounded-lg shadow-sm hover:shadow-md transition-all duration-300 cursor-pointer p-6 group">
+              <div className="group h-full rounded-xl border border-border bg-card p-6 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-primary/50 hover:shadow-md">
                 {/* Pattern Badge */}
                 <div className="flex items-center gap-2 mb-3">
                   <Zap className="w-4 h-4" style={{ color: '#FF9900' }} />

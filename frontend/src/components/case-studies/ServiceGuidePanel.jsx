@@ -215,7 +215,7 @@ export const ServiceGuidePanel = ({ caseStudyId, selectedServices }) => {
                   <p className="font-semibold text-foreground mb-2">Potential Bottlenecks:</p>
                   {caseStudyFlow.bottlenecks.map((bottleneck, idx) => (
                     <div key={idx} className="bg-destructive/10 border border-destructive/30 p-2 rounded mb-1">
-                      <p className="font-medium text-red-900 text-xs">{bottleneck.service}</p>
+                      <p className="text-xs font-medium text-destructive">{bottleneck.service}</p>
                       <p className="text-destructive text-xs">{bottleneck.issue}</p>
                       <p className="text-destructive text-xs font-medium mt-1">Solution: {bottleneck.solution}</p>
                     </div>

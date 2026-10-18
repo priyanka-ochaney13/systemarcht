@@ -105,13 +105,13 @@ export const CaseStudyDetail = ({ caseStudyId }) => {
   }
 
   return (
-    <div className="w-full h-[calc(100dvh-50px)] flex flex-col bg-gray-50">
+    <div className="flex h-[calc(100dvh-3.5rem)] w-full flex-col overflow-hidden bg-background">
       {/* Header */}
-      <div className="bg-background border-b border-border p-6">
+      <div className="shrink-0 border-b border-border bg-background p-4 md:p-6">
         <div className="max-w-full mx-auto">
-          <h1 className="text-3xl font-bold text-foreground mb-2">{caseStudy.title}</h1>
-          <p className="text-muted-foreground mb-4">{caseStudy.description}</p>
-          <div className="grid grid-cols-4 gap-4">
+          <h1 className="mb-2 text-2xl font-bold text-foreground md:text-3xl">{caseStudy.title}</h1>
+          <p className="mb-4 text-sm text-muted-foreground md:text-base">{caseStudy.description}</p>
+          <div className="grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-4">
             <div>
               <p className="text-xs text-muted-foreground font-semibold uppercase mb-1">Scale</p>
               <p className="text-sm font-semibold text-foreground">{caseStudy.scale}</p>
@@ -133,9 +133,9 @@ export const CaseStudyDetail = ({ caseStudyId }) => {
       </div>
 
       {/* Main Content */}
-      <div ref={containerRef} className="flex-1 flex overflow-hidden relative">
+      <div ref={containerRef} className="relative flex min-h-0 flex-1 flex-col overflow-hidden lg:flex-row">
         {/* LEFT: Service Guide Panel (Resizable) */}
-        <div style={{ width: `${guideWidth}px` }} className="flex flex-col border-r border-border bg-card overflow-hidden">
+        <div style={{ width: `${guideWidth}px` }} className="flex max-h-[35vh] min-h-0 w-full flex-col overflow-hidden border-b border-border bg-card lg:max-h-none lg:w-auto lg:border-b-0 lg:border-r">
           <ServiceGuidePanel caseStudyId={caseStudyId} selectedServices={selectedServices} />
         </div>
 
@@ -143,24 +143,24 @@ export const CaseStudyDetail = ({ caseStudyId }) => {
         <div
           ref={resizeDividerRef}
           onMouseDown={handleResizeStart}
-          className={`w-1 bg-muted hover:bg-primary cursor-col-resize transition-colors ${
+          className={`hidden w-1 cursor-col-resize bg-muted transition-colors hover:bg-primary lg:block ${
             isResizing ? 'bg-primary' : ''
           }`}
           style={{ userSelect: isResizing ? 'none' : 'auto' }}
         />
 
         {/* CENTER: Playground Canvas */}
-        <div className="flex-1 flex flex-col overflow-hidden">
+        <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
           <PlaygroundCanvas onNodeSelect={handleNodeSelect} />
         </div>
 
         {/* RIGHT: Config Panel (slides in from right) */}
         <div
           className={`border-l border-border bg-card overflow-y-auto transition-all duration-300 ease-in-out ${
-            openConfigPanel ? 'w-96 shadow-lg' : 'w-0'
+            openConfigPanel ? 'w-full shadow-lg lg:w-96' : 'w-0'
           }`}
           style={{
-            minWidth: openConfigPanel ? '384px' : '0',
+            minWidth: openConfigPanel ? undefined : '0',
           }}
         >
           {openConfigPanel && (
