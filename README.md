@@ -8,6 +8,7 @@ SystemArcht is an AWS architecture planning and cost-estimation app. It combines
 - Architecture modeling and cost estimation across connected services.
 - AI-assisted architecture generation and chat.
 - Architecture validation and Mermaid diagram generation.
+- User-owned architecture documents with saved canvas layouts, service configurations, and printable calculation reports.
 - A Next.js frontend backed by a FastAPI API.
 
 ## Architecture and data
@@ -17,6 +18,7 @@ SystemArcht is an AWS architecture planning and cost-estimation app. It combines
 - Learning module content is read from the `learning_modules` collection in the database named by `MONGODB_USER_DB` on the cluster configured by `MONGODB_USER_URI`.
 - `backend/pricing_data/` contains JSON pricing sources and configuration fallbacks. Keep this directory until you have verified MongoDB-only operation and no longer need local fallback or migration sources.
 - The MongoDB database stores AWS SKU data in the `pricing` collection and application service settings in the `service_config` collection.
+- User-owned designs and their separate cost snapshots are stored in the `architecture_documents` collection in `MONGODB_USER_DB`.
 - `frontend/src/` contains the Next.js UI, API client, and application state.
 - `FORMULAE.md` documents the cost-calculation formulas.
 
@@ -92,7 +94,9 @@ Copy-Item .env.example .env.local
 npm run dev
 ```
 
-Before starting, fill in the Firebase web app values in `frontend/.env.local` (`NEXT_PUBLIC_FIREBASE_API_KEY`, `NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN`, `NEXT_PUBLIC_FIREBASE_PROJECT_ID`, and `NEXT_PUBLIC_FIREBASE_APP_ID`) and enable Email/Password and Google providers in Firebase Authentication. These are public client configuration values; never put service-account credentials in the frontend. Only the frontend `/login` and `/signup` pages are public; the frontend gates all other pages. Every backend route, including `/`, `/health`, and profile routes, requires a verified Firebase ID token. Interactive API documentation is disabled. Profile edits can only change the signed-in user's own display name.
+Before starting, fill in the Firebase web app values in `frontend/.env.local` (`NEXT_PUBLIC_FIREBASE_API_KEY`, `NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN`, `NEXT_PUBLIC_FIREBASE_PROJECT_ID`, and `NEXT_PUBLIC_FIREBASE_APP_ID`) and enable Email/Password and Google providers in Firebase Authentication. These are public client configuration values; never put service-account credentials in the frontend. Only the frontend `/login` and `/signup` pages are public; the frontend gates all other pages. Every backend route, including `/`, `/health`, and profile routes, requires a verified Firebase ID token. Interactive API documentation is disabled. Profile edits and architecture documents are scoped to the signed-in user.
+
+Architecture documents can be created from **New architecture doc** on the landing page or **My Documents** in the site navigation. The API provides authenticated create, list, read, update, and delete operations at `/api/architecture-documents`; calculation snapshots are appended at `/api/architecture-documents/{id}/snapshots` without changing the editable design. A saved snapshot includes the design and service configurations as they existed at calculation time, the cost result, calculation timestamp, and pricing basis. Use **Print / Save as PDF** on its report page to export a print-ready estimate. Document storage requires both `MONGODB_USER_URI` and `MONGODB_USER_DB`.
 
 Open <http://localhost:3000>. `NEXT_PUBLIC_API_URL` defaults to `http://localhost:8000`. To use a different backend URL, set `NEXT_PUBLIC_API_URL` before starting the Next.js server, for example:
 

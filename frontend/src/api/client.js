@@ -104,6 +104,39 @@ export const getArchitectures = async () => {
   }
 };
 
+export const createArchitectureDocument = async (document) => {
+  const response = await apiClient.post('/architecture-documents', document);
+  return response.data;
+};
+
+export const getArchitectureDocuments = async () => {
+  const response = await apiClient.get('/architecture-documents');
+  return response.data;
+};
+
+export const getArchitectureDocument = async (documentId) => {
+  const response = await apiClient.get(`/architecture-documents/${documentId}`);
+  return response.data;
+};
+
+export const updateArchitectureDocument = async (documentId, document) => {
+  const response = await apiClient.put(`/architecture-documents/${documentId}`, document);
+  return response.data;
+};
+
+export const deleteArchitectureDocument = async (documentId) => {
+  const response = await apiClient.delete(`/architecture-documents/${documentId}`);
+  return response.data;
+};
+
+export const createCalculationSnapshot = async (documentId, snapshot) => {
+  const response = await apiClient.post(
+    `/architecture-documents/${documentId}/snapshots`,
+    snapshot
+  );
+  return response.data;
+};
+
 export const simulateArchitecture = async (architecture) => {
   try {
     const response = await apiClient.post('/architecture/calculate', architecture);

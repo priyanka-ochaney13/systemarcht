@@ -13,6 +13,7 @@ PRICING_COLLECTION = "pricing"
 SERVICE_CONFIG_COLLECTION = "service_config"
 LEARNING_MODULES_COLLECTION = "learning_modules"
 USER_PROFILES_COLLECTION = "users"
+ARCHITECTURE_DOCUMENTS_COLLECTION = "architecture_documents"
 
 
 @lru_cache(maxsize=1)
@@ -64,3 +65,12 @@ def get_user_profiles_collection() -> Optional[Collection]:
     if client is None or not database_name:
         return None
     return client[database_name][USER_PROFILES_COLLECTION]
+
+
+def get_architecture_documents_collection() -> Optional[Collection]:
+    """Return the authenticated users' architecture documents collection."""
+    client = _get_user_client()
+    database_name = os.getenv("MONGODB_USER_DB")
+    if client is None or not database_name:
+        return None
+    return client[database_name][ARCHITECTURE_DOCUMENTS_COLLECTION]

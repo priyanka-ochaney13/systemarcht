@@ -64,6 +64,8 @@ export const useArchitectureStore = create((set) => ({
   }),
 }));
 
+let initialServiceConfigs = {};
+
 export const useServiceConfigStore = create((set) => ({
   apiGatewayConfig: {
     region: 'ap-south-1',
@@ -221,7 +223,34 @@ export const useServiceConfigStore = create((set) => ({
   updateCloudFrontConfig: (config) => set({ cloudFrontConfig: config }),
   updateElastiCacheConfig: (config) => set({ elastiCacheConfig: config }),
   updateSQSConfig: (config) => set({ sqsConfig: config }),
+  loadServiceConfigs: (configs) =>
+    set((state) =>
+      Object.fromEntries(
+        Object.entries(configs || {}).filter(
+          ([key, value]) =>
+            key.endsWith('Config') &&
+            Object.prototype.hasOwnProperty.call(state, key) &&
+            value &&
+            typeof value === 'object' &&
+            !Array.isArray(value)
+        )
+      )
+    ),
+  resetServiceConfigs: () => set(initialServiceConfigs),
 }));
+
+initialServiceConfigs = Object.fromEntries(
+  Object.entries(useServiceConfigStore.getState()).filter(
+    ([key, value]) => key.endsWith('Config') && value && typeof value === 'object'
+  )
+);
+
+export const getServiceConfigs = () =>
+  Object.fromEntries(
+    Object.entries(useServiceConfigStore.getState()).filter(
+      ([key, value]) => key.endsWith('Config') && value && typeof value === 'object'
+    )
+  );
 
 // ------------------------------------------------------------------
 // Pricing store

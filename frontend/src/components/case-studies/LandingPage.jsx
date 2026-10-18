@@ -1,6 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
-import { Zap, Layout, Gauge, Lightbulb, ArrowRight, MessageSquare, BookOpen, Sparkles } from 'lucide-react';
+import { Zap, Layout, Gauge, Lightbulb, ArrowRight, MessageSquare, BookOpen, Sparkles, FilePlus2 } from 'lucide-react';
 import { SiteHeader } from '@/components/layout/SiteHeader';
 import { CASE_STUDIES } from '@/lib/constants';
 
@@ -55,6 +55,10 @@ export const LandingPage = () => {
             <Link href="/playground" className="sa-btn-secondary h-11 px-5 text-[15px]">
               <Layout className="size-4" />
               Start Building
+            </Link>
+            <Link href="/playground?newDocument=true" className="sa-btn-secondary h-11 px-5 text-[15px]">
+              <FilePlus2 className="size-4" />
+              New architecture doc
             </Link>
             <Link href="/ai-architect" className="sa-btn-secondary h-11 px-5 text-[15px]">
               <Sparkles className="size-4" />

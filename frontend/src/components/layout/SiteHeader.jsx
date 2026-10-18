@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { Menu, MessageSquare, Sparkles, X, Zap } from 'lucide-react';
+import { Files, Menu, MessageSquare, Sparkles, X, Zap } from 'lucide-react';
 import { ThemeToggle } from '@/components/theme/ThemeToggle';
 import AuthMenu from '@/components/auth/AuthMenu';
 import { cn } from '@/lib/utils';
@@ -11,6 +11,7 @@ import { cn } from '@/lib/utils';
 const NAV_LINKS = [
   { href: '/learning', label: 'Learning' },
   { href: '/playground', label: 'Playground' },
+  { href: '/documents', label: 'My Documents', icon: Files },
   { href: '/case-studies', label: 'Case Studies' },
   { href: '/ai-architect', label: 'AI Architect', icon: Sparkles, emphasis: true },
   { href: '/chatbot', label: 'ArchBot', icon: MessageSquare },

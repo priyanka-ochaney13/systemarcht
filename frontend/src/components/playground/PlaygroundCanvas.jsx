@@ -8,6 +8,7 @@ import ReactFlow, {
   Controls,
   Background,
   MiniMap,
+  ConnectionMode,
 } from 'reactflow';
 import 'reactflow/dist/style.css';
 import { useArchitectureStore } from '@/store';
@@ -21,19 +22,19 @@ import {
 } from 'lucide-react';
 
 const SERVICES = [
-  { type: 'api_gateway', label: 'API Gateway', category: 'Compute', color: 'bg-yellow-500 hover:bg-yellow-600' },
-  { type: 'lambda', label: 'Lambda', category: 'Compute', color: 'bg-yellow-500 hover:bg-yellow-600' },
-  { type: 'ec2', label: 'EC2', category: 'Compute', color: 'bg-amber-500 hover:bg-amber-600' },
-  { type: 'elastic_beanstalk', label: 'Elastic Beanstalk', category: 'Compute', color: 'bg-orange-500 hover:bg-orange-600' },
-  { type: 's3', label: 'S3', category: 'Storage', color: 'bg-yellow-500 hover:bg-yellow-600' },
-  { type: 'dynamodb', label: 'DynamoDB', category: 'Data', color: 'bg-yellow-500 hover:bg-yellow-600' },
-  { type: 'rds', label: 'RDS', category: 'Data', color: 'bg-blue-600 hover:bg-blue-700' },
-  { type: 'elasticache', label: 'ElastiCache', category: 'Data', color: 'bg-fuchsia-500 hover:bg-fuchsia-600' },
-  { type: 'cognito', label: 'Cognito', category: 'Identity', color: 'bg-yellow-500 hover:bg-yellow-600' },
-  { type: 'elb', label: 'ELB', category: 'Networking', color: 'bg-yellow-500 hover:bg-yellow-600' },
-  { type: 'cloudfront', label: 'CloudFront', category: 'Networking', color: 'bg-purple-500 hover:bg-purple-600' },
-  { type: 'sqs', label: 'SQS', category: 'Messaging', color: 'bg-rose-500 hover:bg-rose-600' },
-  { type: 'cloudwatch', label: 'CloudWatch', category: 'Monitoring', color: 'bg-pink-500 hover:bg-pink-600' },
+  { type: 'api_gateway', label: 'API Gateway', category: 'Compute' },
+  { type: 'lambda', label: 'Lambda', category: 'Compute' },
+  { type: 'ec2', label: 'EC2', category: 'Compute' },
+  { type: 'elastic_beanstalk', label: 'Elastic Beanstalk', category: 'Compute' },
+  { type: 's3', label: 'S3', category: 'Storage' },
+  { type: 'dynamodb', label: 'DynamoDB', category: 'Data' },
+  { type: 'rds', label: 'RDS', category: 'Data' },
+  { type: 'elasticache', label: 'ElastiCache', category: 'Data' },
+  { type: 'cognito', label: 'Cognito', category: 'Identity' },
+  { type: 'elb', label: 'ELB', category: 'Networking' },
+  { type: 'cloudfront', label: 'CloudFront', category: 'Networking' },
+  { type: 'sqs', label: 'SQS', category: 'Messaging' },
+  { type: 'cloudwatch', label: 'CloudWatch', category: 'Monitoring' },
 ];
 
 // Define nodeTypes outside component to avoid React Flow warning
@@ -64,7 +65,10 @@ export const PlaygroundCanvas = ({ onNodeSelect, onArchitectureChange }) => {
   React.useEffect(() => {
     const rfNodesData = nodes.map(node => ({
       id: node.id,
-      data: { label: node.label || node.name || node.serviceType?.toUpperCase(), serviceType: node.serviceType },
+      data: {
+        label: node.label || node.name || node.serviceType?.toUpperCase(),
+        serviceType: node.serviceType,
+      },
       position: node.position || { x: 100, y: 100 },
       type: 'serviceNode',
     }));
@@ -76,6 +80,8 @@ export const PlaygroundCanvas = ({ onNodeSelect, onArchitectureChange }) => {
       id: conn.id || `${conn.source}-${conn.target}`,
       source: conn.source,
       target: conn.target,
+      sourceHandle: conn.sourceHandle,
+      targetHandle: conn.targetHandle,
       animated: true,
       style: { stroke: '#FF9900', strokeWidth: 2 },
     }));
@@ -84,10 +90,27 @@ export const PlaygroundCanvas = ({ onNodeSelect, onArchitectureChange }) => {
 
   const onConnect = useCallback(
     (connection) => {
+      if (!connection.source || !connection.target || connection.source === connection.target) {
+        return;
+      }
+      const exists = useArchitectureStore
+        .getState()
+        .connections.some(
+          (edge) =>
+            edge.source === connection.source &&
+            edge.target === connection.target &&
+            edge.sourceHandle === connection.sourceHandle &&
+            edge.targetHandle === connection.targetHandle
+        );
+      if (exists) {
+        return;
+      }
       const newEdge = {
-        id: `${connection.source}-${connection.target}`,
+        id: `${connection.source}-${connection.sourceHandle || 'default'}-${connection.target}-${connection.targetHandle || 'default'}`,
         source: connection.source,
         target: connection.target,
+        sourceHandle: connection.sourceHandle,
+        targetHandle: connection.targetHandle,
       };
       setRfEdges((eds) => addEdge(connection, eds));
       addConnection(newEdge);
@@ -106,7 +129,6 @@ export const PlaygroundCanvas = ({ onNodeSelect, onArchitectureChange }) => {
   }, [onNodesChange, updateNode]);
 
   const onNodeClick = (event, node) => {
-    console.log('onNodeClick triggered:', { nodeId: node.id, node });
     setSelectedNodeId(node.id);
     onNodeSelect?.(node);
   };
@@ -173,20 +195,83 @@ export const PlaygroundCanvas = ({ onNodeSelect, onArchitectureChange }) => {
       {/* Toolbar */}
       <div className="bg-muted/50 border-b border-border p-4">
         <div className="flex items-center gap-2 flex-wrap">
-          <button
-            type="button"
-            onClick={() => setServiceMenuOpen((open) => !open)}
-            aria-expanded={serviceMenuOpen}
-            aria-controls="service-picker"
-            className="inline-flex items-center gap-2 rounded-md bg-primary px-3 py-2 text-sm text-primary-foreground transition hover:bg-primary/90"
-          >
-            Add Service
-            {serviceMenuOpen ? (
-              <ChevronUp className="h-4 w-4" />
-            ) : (
-              <ChevronDown className="h-4 w-4" />
+          <div className="relative">
+            <button
+              type="button"
+              onClick={() => setServiceMenuOpen((open) => !open)}
+              aria-expanded={serviceMenuOpen}
+              aria-controls="service-picker"
+              className="inline-flex items-center gap-2 rounded-md bg-primary px-3 py-2 text-sm text-primary-foreground transition hover:bg-primary/90"
+            >
+              Add Service
+              {serviceMenuOpen ? (
+                <ChevronUp className="h-4 w-4" />
+              ) : (
+                <ChevronDown className="h-4 w-4" />
+              )}
+            </button>
+
+            {serviceMenuOpen && (
+              <div
+                id="service-picker"
+                className="absolute left-0 top-full z-30 mt-2 space-y-3 rounded-lg border border-border bg-card p-3 shadow-xl"
+                style={{ width: 'min(28rem, calc(100vw - 2rem))' }}
+              >
+                <div className="flex min-w-0 gap-2">
+                  <label className="relative block min-w-0 flex-1">
+                    <Search aria-hidden="true" className="pointer-events-none absolute left-3 top-1/2 z-10 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                    <input
+                      type="search"
+                      value={serviceSearch}
+                      onChange={(event) => setServiceSearch(event.target.value)}
+                      placeholder="Search services"
+                      aria-label="Search AWS services"
+                      className="sa-input"
+                      style={{ paddingLeft: '2.5rem' }}
+                    />
+                  </label>
+                  <label className="sr-only" htmlFor="service-category">
+                    Filter services by category
+                  </label>
+                  <select
+                    id="service-category"
+                    value={serviceCategory}
+                    onChange={(event) => setServiceCategory(event.target.value)}
+                    className="w-32 shrink-0 rounded-md border border-input bg-background px-2 text-xs text-foreground outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/40"
+                  >
+                    {['All', ...new Set(SERVICES.map((service) => service.category))].map(
+                      (category) => (
+                        <option key={category} value={category}>
+                          {category === 'All' ? 'All categories' : category}
+                        </option>
+                      )
+                    )}
+                  </select>
+                </div>
+                <div className="grid max-h-64 grid-cols-2 gap-2 overflow-y-auto">
+                  {visibleServices.map((service) => (
+                    <button
+                      key={service.type}
+                      type="button"
+                      onClick={() => handleAddNode(service.type)}
+                      className="flex h-9 min-w-0 items-center justify-between gap-2 rounded-md border border-primary/70 bg-primary px-2.5 text-left text-xs font-medium text-primary-foreground transition hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                      title={`Add ${service.label}`}
+                    >
+                      <span className="truncate">+ {service.label}</span>
+                      <span className="shrink-0 text-[10px] text-primary-foreground/75">
+                        {service.category}
+                      </span>
+                    </button>
+                  ))}
+                  {visibleServices.length === 0 && (
+                    <p className="col-span-2 py-3 text-center text-sm text-muted-foreground">
+                      No services match that search.
+                    </p>
+                  )}
+                </div>
+              </div>
             )}
-          </button>
+          </div>
 
           {/* Action buttons on the right */}
           <div className="flex-1" />
@@ -210,66 +295,6 @@ export const PlaygroundCanvas = ({ onNodeSelect, onArchitectureChange }) => {
             </button>
           </div>
         </div>
-
-        {serviceMenuOpen && (
-          <div id="service-picker" className="mt-3 space-y-3">
-            <div className="flex flex-col gap-2 sm:flex-row">
-              <label className="relative min-w-0 flex-1">
-                <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                <input
-                  type="search"
-                  value={serviceSearch}
-                  onChange={(event) => setServiceSearch(event.target.value)}
-                  placeholder="Search AWS services"
-                  aria-label="Search AWS services"
-                  className="sa-input py-2 pl-9"
-                />
-              </label>
-              <label className="sr-only" htmlFor="service-category">
-                Filter services by category
-              </label>
-              <select
-                id="service-category"
-                value={serviceCategory}
-                onChange={(event) => setServiceCategory(event.target.value)}
-                className="rounded-md border border-input bg-background px-3 py-2 text-sm text-foreground outline-none focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/40"
-              >
-                {['All', ...new Set(SERVICES.map((service) => service.category))].map(
-                  (category) => (
-                    <option key={category} value={category}>
-                      {category === 'All' ? 'All categories' : category}
-                    </option>
-                  )
-                )}
-              </select>
-            </div>
-            <div className="grid max-h-36 grid-cols-2 gap-2 overflow-y-auto sm:grid-cols-3 lg:grid-cols-4">
-              {visibleServices.map((service) => (
-                <button
-                  key={service.type}
-                  type="button"
-                  onClick={() => {
-                    handleAddNode(service.type);
-                    setServiceMenuOpen(false);
-                    setServiceSearch('');
-                    setServiceCategory('All');
-                  }}
-                  className={`rounded-md px-3 py-2 text-left text-sm text-white transition ${service.color}`}
-                >
-                  + {service.label}
-                  <span className="ml-2 text-xs text-white/75">
-                    {service.category}
-                  </span>
-                </button>
-              ))}
-              {visibleServices.length === 0 && (
-                <p className="col-span-full py-3 text-center text-sm text-muted-foreground">
-                  No services match that search.
-                </p>
-              )}
-            </div>
-          </div>
-        )}
       </div>
 
       {/* Canvas */}
@@ -282,6 +307,7 @@ export const PlaygroundCanvas = ({ onNodeSelect, onArchitectureChange }) => {
           onConnect={onConnect}
           onNodeClick={onNodeClick}
           nodeTypes={nodeTypesConfig}
+          connectionMode={ConnectionMode.Loose}
           fitView
         >
           <Background />

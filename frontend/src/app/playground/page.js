@@ -1,6 +1,6 @@
 'use client';
 import { useState, useEffect, useMemo, useRef } from 'react';
-import { useSearchParams } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 
 import {
@@ -11,6 +11,10 @@ import {
   AlertCircle,
   Info,
   Sparkles,
+  FilePlus2,
+  FolderOpen,
+  Save,
+  FileText,
 } from 'lucide-react';
 
 import { useLearningModules } from '@/hooks/useLearningModules';
@@ -19,7 +23,15 @@ import {
   useArchitectureStore,
   usePricingStore,
   useLearningStore,
+  useServiceConfigStore,
+  getServiceConfigs,
 } from '@/store';
+import {
+  createArchitectureDocument,
+  createCalculationSnapshot,
+  getArchitectureDocument,
+  updateArchitectureDocument,
+} from '@/api/client';
 
 import { validateModuleArchitecture } from '@/lib/architectureValidation';
 
@@ -41,6 +53,22 @@ import { RDSConfigPanel } from '@/components/services/RDSConfigPanel';
 
 import { ArchitectChatbot } from '@/components/chatbot';
 import { MermaidArchitectureDiagram } from '@/components/playground/MermaidArchitectureDiagram';
+
+const DOCUMENT_CALCULATION_OPTIONS = {
+  currency: 'USD',
+  period: 'monthly',
+  free_tier: 'as configured per service',
+};
+
+const currentDocumentSignature = (title) => {
+  const { nodes, connections } = useArchitectureStore.getState();
+  return JSON.stringify({
+    title,
+    diagram_data: { nodes, connections },
+    service_configs: getServiceConfigs(),
+    calculation_options: DOCUMENT_CALCULATION_OPTIONS,
+  });
+};
 
 function ModuleInstructions({
   module,
@@ -269,12 +297,16 @@ import { ThemeToggle } from '@/components/theme/ThemeToggle';
 
 export default function PlaygroundPage() {
   const searchParams = useSearchParams();
+  const router = useRouter();
 
   // ============================================================
   // MODULE CONTEXT
   // ============================================================
 
   const moduleId = searchParams.get('module');
+  const requestedDocumentId = searchParams.get('document');
+  const isNewDocument = searchParams.get('newDocument') === 'true';
+  const isDocumentWorkflow = !moduleId && (isNewDocument || Boolean(requestedDocumentId));
   const {
     modules: learningModules,
     isLoading: areModulesLoading,
@@ -297,6 +329,16 @@ export default function PlaygroundPage() {
   const architectureConnections = useArchitectureStore(
     (state) => state.connections
   );
+  const serviceConfigState = useServiceConfigStore((state) => state);
+  const serviceConfigs = useMemo(
+    () =>
+      Object.fromEntries(
+        Object.entries(serviceConfigState).filter(
+          ([key, value]) => key.endsWith('Config') && value && typeof value === 'object'
+        )
+      ),
+    [serviceConfigState]
+  );
 
   // ============================================================
   // LOCAL STATE
@@ -312,6 +354,16 @@ export default function PlaygroundPage() {
 
   const [validationResult, setValidationResult] =
     useState(null);
+  const [documentTitle, setDocumentTitle] = useState('Untitled architecture');
+  const [documentId, setDocumentId] = useState(null);
+  const [documentReady, setDocumentReady] = useState(false);
+  const [documentSaving, setDocumentSaving] = useState(false);
+  const [documentDirty, setDocumentDirty] = useState(false);
+  const [documentError, setDocumentError] = useState('');
+  const [latestSnapshot, setLatestSnapshot] = useState(null);
+  const [documentLoadAttempt, setDocumentLoadAttempt] = useState(0);
+  const loadedDocumentKey = useRef(null);
+  const savedDocumentSignature = useRef(null);
   const [instructionsPanelWidth, setInstructionsPanelWidth] = useState(320);
   const [isResizingInstructions, setIsResizingInstructions] = useState(false);
   const mainContentRef = useRef(null);
@@ -348,6 +400,81 @@ export default function PlaygroundPage() {
       window.removeEventListener('pointerup', handlePointerUp);
     };
   }, [isResizingInstructions]);
+
+  useEffect(() => {
+    if (!isDocumentWorkflow) return undefined;
+
+    const documentKey = requestedDocumentId ? `document:${requestedDocumentId}` : 'new';
+    if (loadedDocumentKey.current === documentKey) return undefined;
+
+    let active = true;
+    setDocumentReady(false);
+    setDocumentError('');
+    setLatestSnapshot(null);
+
+    const prepareBlankDocument = () => {
+      useArchitectureStore.getState().clearArchitecture();
+      useServiceConfigStore.getState().resetServiceConfigs();
+      usePricingStore.getState().reset();
+      setDocumentId(null);
+      setDocumentTitle('Untitled architecture');
+      savedDocumentSignature.current = currentDocumentSignature('Untitled architecture');
+      loadedDocumentKey.current = 'new';
+      setDocumentReady(true);
+    };
+
+    if (isNewDocument || !requestedDocumentId) {
+      prepareBlankDocument();
+    } else {
+      getArchitectureDocument(requestedDocumentId)
+        .then((document) => {
+          if (!active) return;
+          useArchitectureStore.getState().loadArchitecture(document.diagram_data || {});
+          useServiceConfigStore.getState().loadServiceConfigs(document.service_configs || {});
+          usePricingStore.getState().reset();
+          setDocumentId(document.id);
+          setDocumentTitle(document.title);
+          setLatestSnapshot(document.snapshots?.[document.snapshots.length - 1] || null);
+          savedDocumentSignature.current = currentDocumentSignature(document.title);
+          loadedDocumentKey.current = documentKey;
+          setDocumentReady(true);
+        })
+        .catch((error) => {
+          if (!active) return;
+          setDocumentError(
+            error.response?.data?.detail || error.message || 'Could not load this document.'
+          );
+        });
+    }
+
+    return () => {
+      active = false;
+    };
+  }, [isDocumentWorkflow, isNewDocument, requestedDocumentId, documentLoadAttempt]);
+
+  useEffect(() => {
+    if (!isDocumentWorkflow || !documentReady) return;
+    setDocumentDirty(
+      savedDocumentSignature.current !== currentDocumentSignature(documentTitle)
+    );
+  }, [
+    isDocumentWorkflow,
+    documentReady,
+    documentTitle,
+    architectureNodes,
+    architectureConnections,
+    serviceConfigs,
+  ]);
+
+  useEffect(() => {
+    if (!isDocumentWorkflow || !documentDirty) return undefined;
+    const warnBeforeLeaving = (event) => {
+      event.preventDefault();
+      event.returnValue = '';
+    };
+    window.addEventListener('beforeunload', warnBeforeLeaving);
+    return () => window.removeEventListener('beforeunload', warnBeforeLeaving);
+  }, [isDocumentWorkflow, documentDirty]);
 
   const resizeInstructionsPanel = (direction) => {
     const containerWidth = mainContentRef.current?.getBoundingClientRect().width;
@@ -670,6 +797,140 @@ export default function PlaygroundPage() {
     });
   };
 
+  const getDocumentPayload = (title = documentTitle) => {
+    const { nodes, connections } = useArchitectureStore.getState();
+    return {
+      title: title.trim(),
+      diagram_data: { nodes, connections },
+      service_configs: getServiceConfigs(),
+      calculation_options: DOCUMENT_CALCULATION_OPTIONS,
+    };
+  };
+
+  const handleSaveDocument = async () => {
+    const payload = getDocumentPayload();
+    if (!payload.title) {
+      setDocumentError('Give this architecture a name before saving.');
+      return null;
+    }
+
+    setDocumentSaving(true);
+    setDocumentError('');
+    try {
+      const savedDocument = documentId
+        ? await updateArchitectureDocument(documentId, payload)
+        : await createArchitectureDocument(payload);
+      setDocumentId(savedDocument.id);
+      setDocumentTitle(savedDocument.title);
+      savedDocumentSignature.current = currentDocumentSignature(savedDocument.title);
+      loadedDocumentKey.current = `document:${savedDocument.id}`;
+      setDocumentDirty(false);
+      router.replace(`/playground?document=${encodeURIComponent(savedDocument.id)}`);
+      return savedDocument;
+    } catch (error) {
+      setDocumentError(
+        error.response?.data?.detail || error.message || 'Could not save this document.'
+      );
+      return null;
+    } finally {
+      setDocumentSaving(false);
+    }
+  };
+
+  const handleSaveCalculationSnapshot = async () => {
+    if (architectureNodes.length === 0) {
+      setDocumentError('Add at least one service to the canvas before saving a report.');
+      return;
+    }
+    const currentPricing = usePricingStore.getState();
+    const costKeyByService = {
+      api_gateway: 'apiGatewayCost',
+      lambda: 'lambdaCost',
+      s3: 's3Cost',
+      cognito: 'cognitoCost',
+      dynamodb: 'dynamoDBCost',
+      elb: 'elbCost',
+      elastic_beanstalk: 'elasticBeanstalkCost',
+      cloudwatch: 'cloudWatchCost',
+      cloudfront: 'cloudFrontCost',
+      elasticache: 'elastiCacheCost',
+      sqs: 'sqsCost',
+      ec2: 'ec2Cost',
+      rds: 'rdsCost',
+    };
+    const usedServices = [
+      ...new Set(
+        architectureNodes
+          .map((node) => node.serviceType || node.service_type || node.type)
+          .filter(Boolean)
+      ),
+    ];
+    const missingCalculations = usedServices.filter(
+      (service) => !currentPricing[costKeyByService[service]]?.breakdown
+    );
+    if (missingCalculations.length > 0) {
+      setDocumentError(
+        `Calculate costs for each service on the canvas before saving a report. Still needed: ${missingCalculations.join(', ')}.`
+      );
+      return;
+    }
+    const serviceCosts = Object.fromEntries(
+      usedServices.map((service) => [costKeyByService[service], currentPricing[costKeyByService[service]]])
+    );
+    const snapshotTotal = Object.values(serviceCosts).reduce(
+      (sum, result) => sum + (result?.breakdown?.total_cost || 0),
+      0
+    );
+
+    setDocumentError('');
+    const architectureSnapshot = getDocumentPayload();
+    const savedDocument = !documentId || documentDirty
+      ? await handleSaveDocument()
+      : { id: documentId };
+    if (!savedDocument) return;
+
+    try {
+      const snapshot = await createCalculationSnapshot(savedDocument.id, {
+        total_cost: snapshotTotal,
+        service_costs: serviceCosts,
+        architecture_snapshot: {
+          title: architectureSnapshot.title,
+          diagram_data: architectureSnapshot.diagram_data,
+          service_configs: architectureSnapshot.service_configs,
+        },
+        calculation_options: DOCUMENT_CALCULATION_OPTIONS,
+        pricing_basis: 'SystemArcht pricing data and calculator results available at calculation time. Monthly USD estimate; AWS prices may have changed since this snapshot.',
+      });
+      setLatestSnapshot(snapshot);
+    } catch (error) {
+      setDocumentError(
+        error.response?.data?.detail || error.message || 'Could not save this calculation snapshot.'
+      );
+    }
+  };
+
+  const handleNewDocument = () => {
+    if (documentDirty && !window.confirm('Discard your unsaved changes and start a new document?')) {
+      return;
+    }
+    useArchitectureStore.getState().clearArchitecture();
+    useServiceConfigStore.getState().resetServiceConfigs();
+    usePricingStore.getState().reset();
+    setDocumentId(null);
+    setDocumentTitle('Untitled architecture');
+    setLatestSnapshot(null);
+    savedDocumentSignature.current = currentDocumentSignature('Untitled architecture');
+    loadedDocumentKey.current = 'new';
+    setDocumentReady(true);
+    router.push('/playground?newDocument=true');
+  };
+
+  const confirmUnsavedNavigation = (event) => {
+    if (documentDirty && !window.confirm('Leave this document without saving your changes?')) {
+      event.preventDefault();
+    }
+  };
+
   // ============================================================
   // UI
   // ============================================================
@@ -681,28 +942,39 @@ export default function PlaygroundPage() {
           HEADER
       ======================================================= */}
 
-      <div className="bg-background border-b border-border p-3 md:p-4 flex flex-wrap items-center justify-between gap-3">
+      <div className={`bg-background border-b border-border p-3 md:p-4 flex gap-3 ${
+        isDocumentWorkflow
+          ? 'flex-col items-stretch'
+          : 'flex-wrap items-center justify-between'
+      }`}>
 
         {/* LEFT */}
 
-        <div className="flex items-center gap-4">
+        <div className={`flex items-center gap-4 ${isDocumentWorkflow ? 'min-w-0 flex-wrap justify-between' : ''}`}>
 
           <Link
-            href={module ? `/learning/${module.id}` : '/learning'}
+            href={module ? `/learning/${module.id}` : isDocumentWorkflow ? '/documents' : '/learning'}
+            onClick={isDocumentWorkflow ? confirmUnsavedNavigation : undefined}
             className="flex items-center gap-1 text-muted-foreground hover:text-foreground"
           >
             <ChevronLeft className="w-5 h-5" />
-            <span>{module ? 'Back to Module' : 'Back to Learning'}</span>
+            <span>{module ? 'Back to Module' : isDocumentWorkflow ? 'My Documents' : 'Back to Learning'}</span>
           </Link>
 
           <div>
 
             <h1 className="text-2xl font-bold text-foreground">
-              Architecture Playground
+              {isDocumentWorkflow ? 'Architecture Document' : 'Architecture Playground'}
             </h1>
 
             <p className="text-sm text-muted-foreground">
-              Design and simulate AWS architectures
+              {isDocumentWorkflow
+                ? documentDirty
+                  ? 'Unsaved changes'
+                  : documentId
+                    ? 'All changes saved'
+                    : 'New document · not saved yet'
+                : 'Design and simulate AWS architectures'}
             </p>
 
             {module && (
@@ -714,11 +986,83 @@ export default function PlaygroundPage() {
 
           </div>
 
+          {isDocumentWorkflow && (
+            <div className="ml-auto">
+              <ThemeToggle />
+            </div>
+          )}
+
         </div>
 
         {/* RIGHT */}
 
-        <div className="flex items-center gap-3">
+        <div className={`flex flex-wrap gap-2 ${
+          isDocumentWorkflow
+            ? 'w-full flex-col items-stretch sm:flex-row sm:items-center'
+            : 'items-center justify-end gap-3'
+        }`}>
+
+          {isDocumentWorkflow && (
+            <>
+              <div className="flex min-w-0 flex-1 gap-2">
+                <input
+                  aria-label="Architecture document name"
+                  value={documentTitle}
+                  onChange={(event) => setDocumentTitle(event.target.value)}
+                  disabled={!documentReady}
+                  maxLength={200}
+                  className="h-10 min-w-0 flex-1 rounded-lg border border-border bg-card px-3 text-sm text-foreground disabled:opacity-50"
+                  placeholder="Architecture name"
+                />
+                <button
+                  type="button"
+                  onClick={handleSaveDocument}
+                  disabled={!documentReady || documentSaving || (!documentDirty && Boolean(documentId))}
+                  className="inline-flex h-10 shrink-0 items-center gap-2 rounded-lg bg-primary px-3 text-sm font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
+                >
+                  <Save className="size-4" />
+                  {documentSaving ? 'Saving…' : documentId ? 'Save' : 'Save document'}
+                </button>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                <button
+                  type="button"
+                  onClick={handleSaveCalculationSnapshot}
+                  disabled={!documentReady || documentSaving}
+                  className="inline-flex h-10 items-center gap-2 rounded-lg border border-border bg-card px-3 text-sm font-medium hover:bg-muted disabled:opacity-50"
+                >
+                  <FileText className="size-4" />
+                  Save report snapshot
+                </button>
+                {latestSnapshot && documentId && (
+                  <Link
+                    href={`/documents/${encodeURIComponent(documentId)}/report?snapshot=${encodeURIComponent(latestSnapshot.id)}`}
+                    onClick={confirmUnsavedNavigation}
+                    className="inline-flex h-10 items-center gap-2 rounded-lg border border-border bg-card px-3 text-sm font-medium hover:bg-muted"
+                  >
+                    <FileText className="size-4" />
+                    Print report
+                  </Link>
+                )}
+                <button
+                  type="button"
+                  onClick={handleNewDocument}
+                  className="inline-flex h-10 items-center gap-2 rounded-lg border border-border bg-card px-3 text-sm font-medium hover:bg-muted"
+                >
+                  <FilePlus2 className="size-4" />
+                  New
+                </button>
+                <Link
+                  href="/documents"
+                  onClick={confirmUnsavedNavigation}
+                  className="inline-flex h-10 items-center gap-2 rounded-lg border border-border bg-card px-3 text-sm font-medium hover:bg-muted"
+                >
+                  <FolderOpen className="size-4" />
+                  My documents
+                </Link>
+              </div>
+            </>
+          )}
 
           {/* VALIDATE */}
 
@@ -748,7 +1092,7 @@ export default function PlaygroundPage() {
           )}
 
           {/* AI ARCHITECT */}
-          <Link href="/ai-architect">
+          {!isDocumentWorkflow && <Link href="/ai-architect">
             <button
               className="flex items-center gap-1.5 px-3.5 py-2 rounded-lg font-semibold text-sm bg-primary hover:bg-primary/90 text-primary-foreground shadow-xs transition-colors"
               title="Design new architecture with AI"
@@ -756,11 +1100,11 @@ export default function PlaygroundPage() {
               <Sparkles className="w-4 h-4 fill-primary-foreground" />
               <span>AI Architect</span>
             </button>
-          </Link>
+          </Link>}
 
           {/* ARCHBOT */}
 
-          <button
+          {!isDocumentWorkflow && <button
             onClick={handleChatbotToggle}
             className={`
               flex items-center gap-2
@@ -806,9 +1150,9 @@ export default function PlaygroundPage() {
               </>
             )}
 
-          </button>
+          </button>}
 
-          <ThemeToggle />
+          {!isDocumentWorkflow && <ThemeToggle />}
 
         </div>
 
@@ -824,6 +1168,15 @@ export default function PlaygroundPage() {
           module ? 'flex-col md:flex-row' : ''
         }`}
       >
+
+        {isDocumentWorkflow && documentReady && documentError && (
+          <div role="alert" className="absolute left-1/2 top-20 z-20 max-w-xl -translate-x-1/2 rounded-lg border border-destructive/30 bg-card px-4 py-3 text-sm text-destructive shadow-lg">
+            {documentError}
+            <button type="button" onClick={() => setDocumentError('')} className="ml-3 font-semibold underline">
+              Dismiss
+            </button>
+          </div>
+        )}
 
         {module && (
           <ModuleInstructions
@@ -869,10 +1222,32 @@ export default function PlaygroundPage() {
         {/* PLAYGROUND */}
 
         <div className="flex-1 flex flex-col min-w-0 min-h-0">
-          <PlaygroundCanvas
-            onNodeSelect={handleNodeSelect}
-            onArchitectureChange={handleArchitectureChange}
-          />
+          {isDocumentWorkflow && !documentReady ? (
+            <div role={documentError ? 'alert' : 'status'} className="flex h-full items-center justify-center bg-background p-6 text-center text-sm text-muted-foreground">
+              {documentError ? (
+                <div>
+                  <p className="text-destructive">{documentError}</p>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      loadedDocumentKey.current = null;
+                      setDocumentError('');
+                      setDocumentReady(false);
+                      setDocumentLoadAttempt((attempt) => attempt + 1);
+                    }}
+                    className="mt-3 rounded-md border border-border px-3 py-2 text-foreground hover:bg-muted"
+                  >
+                    Try loading again
+                  </button>
+                </div>
+              ) : 'Loading architecture document…'}
+            </div>
+          ) : (
+            <PlaygroundCanvas
+              onNodeSelect={handleNodeSelect}
+              onArchitectureChange={handleArchitectureChange}
+            />
+          )}
         </div>
 
         {/* CONFIG PANEL */}
