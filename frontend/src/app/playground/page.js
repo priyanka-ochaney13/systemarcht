@@ -13,7 +13,7 @@ import {
   Sparkles,
 } from 'lucide-react';
 
-import { learningModules } from '@/lib/learningModules';
+import { useLearningModules } from '@/hooks/useLearningModules';
 
 import {
   useArchitectureStore,
@@ -275,7 +275,12 @@ export default function PlaygroundPage() {
   // ============================================================
 
   const moduleId = searchParams.get('module');
-
+  const {
+    modules: learningModules,
+    isLoading: areModulesLoading,
+    error: modulesError,
+    retry: retryModules,
+  } = useLearningModules(Boolean(moduleId));
   const module = learningModules.find(
     (item) => item.id === moduleId
   );
@@ -578,6 +583,39 @@ export default function PlaygroundPage() {
       sourceService
     )} → ${getServiceName(targetService)}`;
   };
+
+  if (moduleId && (areModulesLoading || modulesError || !module)) {
+    return (
+      <main className="flex min-h-screen items-center justify-center bg-background px-6 text-foreground">
+        <section className="max-w-xl rounded-xl border border-border bg-card p-6">
+          {areModulesLoading ? (
+            <p role="status" className="text-sm text-muted-foreground">
+              Loading learning module...
+            </p>
+          ) : modulesError ? (
+            <>
+              <h1 className="text-xl font-semibold">Learning module is unavailable</h1>
+              <p role="alert" className="mt-2 text-sm text-muted-foreground">
+                {modulesError}
+              </p>
+              <button
+                type="button"
+                onClick={retryModules}
+                className="mt-4 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground"
+              >
+                Try again
+              </button>
+            </>
+          ) : (
+            <h1 className="text-xl font-semibold">Learning module not found</h1>
+          )}
+          <Link href="/learning" className="mt-5 inline-flex text-sm text-primary hover:underline">
+            Back to learning modules
+          </Link>
+        </section>
+      </main>
+    );
+  }
 
   // ============================================================
   // VALIDATE ARCHITECTURE

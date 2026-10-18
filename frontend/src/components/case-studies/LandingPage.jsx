@@ -2,6 +2,7 @@ import React from 'react';
 import Link from 'next/link';
 import { Zap, Layout, Gauge, Lightbulb, ArrowRight, MessageSquare, BookOpen, Sparkles } from 'lucide-react';
 import { SiteHeader } from '@/components/layout/SiteHeader';
+import { CASE_STUDIES } from '@/lib/constants';
 
 const FEATURES = [
   {
@@ -25,24 +26,6 @@ const FEATURES = [
     description: 'Chat with your assistant for cost breakdowns and optimization tips for your architecture.',
     link: '/chatbot',
     highlight: true,
-  },
-];
-
-const PATTERNS = [
-  {
-    title: 'Event-Driven Microservices',
-    example: 'Netflix-like video streaming',
-    cost: '$13,020/month',
-  },
-  {
-    title: 'Real-Time Analytics',
-    example: 'Uber/Airbnb dashboards',
-    cost: '$86/month',
-  },
-  {
-    title: 'Photo Sharing Platform',
-    example: 'Instagram/Pinterest scale',
-    cost: '$253,000/month',
   },
 ];
 
@@ -112,17 +95,35 @@ export const LandingPage = () => {
 
       <section id="patterns" className="px-4 py-16">
         <div className="mx-auto max-w-6xl">
-          <h2 className="mb-8 text-center text-2xl font-semibold tracking-tight">Learn 3 core patterns</h2>
+          <h2 className="mb-3 text-center text-2xl font-semibold tracking-tight">Learn 3 core patterns</h2>
+          <p className="mb-8 text-center text-sm text-muted-foreground">
+            Explore real-world case studies and open each architecture in the interactive playground.
+          </p>
           <div className="space-y-3">
-            {PATTERNS.map((pattern) => (
-              <div key={pattern.title} className="flex flex-col gap-2 rounded-xl border border-border bg-card px-5 py-4 shadow-xs sm:flex-row sm:items-center sm:justify-between">
-                <div>
-                  <h3 className="text-base font-semibold">{pattern.title}</h3>
-                  <p className="text-sm text-muted-foreground">{pattern.example}</p>
+            {CASE_STUDIES.map((caseStudy) => (
+              <Link
+                key={caseStudy.id}
+                href={`/case-studies/${caseStudy.id}`}
+                className="group flex flex-col gap-3 rounded-xl border border-border bg-card px-5 py-4 shadow-xs transition-colors hover:border-primary/50 hover:bg-muted/40 sm:flex-row sm:items-center sm:justify-between"
+              >
+                <div className="min-w-0">
+                  <span className="mb-2 inline-flex rounded-full bg-accent px-2.5 py-1 text-xs font-semibold text-accent-foreground">
+                    {caseStudy.pattern}
+                  </span>
+                  <h3 className="text-base font-semibold group-hover:text-primary">{caseStudy.title}</h3>
+                  <p className="mt-1 text-sm text-muted-foreground">{caseStudy.description}</p>
                 </div>
-                <span className="text-sm font-semibold text-primary">Est: {pattern.cost}</span>
-              </div>
+                <span className="inline-flex shrink-0 items-center gap-2 text-sm font-semibold text-primary">
+                  Est: {caseStudy.cost}
+                  <ArrowRight className="size-4 transition-transform group-hover:translate-x-1" aria-hidden="true" />
+                </span>
+              </Link>
             ))}
+          </div>
+          <div className="mt-6 text-center">
+            <Link href="/case-studies" className="inline-flex items-center gap-1 text-sm font-medium text-primary hover:underline">
+              Browse all case studies <ArrowRight className="size-4" aria-hidden="true" />
+            </Link>
           </div>
         </div>
       </section>

@@ -14,6 +14,7 @@ SystemArcht is an AWS architecture planning and cost-estimation app. It combines
 
 - `backend/app/` contains the FastAPI routes, request/response models, and cost calculators.
 - `backend/ai/` contains the AI, retrieval, and architecture workflows.
+- Learning module content is read from the `learning_modules` collection in the database named by `MONGODB_USER_DB` on the cluster configured by `MONGODB_USER_URI`.
 - `backend/pricing_data/` contains JSON pricing sources and configuration fallbacks. Keep this directory until you have verified MongoDB-only operation and no longer need local fallback or migration sources.
 - The MongoDB database stores AWS SKU data in the `pricing` collection and application service settings in the `service_config` collection.
 - `frontend/src/` contains the Next.js UI, API client, and application state.
@@ -49,6 +50,9 @@ Edit `backend/.env` and set the values you need:
 ```dotenv
 MONGODB_URI=mongodb+srv://<username>:<password>@<cluster-host>/
 MONGODB_DB=capstone
+# Separate cluster used for learning modules and future user data
+MONGODB_USER_URI=mongodb+srv://<username>:<password>@<user-cluster-host>/
+MONGODB_USER_DB=capstoneuser
 PRICING_SOURCE=auto
 SERVICE_CONFIG_SOURCE=auto
 ```

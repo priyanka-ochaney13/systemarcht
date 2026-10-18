@@ -17,9 +17,9 @@ import {
   Bot,
 } from 'lucide-react';
 
-import { learningModules } from '@/lib/learningModules';
 import { useLearningStore } from '@/store';
 import { SiteHeader } from '@/components/common/SiteHeader';
+import { useLearningModules } from '@/hooks/useLearningModules';
 
 const EMPTY_QUIZ_ANSWERS = {};
 const EMPTY_MODULE_PROGRESS = {};
@@ -29,10 +29,16 @@ export default function LearningModulePage() {
   const router = useRouter();
 
   const moduleId = params?.moduleId;
+  const {
+    modules: learningModules,
+    isLoading,
+    error,
+    retry,
+  } = useLearningModules();
 
   const module = useMemo(
     () => learningModules.find((item) => item.id === moduleId),
-    [moduleId]
+    [learningModules, moduleId]
   );
 
   const progress = useLearningStore(
@@ -48,6 +54,41 @@ export default function LearningModulePage() {
       startModule(module.id);
     }
   }, [module?.id, startModule]);
+
+  if (isLoading || error) {
+    return (
+      <>
+        <SiteHeader />
+        <main className="min-h-screen bg-background px-6 py-10 text-foreground">
+          <div className="mx-auto max-w-4xl">
+            {isLoading ? (
+              <p role="status" className="text-sm text-muted-foreground">
+                Loading learning module...
+              </p>
+            ) : (
+              <section role="alert" className="max-w-xl rounded-xl border border-red-200 bg-red-50 p-5">
+                <h1 className="text-xl font-bold text-red-900">
+                  Learning module is unavailable
+                </h1>
+                <p className="mt-2 text-sm text-red-800">{error}</p>
+                <button
+                  type="button"
+                  onClick={retry}
+                  className="mt-4 rounded-lg bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-gray-700"
+                >
+                  Try again
+                </button>
+              </section>
+            )}
+            <Link href="/learning" className="mt-6 inline-flex items-center gap-2 text-primary">
+              <ArrowLeft className="h-4 w-4" />
+              Back to Learning
+            </Link>
+          </div>
+        </main>
+      </>
+    );
+  }
 
   if (!module) {
     return (

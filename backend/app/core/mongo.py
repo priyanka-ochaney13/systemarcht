@@ -11,11 +11,20 @@ load_dotenv()
 
 PRICING_COLLECTION = "pricing"
 SERVICE_CONFIG_COLLECTION = "service_config"
+LEARNING_MODULES_COLLECTION = "learning_modules"
 
 
 @lru_cache(maxsize=1)
 def _get_client() -> Optional[MongoClient]:
     uri = os.getenv("MONGODB_URI")
+    if not uri:
+        return None
+    return MongoClient(uri, serverSelectionTimeoutMS=5000)
+
+
+@lru_cache(maxsize=1)
+def _get_user_client() -> Optional[MongoClient]:
+    uri = os.getenv("MONGODB_USER_URI")
     if not uri:
         return None
     return MongoClient(uri, serverSelectionTimeoutMS=5000)
@@ -36,3 +45,12 @@ def get_pricing_collection() -> Optional[Collection]:
 def get_service_config_collection() -> Optional[Collection]:
     """Return the service configuration collection, or None without MongoDB URI."""
     return _get_collection(SERVICE_CONFIG_COLLECTION)
+
+
+def get_learning_modules_collection() -> Optional[Collection]:
+    """Return the learning modules collection from the user-data MongoDB cluster."""
+    client = _get_user_client()
+    if client is None:
+        return None
+    database_name = os.getenv("MONGODB_USER_DB", "capstoneuser")
+    return client[database_name][LEARNING_MODULES_COLLECTION]

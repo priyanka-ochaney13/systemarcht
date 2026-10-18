@@ -8,11 +8,12 @@ import {
   Circle,
 } from 'lucide-react';
 
-import { learningModules } from '@/lib/learningModules';
 import { useLearningStore } from '@/store';
 import { SiteHeader } from '@/components/common/SiteHeader';
+import { useLearningModules } from '@/hooks/useLearningModules';
 
 export default function LearningPage() {
+  const { modules: learningModules, isLoading, error, retry } = useLearningModules();
   const modulesProgress = useLearningStore((state) => state.modules);
   const activeModuleId = useLearningStore((state) => state.activeModuleId);
 
@@ -46,6 +47,52 @@ export default function LearningPage() {
     learningModules.find((module) => getProgress(module).percent < 100) ||
     storedActiveModule ||
     learningModules[0];
+
+  if (isLoading || error || learningModules.length === 0) {
+    return (
+      <>
+        <SiteHeader />
+        <main className="min-h-screen bg-white px-6 py-10 text-gray-900">
+          <div className="mx-auto max-w-6xl">
+            {isLoading ? (
+              <p role="status" className="text-sm text-gray-600">
+                Loading learning modules...
+              </p>
+            ) : error ? (
+              <section role="alert" className="max-w-xl rounded-xl border border-red-200 bg-red-50 p-5">
+                <h1 className="text-lg font-semibold text-red-900">
+                  Learning modules are unavailable
+                </h1>
+                <p className="mt-2 text-sm text-red-800">{error}</p>
+                <button
+                  type="button"
+                  onClick={retry}
+                  className="mt-4 rounded-lg bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-gray-700"
+                >
+                  Try again
+                </button>
+              </section>
+            ) : (
+              <section role="status" className="max-w-xl rounded-xl border border-gray-200 p-5">
+                <h1 className="text-lg font-semibold">No learning modules found</h1>
+                <p className="mt-2 text-sm text-gray-600">
+                  Seed the learning modules into the configured MongoDB database, then try again.
+                </p>
+                <button
+                  type="button"
+                  onClick={retry}
+                  className="mt-4 rounded-lg bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-gray-700"
+                >
+                  Try again
+                </button>
+              </section>
+            )}
+          </div>
+        </main>
+      </>
+    );
+  }
+
   const activeModuleProgress = getProgress(activeModule);
 
   return (

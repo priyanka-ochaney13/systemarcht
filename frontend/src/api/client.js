@@ -9,6 +9,11 @@ const apiClient = axios.create({
   },
 });
 
+export const getLearningModules = async ({ signal } = {}) => {
+  const response = await apiClient.get('/learning-modules', { signal });
+  return response.data;
+};
+
 // Pricing Calculator APIs
 export const calculateAPIGatewayCost = async (params) => {
   const response = await apiClient.post('/api-gateway/calculate', params);

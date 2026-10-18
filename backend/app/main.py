@@ -19,6 +19,7 @@ from app.routers.ai_chat import router as ai_chat_router
 from app.routers.ec2 import router as ec2_router
 from app.routers.rds import router as rds_router
 from app.routers.ai_architect import router as ai_architect_router
+from app.routers.learning_modules import router as learning_modules_router
 import logging
 
 logging.basicConfig(level=logging.INFO)
@@ -55,6 +56,7 @@ app.include_router(sqs_router)
 app.include_router(ai_architect_router)
 app.include_router(ec2_router)
 app.include_router(rds_router)
+app.include_router(learning_modules_router)
 
 @app.get("/")
 def root():
