@@ -4,6 +4,8 @@ import { CustomLoader } from "@/components/common/CustomLoader";
 import { ThemeProvider } from '@/components/theme/ThemeProvider';
 import { THEME_STORAGE_KEY } from '@/lib/theme';
 import { LearningProgressHydration } from "@/components/common/LearningProgressHydration";
+import { AuthProvider } from "@/hooks/useAuth";
+import AuthBoundary from "@/components/auth/AuthBoundary";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -46,10 +48,12 @@ export default function RootLayout({ children }) {
       </head>
       <body className="theme-transition flex min-h-full flex-col bg-background text-foreground">
         <ThemeProvider>
-          <LearningProgressHydration />
-        <Suspense fallback={<CustomLoader />}>
-            {children}
-          </Suspense>
+          <AuthProvider>
+            <LearningProgressHydration />
+            <Suspense fallback={<CustomLoader />}>
+              <AuthBoundary>{children}</AuthBoundary>
+            </Suspense>
+          </AuthProvider>
         </ThemeProvider>
       </body>
     </html>

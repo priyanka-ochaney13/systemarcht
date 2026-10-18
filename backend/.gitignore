@@ -50,3 +50,5 @@ myenv
 # Logs
 *.log
 logs/
+
+firebase-service-account.json

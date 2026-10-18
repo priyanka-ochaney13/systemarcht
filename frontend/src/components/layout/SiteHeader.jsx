@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Menu, MessageSquare, Sparkles, X, Zap } from 'lucide-react';
 import { ThemeToggle } from '@/components/theme/ThemeToggle';
+import AuthMenu from '@/components/auth/AuthMenu';
 import { cn } from '@/lib/utils';
 
 const NAV_LINKS = [
@@ -67,6 +68,7 @@ export function SiteHeader({ showLandingAnchors = false }) {
 
         <div className="flex items-center gap-2">
           <ThemeToggle />
+          <AuthMenu />
           <button
             type="button"
             className="inline-flex size-9 items-center justify-center rounded-md border border-border bg-card text-foreground md:hidden"

@@ -1,5 +1,5 @@
 """FastAPI main application"""
-from fastapi import FastAPI
+from fastapi import Depends, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.routers import api_gateway
 from app.routers.lambda_function import router as lambda_router
@@ -21,13 +21,19 @@ from app.routers.rds import router as rds_router
 from app.routers.ai_architect import router as ai_architect_router
 from app.routers.learning_modules import router as learning_modules_router
 import logging
+from app.routers import auth
+from app.services.firebase_auth import get_current_user
 
 logging.basicConfig(level=logging.INFO)
 
 app = FastAPI(
     title="AWS Pricing Calculator",
     description="Multi-service AWS pricing calculator",
-    version="1.0.0"
+    version="1.0.0",
+    dependencies=[Depends(get_current_user)],
+    docs_url=None,
+    redoc_url=None,
+    openapi_url=None,
 )
 
 app.add_middleware(
@@ -57,6 +63,8 @@ app.include_router(ai_architect_router)
 app.include_router(ec2_router)
 app.include_router(rds_router)
 app.include_router(learning_modules_router)
+
+app.include_router(auth.router, prefix="/api")
 
 @app.get("/")
 def root():

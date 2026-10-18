@@ -53,11 +53,14 @@ MONGODB_DB=capstone
 # Separate cluster used for learning modules and future user data
 MONGODB_USER_URI=mongodb+srv://<username>:<password>@<user-cluster-host>/
 MONGODB_USER_DB=capstoneuser
+FIREBASE_CREDENTIALS_PATH=firebase-service-account.json
 PRICING_SOURCE=auto
 SERVICE_CONFIG_SOURCE=auto
 ```
 
-Keep credentials private; do not commit `.env`. If you want to require MongoDB rather than allow JSON fallbacks, set both source settings to `mongo`:
+Keep credentials private; do not commit `.env` or `firebase-service-account.json`. The Firebase service-account file belongs in `backend/` by default; alternatively set `FIREBASE_CREDENTIALS_PATH` to its path. User profiles are stored in the database named by `MONGODB_USER_DB` on the cluster configured by `MONGODB_USER_URI`.
+
+If you want to require MongoDB rather than allow JSON fallbacks, set both source settings to `mongo`:
 
 ```dotenv
 PRICING_SOURCE=mongo
@@ -85,13 +88,16 @@ In a second PowerShell terminal:
 ```powershell
 cd frontend
 npm ci
+Copy-Item .env.example .env.local
 npm run dev
 ```
 
-Open <http://localhost:3000>. The frontend uses `http://localhost:8000/api` as its default API base URL. To use a different backend URL, set `NEXT_PUBLIC_API_URL` before starting the Next.js server, for example:
+Before starting, fill in the Firebase web app values in `frontend/.env.local` (`NEXT_PUBLIC_FIREBASE_API_KEY`, `NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN`, `NEXT_PUBLIC_FIREBASE_PROJECT_ID`, and `NEXT_PUBLIC_FIREBASE_APP_ID`) and enable Email/Password and Google providers in Firebase Authentication. These are public client configuration values; never put service-account credentials in the frontend. Only the frontend `/login` and `/signup` pages are public; the frontend gates all other pages. Every backend route, including `/`, `/health`, and profile routes, requires a verified Firebase ID token. Interactive API documentation is disabled. Profile edits can only change the signed-in user's own display name.
+
+Open <http://localhost:3000>. `NEXT_PUBLIC_API_URL` defaults to `http://localhost:8000`. To use a different backend URL, set `NEXT_PUBLIC_API_URL` before starting the Next.js server, for example:
 
 ```powershell
-$env:NEXT_PUBLIC_API_URL = "http://localhost:8000/api"
+$env:NEXT_PUBLIC_API_URL = "http://localhost:8000"
 npm run dev
 ```
 
@@ -113,6 +119,7 @@ Frontend setup in a separate terminal:
 ```bash
 cd frontend
 npm ci
+cp .env.example .env.local
 npm run dev
 ```
 

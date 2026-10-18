@@ -1,7 +1,4 @@
-import axios from 'axios';
-
-// NEXT_PUBLIC_API_URL is the server root, e.g. http://localhost:8000
-const SERVER = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+import { apiClient } from '@/api/client';
 
 /**
  * Runs the deterministic architecture cost calculator.
@@ -9,13 +6,7 @@ const SERVER = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
  * This remains the source of truth for all cost numbers.
  */
 export const analyzeArchitectureCost = async (payload) => {
-  const url = `${SERVER}/api/architecture/calculate`;
-  console.log('[ArchBot] POST', url);
-
-  const response = await axios.post(url, payload, {
-    headers: { 'Content-Type': 'application/json' },
-  });
-
+  const response = await apiClient.post('/architecture/calculate', payload);
   return response.data;
 };
 
@@ -37,21 +28,11 @@ export const chatAboutArchitecture = async ({
   costResult = null,
   history = [],
 }) => {
-  const url = `${SERVER}/api/ai/chat/architecture`;
-  console.log('[ArchBot] POST', url);
-
-  const response = await axios.post(
-    url,
-    {
-      message,
-      architecture_snapshot: architectureSnapshot,
-      cost_result: costResult,
-      history,
-    },
-    {
-      headers: { 'Content-Type': 'application/json' },
-    }
-  );
-
+  const response = await apiClient.post('/ai/chat/architecture', {
+    message,
+    architecture_snapshot: architectureSnapshot,
+    cost_result: costResult,
+    history,
+  });
   return response.data;
 };

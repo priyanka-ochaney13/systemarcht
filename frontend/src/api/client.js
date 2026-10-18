@@ -1,12 +1,25 @@
 import axios from 'axios';
+import { auth } from '@/lib/firebase';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api';
+const SERVER_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+const API_ROOT = `${SERVER_URL.replace(/\/+$/, '').replace(/\/api$/i, '')}/api`;
 
-const apiClient = axios.create({
-  baseURL: API_URL,
+export const apiClient = axios.create({
+  baseURL: API_ROOT,
   headers: {
     'Content-Type': 'application/json',
   },
+});
+
+apiClient.interceptors.request.use(async (config) => {
+  const firebaseUser = auth?.currentUser;
+  if (!firebaseUser) {
+    throw new Error('You must be signed in to access this service.');
+  }
+
+  const token = await firebaseUser.getIdToken();
+  config.headers.set('Authorization', `Bearer ${token}`);
+  return config;
 });
 
 export const getLearningModules = async ({ signal } = {}) => {

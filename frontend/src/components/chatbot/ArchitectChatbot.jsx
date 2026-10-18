@@ -134,7 +134,7 @@ export function ArchitectChatbot({ onClose, embedded = false }) {
       const detail = Array.isArray(rawDetail)
         ? rawDetail.map(e => `${e.loc?.join('.')} — ${e.msg}`).join(', ')
         : rawDetail;
-      const calledUrl = `${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api'}/architecture/calculate`;
+      const calledUrl = `${(process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000').replace(/\/+$/, '').replace(/\/api$/i, '')}/api/architecture/calculate`;
       const errorMsg = detail || err.message || 'Unknown error';
 
       let hint;

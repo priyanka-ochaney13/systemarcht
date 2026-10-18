@@ -12,6 +12,7 @@ load_dotenv()
 PRICING_COLLECTION = "pricing"
 SERVICE_CONFIG_COLLECTION = "service_config"
 LEARNING_MODULES_COLLECTION = "learning_modules"
+USER_PROFILES_COLLECTION = "users"
 
 
 @lru_cache(maxsize=1)
@@ -54,3 +55,12 @@ def get_learning_modules_collection() -> Optional[Collection]:
         return None
     database_name = os.getenv("MONGODB_USER_DB", "capstoneuser")
     return client[database_name][LEARNING_MODULES_COLLECTION]
+
+
+def get_user_profiles_collection() -> Optional[Collection]:
+    """Return the user profiles collection, or None when its database is unconfigured."""
+    client = _get_user_client()
+    database_name = os.getenv("MONGODB_USER_DB")
+    if client is None or not database_name:
+        return None
+    return client[database_name][USER_PROFILES_COLLECTION]
