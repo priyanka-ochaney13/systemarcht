@@ -22,7 +22,7 @@ This document defines the exact UI behavior and backend integration for the AWS 
    [1,000,000                                        ]
    users per month
    💡 Free: First 50,000 MAUs
-      Paid: $0.004/user/month
+      Paid: regional tiered rates from the Cognito pricing catalog
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
@@ -51,9 +51,9 @@ This document defines the exact UI behavior and backend integration for the AWS 
    [✓] Enable MFA
    
    MFA Type
-   (•) SMS MFA        $0.00248 per SMS
-   ( ) Email MFA      FREE (uses AWS SES)
-   ( ) Auth App       FREE (TOTP)
+   (•) SMS MFA        regional catalog rate per SMS
+   ( ) Email MFA      Not priced in Cognito catalog
+   ( ) Auth App       Regional catalog rate (TOTP)
 
    ────────────────────────────────────────────────
 
@@ -69,22 +69,22 @@ This document defines the exact UI behavior and backend integration for the AWS 
 
    [✓] Enable Advanced Security
    
-   Risk-Evaluated Logins per Month
+   Monthly Active Users with Advanced Security
    [100,000                                         ]
-   logins per month
-   Cost: $0.01 per login (first 1M free)
+   users per month
+   Billed per MAU at the selected region's catalog rate
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 🎨 ADDITIONAL FEATURES (Collapsible)
 
    [✓] Custom Domain
-       Cost: $0.50/month
+       Not priced by the current Cognito catalog
 
    ────────────────────────────────────────────────
 
    [✓] Email Customization (From Cognito)
-       Cost: $0.00003 per email
+       Not priced by the current Cognito catalog
        Monthly Emails: [50,000           ]
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -141,11 +141,10 @@ This document defines the exact UI behavior and backend integration for the AWS 
 - **Unit Display:** "users per month"
 - **Format:** Comma-separated thousands (1,000,000)
 - **Tooltip:** "Unique users who have authenticated in the month"
-- **Note:** "💡 Free: First 50,000 MAUs | Paid: $0.004/user/month"
+- **Note:** "💡 Free: First 50,000 MAUs | Paid: regional catalog tiers"
 - **Pricing:**
   - Free Tier: 50,000 MAUs/month
-  - Paid: $0.004 per MAU
-  - Formula: `max(0, mau - 50000) × $0.004`
+  - Paid rates and tier boundaries are loaded from the selected region's AWS catalog data.
 
 ---
 
@@ -199,9 +198,9 @@ This document defines the exact UI behavior and backend integration for the AWS 
 - **Options:**
   | Display | Value | Cost | Note |
   |---------|-------|------|------|
-  | SMS MFA | `sms` | $0.00248 per SMS | Most common |
-  | Email MFA | `email` | FREE | Uses AWS SES |
-  | Auth App | `totp` | FREE | TOTP/Authenticator |
+  | SMS MFA | `sms` | Regional catalog rate | Most common |
+  | Email MFA | `email` | Not in Cognito catalog | Requires another pricing source |
+  | Auth App | `totp` | Regional catalog rate | TOTP/Authenticator |
 - **Default:** SMS
 - **Backend Value:** Send selected type
 
@@ -227,19 +226,15 @@ This document defines the exact UI behavior and backend integration for the AWS 
 
 #### Sub-fields (when enabled):
 
-**7a. Risk-Evaluated Logins per Month**
-- **Label:** "Risk-Evaluated Logins per Month"
+**7a. Monthly Active Users with Advanced Security**
+- **Label:** "Monthly Active Users with Advanced Security"
 - **Type:** Number input
 - **Default:** 100,000
 - **Min:** 0
 - **Required:** No (if feature disabled)
-- **Unit Display:** "logins per month"
-- **Tooltip:** "Risk-evaluated login events trigger advanced security checks"
-- **Note:** "💡 First 1M evaluations FREE | Paid: $0.01/evaluation"
-- **Pricing:**
-  - Free Tier: 1,000,000 evaluations/month
-  - Paid: $0.01 per evaluation
-  - Formula: `max(0, evaluations - 1000000) × $0.01`
+- **Unit Display:** "users per month"
+- **Tooltip:** "Monthly active users charged for Advanced Security"
+- **Pricing:** Per-MAU rate from the selected region's AWS Cognito catalog. The catalog does not specify a separate one-million-evaluation free tier.
 
 ---
 
@@ -248,8 +243,8 @@ This document defines the exact UI behavior and backend integration for the AWS 
 - **Type:** Checkbox
 - **Default:** Unchecked (false)
 - **Required:** No
-- **Cost:** $0.50/month (flat)
-- **Note:** "Custom domain for hosted UI (e.g., auth.yourdomain.com)"
+- **Cost:** Not present in the current Cognito pricing catalog
+- **Note:** Enabling this option returns a pricing error until a supported pricing source is added.
 
 ---
 
@@ -258,7 +253,7 @@ This document defines the exact UI behavior and backend integration for the AWS 
 - **Type:** Checkbox + Number input
 - **Default:** Unchecked, 0 emails
 - **Required:** No
-- **Cost:** $0.00003 per email (SES rates)
+- **Cost:** Not present in the current Cognito pricing catalog
 
 #### Sub-field (when enabled):
 
@@ -269,11 +264,10 @@ This document defines the exact UI behavior and backend integration for the AWS 
 - **Min:** 0
 - **Unit Display:** "emails per month"
 - **Tooltip:** "Verification codes, password resets, welcome emails"
-- **Note:** "First email per user per day is FREE"
+- **Note:** Email customization is not priced by the current Cognito catalog.
 - **Pricing:**
   - Free: First email per user per day
-  - Paid: $0.00003 per additional email
-  - Simplified: Budget `emails_count × $0.00003`
+  - The current Cognito catalog does not provide email customization/SES rates.
 
 ---
 
@@ -281,68 +275,38 @@ This document defines the exact UI behavior and backend integration for the AWS 
 
 ### MAU Charges
 ```
-Free Tier: 50,000 users/month
-Rate: $0.004 per user/month
-
-Formula:
-  billable_mau = max(0, mau - 50000)
-  cost = billable_mau × $0.004
-
-Example:
-  1,000,000 MAU:
-  billable = 1,000,000 - 50,000 = 950,000
-  cost = 950,000 × $0.004 = $3,800/month
+The first 50,000 MAUs are free. Paid tier boundaries and rates come from the selected region's
+catalog entries. Apply each tier's rate only to the users within that tier.
 ```
 
 ### SMS MFA Charges
 ```
-Rate: $0.00248 per SMS
+Rate: selected-region Cognito catalog rate per SMS
 Assume: 1 SMS per MFA user per month average
 
 Formula:
-  annual_mau = mau (unique monthly users)
-  mfa_users = annual_mau × (mfa_percentage / 100)
+  mfa_users = mau × (mfa_percentage / 100)
   sms_sent = mfa_users × 12 / 12 = mfa_users per month
-  cost = sms_sent × $0.00248
-
-Example:
-  1,000,000 MAU, 30% with SMS MFA:
-  mfa_users = 1,000,000 × 0.30 = 300,000
-  cost = 300,000 × $0.00248 = $744/month
+  cost = sms_sent × regional_catalog_sms_rate
 ```
 
 ### Advanced Security Charges
 ```
-Free Tier: 1,000,000 evaluations/month
-Rate: $0.01 per evaluation
-
-Formula:
-  billable_evaluations = max(0, risk_evaluations - 1000000)
-  cost = billable_evaluations × $0.01
-
-Example:
-  2,000,000 risk-evaluated logins:
-  billable = 2,000,000 - 1,000,000 = 1,000,000
-  cost = 1,000,000 × $0.01 = $10,000/month
+The catalog prices Advanced Security per MAU. Use the number of MAUs with the feature enabled
+times the selected region's catalog rate. No separate evaluation free tier is defined in the
+catalog.
 ```
 
 ### Custom Domain Charges
 ```
-Price: Flat $0.50/month
-No calculations needed - add when enabled
+Not priced by the current Cognito catalog. Enabling this option must produce a clear pricing
+error rather than applying an assumed rate.
 ```
 
 ### Email Customization Charges
 ```
-Rate: $0.00003 per email (after first per user per day)
-Simplified: All emails charged
-
-Formula:
-  cost = total_monthly_emails × $0.00003
-
-Example:
-  50,000 emails/month:
-  cost = 50,000 × $0.00003 = $1.50/month
+Not priced by the current Cognito catalog. Enabling this option must produce a clear pricing
+error rather than applying an assumed SES rate.
 ```
 
 ---
@@ -366,10 +330,9 @@ POST /api/cognito/calculate
   "mfa_type": "sms",
   "mfa_percentage": 30,
   "advanced_security_enabled": true,
-  "risk_evaluated_logins": 100000,
-  "custom_domain_enabled": true,
-  "email_customization_enabled": true,
-  "monthly_emails": 50000
+  "advanced_security_mau": 100000,
+  "custom_domain_enabled": false,
+  "email_customization_enabled": false
 }
 ```
 
@@ -385,7 +348,7 @@ POST /api/cognito/calculate
 | `mfa_type` | string | No | `sms` | MFA type: sms, email, totp |
 | `mfa_percentage` | integer | No | 0 | % of users with MFA |
 | `advanced_security_enabled` | boolean | No | false | Enable advanced security |
-| `risk_evaluated_logins` | integer | No | 0 | Risk-evaluated logins |
+| `advanced_security_mau` | integer | No | 0 | Monthly active users using Advanced Security; cannot exceed `mau` |
 | `custom_domain_enabled` | boolean | No | false | Enable custom domain |
 | `email_customization_enabled` | boolean | No | false | Enable email customization |
 | `monthly_emails` | integer | No | 0 | Emails sent per month |
@@ -395,21 +358,22 @@ POST /api/cognito/calculate
 {
   "service": "cognito",
   "breakdown": {
-    "total_cost": 4555.50,
-    "mau_charge": 3800.00,
-    "sms_mfa_charge": 744.00,
-    "advanced_security_charge": 10.00,
-    "custom_domain_charge": 0.50,
-    "email_customization_charge": 1.50,
-    "free_tier_savings": 1050.00
+    "total_cost": 3155.115,
+    "mau_charge": 1.615,
+    "sms_mfa_charge": 1453.50,
+    "totp_mfa_charge": 0.00,
+    "advanced_security_charge": 2000.00,
+    "custom_domain_charge": 0.00,
+    "email_customization_charge": 0.00,
+    "free_tier_savings": 0.1275
   },
   "details": {
     "mau": 1000000,
     "billable_mau": 950000,
     "mfa_users": 300000,
-    "risk_evaluated_logins": 100000,
-    "billable_evaluations": 0,
-    "monthly_emails": 50000
+    "advanced_security_mau": 100000,
+    "billable_advanced_security_mau": 100000,
+    "monthly_emails": 0
   }
 }
 ```
@@ -419,20 +383,21 @@ POST /api/cognito/calculate
 {
   "service": "cognito",
   "breakdown": {
-    "total_cost": 0.50,
+    "total_cost": 0.00,
     "mau_charge": 0.00,
     "sms_mfa_charge": 0.00,
+    "totp_mfa_charge": 0.00,
     "advanced_security_charge": 0.00,
-    "custom_domain_charge": 0.50,
+    "custom_domain_charge": 0.00,
     "email_customization_charge": 0.00,
-    "free_tier_savings": 0.00
+    "free_tier_savings": 0.1275
   },
   "details": {
     "mau": 30000,
     "billable_mau": 0,
     "mfa_users": 0,
-    "risk_evaluated_logins": 0,
-    "billable_evaluations": 0,
+    "advanced_security_mau": 0,
+    "billable_advanced_security_mau": 0,
     "monthly_emails": 0
   }
 }
@@ -443,21 +408,22 @@ POST /api/cognito/calculate
 {
   "service": "cognito",
   "breakdown": {
-    "total_cost": 5600.00,
-    "mau_charge": 4800.00,
-    "sms_mfa_charge": 960.00,
+    "total_cost": 2282.20,
+    "mau_charge": 2.20,
+    "sms_mfa_charge": 2280.00,
+    "totp_mfa_charge": 0.00,
     "advanced_security_charge": 0.00,
-    "custom_domain_charge": 0.50,
-    "email_customization_charge": 39.50,
-    "free_tier_savings": 50000.00
+    "custom_domain_charge": 0.00,
+    "email_customization_charge": 0.00,
+    "free_tier_savings": 0.15
   },
   "details": {
     "mau": 1200000,
     "billable_mau": 1150000,
     "mfa_users": 400000,
-    "risk_evaluated_logins": 500000,
-    "billable_evaluations": 0,
-    "monthly_emails": 1315000
+    "advanced_security_mau": 0,
+    "billable_advanced_security_mau": 0,
+    "monthly_emails": 0
   }
 }
 ```
@@ -503,10 +469,10 @@ const validationRules = {
     type: "integer",
     error: "MFA percentage must be 0-100"
   },
-  risk_evaluated_logins: {
+  advanced_security_mau: {
     min: 0,
     type: "integer",
-    error: "Risk logins must be non-negative"
+    error: "Advanced Security MAU must be non-negative and cannot exceed total MAU"
   },
   monthly_emails: {
     min: 0,
@@ -521,9 +487,9 @@ const validationRules = {
    - Message: "💡 At this scale, consider AWS Organizations for volume discounts"
 
 2. **SMS MFA High Cost:** Show warning when `sms_cost > 5000`
-   - Message: "⚠️ SMS MFA is expensive at this scale. Consider email/app MFA"
+   - Message: "⚠️ SMS MFA is expensive at this scale. Consider TOTP MFA"
 
-3. **Advanced Security Large Volume:** Show info when `risk_evaluated_logins > 10000000`
+3. **Advanced Security Large Volume:** Show info when `advanced_security_mau > 10000000`
    - Message: "💡 Contact AWS for volume pricing on advanced security"
 
 ---
@@ -536,13 +502,13 @@ const validationRules = {
 3. Clear error state
 
 ### On Advanced Security Toggle
-1. Show/hide risk-evaluated logins input
+1. Show/hide Advanced Security MAU input
 2. Recalculate estimate if auto-calculate enabled
 3. Update cost breakdown
 
 ### On Custom Domain Toggle
-1. Add/remove $0.50 from total cost immediately (no backend call needed)
-2. Update UI without recalculating
+1. Explain that custom-domain pricing is not included in the Cognito catalog
+2. Display the backend pricing error if this option is enabled for a calculation
 
 ### On Feature Addition
 1. For MFA/Advanced Security: Auto-expand collapsible section

@@ -1,11 +1,20 @@
 """AWS Cognito specific models"""
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, Field, field_validator, model_validator
 from typing import Optional, Literal, List
 from app.models.base import BaseCalculateRequest, BaseCostBreakdown, BaseCalculateResponse
 
 
 class CognitoRequest(BaseCalculateRequest):
     """Cognito User Pools calculation request"""
+
+    @model_validator(mode="before")
+    @classmethod
+    def reject_login_count_for_security_pricing(cls, values):
+        if isinstance(values, dict) and "risk_evaluated_logins" in values:
+            raise ValueError(
+                "Use advanced_security_mau: Cognito catalog pricing is per MAU, not per login."
+            )
+        return values
     
     # Core MAU
     mau: int = Field(
@@ -57,10 +66,10 @@ class CognitoRequest(BaseCalculateRequest):
         description="Enable advanced security features"
     )
     
-    risk_evaluated_logins: int = Field(
+    advanced_security_mau: int = Field(
         default=0,
         ge=0,
-        description="Number of risk-evaluated logins per month"
+        description="Monthly active users billed for advanced security"
     )
     
     # Additional Features
@@ -85,6 +94,7 @@ class CognitoCostBreakdown(BaseCostBreakdown):
     """Cognito cost breakdown"""
     mau_charge: float = Field(..., description="MAU pricing charge")
     sms_mfa_charge: float = Field(default=0, description="SMS MFA charges")
+    totp_mfa_charge: float = Field(default=0, description="TOTP MFA charges")
     advanced_security_charge: float = Field(default=0, description="Advanced security charges")
     custom_domain_charge: float = Field(default=0, description="Custom domain charge")
     email_customization_charge: float = Field(default=0, description="Email customization charges")
@@ -96,8 +106,11 @@ class CognitoUsageDetails(BaseModel):
     mau: int = Field(..., description="Monthly Active Users")
     billable_mau: int = Field(..., description="MAU billable after free tier")
     mfa_users: int = Field(default=0, description="Users with MFA")
-    risk_evaluated_logins: int = Field(default=0, description="Risk-evaluated logins")
-    billable_evaluations: int = Field(default=0, description="Billable security evaluations")
+    advanced_security_mau: int = Field(default=0, description="MAU using advanced security")
+    billable_advanced_security_mau: int = Field(
+        default=0,
+        description="Billable MAU using advanced security"
+    )
     monthly_emails: int = Field(default=0, description="Monthly emails")
 
 

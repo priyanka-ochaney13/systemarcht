@@ -1,5 +1,4 @@
 """Cognito calculator"""
-from typing import Dict, Any
 from app.core.base_calculator import BaseCalculator
 from app.services.cognito_service.pricing import CognitoPricing
 from app.models.cognito import (
@@ -19,30 +18,42 @@ class CognitoCalculator(BaseCalculator):
     
     def calculate(self, request: CognitoRequest) -> CognitoResponse:
         """Main calculation method"""
-        
-        # Extract parameters
         mau = request.mau
-        signups = request.signups_per_month
-        signins = request.signins_per_month
-        token_refreshes = request.token_refreshes_per_month
+        region = request.region
         
         # Calculate MAU cost
-        mau_cost, billable_mau = self.pricing.calculate_mau_cost(mau)
+        mau_cost, billable_mau = self.pricing.calculate_mau_cost(mau, region)
         
-        # Calculate MFA cost (only SMS is charged)
+        # Calculate MFA cost using the selected region's catalog rate.
         sms_mfa_cost = 0
+        totp_mfa_cost = 0
         mfa_users = 0
-        if request.mfa_enabled and request.mfa_type == "sms":
-            sms_mfa_cost, mfa_users = self.pricing.calculate_sms_mfa_cost(
-                mau, request.mfa_percentage
-            )
+        if request.mfa_enabled:
+            if request.mfa_type == "sms":
+                sms_mfa_cost, mfa_users = self.pricing.calculate_sms_mfa_cost(
+                    mau, request.mfa_percentage, region
+                )
+            elif request.mfa_type == "totp":
+                totp_mfa_cost, mfa_users = self.pricing.calculate_totp_mfa_cost(
+                    mau, request.mfa_percentage, region
+                )
+            else:
+                raise ValueError(
+                    "Email MFA pricing is not present in the Cognito pricing catalog."
+                )
         
         # Calculate advanced security cost
         advanced_security_cost = 0
-        billable_evaluations = 0
+        billable_advanced_security_mau = 0
         if request.advanced_security_enabled:
-            advanced_security_cost, billable_evaluations = self.pricing.calculate_advanced_security_cost(
-                request.risk_evaluated_logins
+            if request.advanced_security_mau > mau:
+                raise ValueError(
+                    "Advanced Security MAU cannot exceed the total Cognito MAU."
+                )
+            advanced_security_cost, billable_advanced_security_mau = (
+                self.pricing.calculate_advanced_security_cost(
+                    request.advanced_security_mau, region
+                )
             )
         
         # Calculate custom domain cost
@@ -61,22 +72,22 @@ class CognitoCalculator(BaseCalculator):
         total_cost = (
             mau_cost
             + sms_mfa_cost
+            + totp_mfa_cost
             + advanced_security_cost
             + custom_domain_cost
             + email_customization_cost
         )
         
         # Calculate free tier savings (for informational purposes)
-        free_tier_savings = (
-            (self.pricing.free_tier["mau"] * self.pricing.rates["mau_rate"]) +
-            (self.pricing.free_tier["advanced_security_evaluations"] * self.pricing.rates["advanced_security_rate"])
-        )
+        rates = self.pricing.get_rates_for_region(region)
+        free_tier_savings = self.pricing.free_tier["mau"] * rates["mau_rate"]
         
         # Build response
         breakdown = CognitoCostBreakdown(
             total_cost=total_cost,
             mau_charge=mau_cost,
             sms_mfa_charge=sms_mfa_cost,
+            totp_mfa_charge=totp_mfa_cost,
             advanced_security_charge=advanced_security_cost,
             custom_domain_charge=custom_domain_cost,
             email_customization_charge=email_customization_cost,
@@ -87,8 +98,10 @@ class CognitoCalculator(BaseCalculator):
             mau=mau,
             billable_mau=billable_mau,
             mfa_users=int(mfa_users) if request.mfa_enabled else 0,
-            risk_evaluated_logins=request.risk_evaluated_logins if request.advanced_security_enabled else 0,
-            billable_evaluations=billable_evaluations,
+            advanced_security_mau=(
+                request.advanced_security_mau if request.advanced_security_enabled else 0
+            ),
+            billable_advanced_security_mau=billable_advanced_security_mau,
             monthly_emails=request.monthly_emails if request.email_customization_enabled else 0,
         )
         

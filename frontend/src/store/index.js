@@ -144,7 +144,7 @@ export const useServiceConfigStore = create((set) => ({
     mfa_type: 'sms',
     mfa_percentage: 30,
     advanced_security_enabled: false,
-    risk_evaluated_logins: 100000,
+    advanced_security_mau: 100000,
     custom_domain_enabled: false,
     email_customization_enabled: false,
     monthly_emails: 50000,

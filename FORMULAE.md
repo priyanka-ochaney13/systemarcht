@@ -233,18 +233,18 @@ total_beanstalk_cost = ec2_cost + alb_cost + storage_cost + monitoring_cost + da
 ### Monthly active users
 
 ```text
-free_mau = 50_000
-billable_mau = max(0, mau - free_mau)
-mau_cost = billable_mau × mau_rate_per_user
+free_mau = catalog free-tier boundary
+mau_cost = sum(users_in_each_catalog_tier × that_region's_rate)
 ```
 
 ### SMS MFA / advanced security / custom domain / email customization
 
 ```text
-sms_mfa_cost = mfa_enabled and mfa_type == "sms" ? mfa_users × sms_rate : 0
-advanced_security_cost = advanced_security_enabled ? max(0, risk_evaluated_logins - 50_000) × rate : 0
-custom_domain_cost = custom_domain_enabled ? domain_rate : 0
-email_customization_cost = email_customization_enabled ? monthly_emails × email_rate_per_1000 / 1000 : 0
+sms_mfa_cost = mfa_enabled and mfa_type == "sms" ? mfa_users × regional_catalog_sms_rate : 0
+totp_mfa_cost = mfa_enabled and mfa_type == "totp" ? mfa_users × regional_catalog_totp_rate : 0
+advanced_security_cost = advanced_security_enabled ? advanced_security_mau × regional_catalog_advanced_security_rate : 0
+custom_domain_cost = 0, or return a pricing error when enabled if the catalog has no rate
+email_customization_cost = 0, or return a pricing error when enabled if the catalog has no rate
 ```
 
 ### Total Cognito cost
@@ -252,6 +252,7 @@ email_customization_cost = email_customization_enabled ? monthly_emails × email
 ```text
 total_cognito_cost = mau_cost
                   + sms_mfa_cost
+                  + totp_mfa_cost
                   + advanced_security_cost
                   + custom_domain_cost
                   + email_customization_cost

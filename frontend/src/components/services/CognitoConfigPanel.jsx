@@ -30,13 +30,14 @@ export const CognitoConfigPanel = ({ onClose }) => {
     signins_per_month: Number.isFinite(config.signins_per_month) ? config.signins_per_month : 100000,
     token_refreshes_per_month: Number.isFinite(config.token_refreshes_per_month) ? config.token_refreshes_per_month : 50000,
     mfa_percentage: Number.isFinite(config.mfa_percentage) ? config.mfa_percentage : 30,
-    risk_evaluated_logins: Number.isFinite(config.risk_evaluated_logins) ? config.risk_evaluated_logins : 100000,
+    advanced_security_mau: Number.isFinite(config.advanced_security_mau) ? config.advanced_security_mau : 100000,
     monthly_emails: Number.isFinite(config.monthly_emails) ? config.monthly_emails : 50000,
   };
   
   const [localConfig, setLocalConfig] = useState(safeConfig);
   const [cost, setCost] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [calculationError, setCalculationError] = useState('');
   const [expandedSections, setExpandedSections] = useState({
     mfa: false,
     advancedSecurity: false,
@@ -57,6 +58,8 @@ export const CognitoConfigPanel = ({ onClose }) => {
 
   const handleCalculate = async () => {
     setLoading(true);
+    setCalculationError('');
+    setCost(null);
     try {
       const apiParams = {
         region: localConfig.region,
@@ -68,7 +71,7 @@ export const CognitoConfigPanel = ({ onClose }) => {
         mfa_type: localConfig.mfa_type || 'sms',
         mfa_percentage: localConfig.mfa_percentage || 0,
         advanced_security_enabled: localConfig.advanced_security_enabled || false,
-        risk_evaluated_logins: localConfig.risk_evaluated_logins || 0,
+        advanced_security_mau: localConfig.advanced_security_mau || 0,
         custom_domain_enabled: localConfig.custom_domain_enabled || false,
         email_customization_enabled: localConfig.email_customization_enabled || false,
         monthly_emails: localConfig.monthly_emails || 0,
@@ -76,10 +79,18 @@ export const CognitoConfigPanel = ({ onClose }) => {
 
       const result = await calculateCognitoCost(apiParams);
       setCost(result);
+      setCalculationError('');
       setCognitoCost(result);
       updateConfig(localConfig);
     } catch (error) {
       console.error('Error calculating cost:', error);
+      const detail = error.response?.data?.detail;
+      const message = Array.isArray(detail)
+        ? detail.map(item => item.msg).join('; ')
+        : detail;
+      setCalculationError(
+        message || error.message || 'Unable to calculate Cognito pricing.'
+      );
     } finally {
       setLoading(false);
     }
@@ -96,13 +107,14 @@ export const CognitoConfigPanel = ({ onClose }) => {
       mfa_type: 'sms',
       mfa_percentage: 30,
       advanced_security_enabled: false,
-      risk_evaluated_logins: 100000,
+      advanced_security_mau: 100000,
       custom_domain_enabled: false,
       email_customization_enabled: false,
       monthly_emails: 50000,
     };
     setLocalConfig(defaultConfig);
     setCost(null);
+    setCalculationError('');
     setExpandedSections({
       mfa: false,
       advancedSecurity: false,
@@ -155,7 +167,7 @@ export const CognitoConfigPanel = ({ onClose }) => {
             onChange={(e) => handleChange('mau', parseInt(e.target.value))}
             className="w-full px-3 py-2 border border-input bg-background text-foreground rounded-md focus:ring-2 focus:ring-ring/40"
           />
-          <p className="text-xs text-muted-foreground mt-1">💡 Free: First 50,000 MAUs | Paid: $0.004/user/month</p>
+          <p className="text-xs text-muted-foreground mt-1">💡 First 50,000 MAUs are free. Paid tiers use the selected region&apos;s AWS pricing catalog rates.</p>
         </div>
 
         {/* Authentication Requests */}
@@ -229,9 +241,9 @@ export const CognitoConfigPanel = ({ onClose }) => {
                     </label>
                     <div className="space-y-2">
                       {[
-                        { label: 'SMS MFA', value: 'sms', cost: '$0.00248/SMS' },
-                        { label: 'Email MFA', value: 'email', cost: 'FREE' },
-                        { label: 'Auth App (TOTP)', value: 'totp', cost: 'FREE' },
+                        { label: 'SMS MFA', value: 'sms', cost: 'AWS catalog rate' },
+                        { label: 'Email MFA', value: 'email', cost: 'not in Cognito catalog' },
+                        { label: 'Auth App (TOTP)', value: 'totp', cost: 'AWS catalog rate' },
                       ].map(option => (
                         <label key={option.value} className="flex items-center gap-2 cursor-pointer">
                           <input
@@ -296,15 +308,17 @@ export const CognitoConfigPanel = ({ onClose }) => {
               {localConfig.advanced_security_enabled && (
                 <div>
                   <label className="block text-sm font-medium text-foreground/80 mb-2">
-                    Risk-Evaluated Logins per Month
+                    Monthly Active Users with Advanced Security
                   </label>
                   <input
                     type="number"
-                    value={localConfig.risk_evaluated_logins}
-                    onChange={(e) => handleChange('risk_evaluated_logins', parseInt(e.target.value))}
+                    min="0"
+                    max={localConfig.mau}
+                    value={localConfig.advanced_security_mau}
+                    onChange={(e) => handleChange('advanced_security_mau', parseInt(e.target.value))}
                     className="w-full px-3 py-2 border border-input bg-background text-foreground rounded-md focus:ring-2 focus:ring-ring/40"
                   />
-                  <p className="text-xs text-muted-foreground mt-1">💡 First 1M evaluations FREE | Paid: $0.01/evaluation</p>
+                  <p className="text-xs text-muted-foreground mt-1">💡 Billed per enabled MAU at the selected region&apos;s AWS catalog rate.</p>
                 </div>
               )}
             </div>
@@ -331,7 +345,7 @@ export const CognitoConfigPanel = ({ onClose }) => {
                   className="w-4 h-4 cursor-pointer"
                 />
                 <span className="text-sm font-medium text-foreground/80">Custom Domain</span>
-                <span className="text-xs text-muted-foreground">($0.50/month)</span>
+                <span className="text-xs text-muted-foreground">(not priced in the Cognito catalog)</span>
               </label>
 
               <label className="flex items-center gap-2 cursor-pointer">
@@ -342,7 +356,7 @@ export const CognitoConfigPanel = ({ onClose }) => {
                   className="w-4 h-4 cursor-pointer"
                 />
                 <span className="text-sm font-medium text-foreground/80">Email Customization</span>
-                <span className="text-xs text-muted-foreground">($0.00003/email)</span>
+                <span className="text-xs text-muted-foreground">(not priced in the Cognito catalog)</span>
               </label>
 
               {localConfig.email_customization_enabled && (
@@ -376,6 +390,17 @@ export const CognitoConfigPanel = ({ onClose }) => {
                   <span className="text-foreground/80">SMS MFA:</span>
                   <span className="font-medium">${cost.breakdown.sms_mfa_charge.toFixed(2)}</span>
                 </div>
+              )}
+              {cost.breakdown.totp_mfa_charge > 0 && (
+                <div className="flex justify-between">
+                  <span className="text-foreground/80">TOTP MFA:</span>
+                  <span className="font-medium">${cost.breakdown.totp_mfa_charge.toFixed(2)}</span>
+                </div>
+              )}
+              {calculationError && (
+                <p role="alert" className="mt-3 rounded-md border border-destructive/40 bg-destructive/10 p-3 text-sm text-destructive">
+                  {calculationError}
+                </p>
               )}
               {cost.breakdown.advanced_security_charge > 0 && (
                 <div className="flex justify-between">

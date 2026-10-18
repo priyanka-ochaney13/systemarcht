@@ -4,6 +4,12 @@ import { calculateLambdaCost } from '@/api/client';
 import { Zap, X } from 'lucide-react';
 
 const MEMORY_OPTIONS = [128, 256, 512, 1024, 1536, 2048, 3008, 4096, 5120, 6144, 7168, 8192, 9216, 10240];
+const normalizeInteger = (value, minimum, maximum = Number.MAX_SAFE_INTEGER) => {
+  const number = Number(value);
+  if (!Number.isFinite(number)) return minimum;
+  return Math.min(maximum, Math.max(minimum, Math.trunc(number)));
+};
+
 const REGIONS = {
   'US East (N. Virginia)': 'us-east-1',
   'US East (Ohio)': 'us-east-2',
@@ -40,12 +46,24 @@ export const LambdaConfigPanel = ({ onClose }) => {
   };
 
   const handleProvisionedChange = (field, value) => {
+    const currentCount = normalizeInteger(localConfig.provisioned_concurrency.count, 0);
+    const provisionedConcurrency = field === 'enabled'
+      ? {
+          enabled: value,
+          count: value ? Math.max(1, currentCount) : currentCount,
+        }
+      : {
+          ...localConfig.provisioned_concurrency,
+          count: value === ''
+            ? ''
+            : normalizeInteger(
+                value,
+                localConfig.provisioned_concurrency.enabled ? 1 : 0
+              ),
+        };
     const newConfig = {
       ...localConfig,
-      provisioned_concurrency: {
-        ...localConfig.provisioned_concurrency,
-        [field]: value,
-      },
+      provisioned_concurrency: provisionedConcurrency,
     };
     setLocalConfig(newConfig);
   };
@@ -57,12 +75,12 @@ export const LambdaConfigPanel = ({ onClose }) => {
       const apiParams = {
         region: localConfig.region,
         architecture: localConfig.architecture,
-        requests_per_month: localConfig.requests_per_month || 0,
-        duration_ms: localConfig.average_duration_ms || 128,
+        requests_per_month: normalizeInteger(localConfig.requests_per_month, 0),
+        duration_ms: normalizeInteger(localConfig.average_duration_ms, 1, 900000),
         memory_mb: localConfig.allocated_memory_mb || 128,
         ephemeral_storage_mb: localConfig.ephemeral_storage_mb || 512,
         provisioned_concurrency: localConfig.provisioned_concurrency?.enabled
-          ? localConfig.provisioned_concurrency.count || 0
+          ? normalizeInteger(localConfig.provisioned_concurrency.count, 1)
           : 0,
         include_free_tier: localConfig.include_free_tier ?? true,
       };
@@ -147,8 +165,20 @@ export const LambdaConfigPanel = ({ onClose }) => {
           </label>
           <input
             type="number"
-            value={localConfig.requests_per_month}
-            onChange={(e) => handleChange('requests_per_month', parseInt(e.target.value))}
+            min="0"
+            step="1"
+            value={localConfig.requests_per_month ?? ''}
+            onChange={(e) => {
+              const value = e.target.value;
+              handleChange(
+                'requests_per_month',
+                value === '' ? '' : normalizeInteger(value, 0)
+              );
+            }}
+            onBlur={() => handleChange(
+              'requests_per_month',
+              normalizeInteger(localConfig.requests_per_month, 0)
+            )}
             className="w-full px-3 py-2 border border-input bg-background text-foreground rounded-md focus:ring-2 focus:ring-ring/40"
           />
           <p className="text-xs text-muted-foreground mt-1">💡 First 1M requests FREE every month</p>
@@ -161,10 +191,21 @@ export const LambdaConfigPanel = ({ onClose }) => {
           </label>
           <input
             type="number"
-            value={localConfig.average_duration_ms || 0}
-            onChange={(e) => handleChange('average_duration_ms', parseInt(e.target.value) || 0)}
+            value={localConfig.average_duration_ms ?? ''}
+            onChange={(e) => {
+              const value = e.target.value;
+              handleChange(
+                'average_duration_ms',
+                value === '' ? '' : normalizeInteger(value, 1, 900000)
+              );
+            }}
+            onBlur={() => handleChange(
+              'average_duration_ms',
+              normalizeInteger(localConfig.average_duration_ms, 1, 900000)
+            )}
             min="1"
             max="900000"
+            step="1"
             className="w-full px-3 py-2 border border-input bg-background text-foreground rounded-md focus:ring-2 focus:ring-ring/40"
           />
           <p className="text-xs text-muted-foreground mt-1">💡 Max: 15 minutes (900,000 ms)</p>
@@ -222,9 +263,14 @@ export const LambdaConfigPanel = ({ onClose }) => {
               </label>
               <input
                 type="number"
-                value={localConfig.provisioned_concurrency.count}
-                onChange={(e) => handleProvisionedChange('count', parseInt(e.target.value))}
+                value={localConfig.provisioned_concurrency.count ?? ''}
+                onChange={(e) => handleProvisionedChange('count', e.target.value)}
+                onBlur={() => handleProvisionedChange(
+                  'count',
+                  normalizeInteger(localConfig.provisioned_concurrency.count, 1)
+                )}
                 min="1"
+                step="1"
                 className="w-full px-3 py-2 border border-input bg-background text-foreground rounded-md focus:ring-2 focus:ring-ring/40"
               />
             </div>

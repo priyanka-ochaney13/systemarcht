@@ -1,11 +1,54 @@
-"""Billing constants for AWS services - loaded from service_config.json"""
+"""Billing constants for AWS services, loaded from MongoDB or JSON fallback."""
 import json
+import logging
+import os
 from pathlib import Path
 from typing import Dict, Any
 
+from app.core.mongo import get_service_config_collection
+
+logger = logging.getLogger(__name__)
+
+
 def _load_service_config() -> Dict[str, Any]:
-    """Load service configuration from JSON file"""
+    """Load the shared service config document from MongoDB or its JSON fallback."""
+    source = os.getenv("SERVICE_CONFIG_SOURCE", "auto").lower()
+    if source not in {"auto", "mongo", "file"}:
+        raise ValueError(
+            "SERVICE_CONFIG_SOURCE must be one of: auto, mongo, file"
+        )
+
+    if source != "file":
+        collection = get_service_config_collection()
+        if collection is None:
+            if source == "mongo":
+                raise RuntimeError(
+                    "SERVICE_CONFIG_SOURCE=mongo but MONGODB_URI is not set"
+                )
+        else:
+            document = collection.find_one({"_id": "default"})
+            if document is not None:
+                config = document.get("config")
+                if not isinstance(config, dict):
+                    raise ValueError(
+                        "MongoDB service_config document 'default' must contain "
+                        "an object-valued 'config' field"
+                    )
+                logger.info("Loaded service configuration from MongoDB")
+                return config
+            if source == "mongo":
+                raise RuntimeError(
+                    "SERVICE_CONFIG_SOURCE=mongo but service_config/default was not found"
+                )
+            logger.warning(
+                "MongoDB service_config/default not found; falling back to service_config.json"
+            )
+
     config_file = Path(__file__).parent.parent.parent / "pricing_data" / "service_config.json"
+    if not config_file.exists():
+        raise FileNotFoundError(
+            f"Service configuration not found in MongoDB or JSON fallback: {config_file}"
+        )
     with open(config_file, 'r', encoding='utf-8') as f:
         return json.load(f)
 
@@ -165,7 +208,6 @@ def get_service_config(service: str) -> Dict[str, Any]:
     return _CONFIG.get(service, {})
 
 def reload_config():
-    """Reload configuration from file (useful for testing)"""
+    """Reload configuration from its configured source (useful for testing)."""
     global _CONFIG
     _CONFIG = _load_service_config()
-
