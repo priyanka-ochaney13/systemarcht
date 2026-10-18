@@ -12,6 +12,7 @@ load_dotenv()
 PRICING_COLLECTION = "pricing"
 SERVICE_CONFIG_COLLECTION = "service_config"
 LEARNING_MODULES_COLLECTION = "learning_modules"
+LEARNING_PROGRESS_COLLECTION = "learning_progress"
 USER_PROFILES_COLLECTION = "users"
 ARCHITECTURE_DOCUMENTS_COLLECTION = "architecture_documents"
 
@@ -56,6 +57,15 @@ def get_learning_modules_collection() -> Optional[Collection]:
         return None
     database_name = os.getenv("MONGODB_USER_DB", "capstoneuser")
     return client[database_name][LEARNING_MODULES_COLLECTION]
+
+
+def get_learning_progress_collection() -> Optional[Collection]:
+    """Return the authenticated users' learning progress collection."""
+    client = _get_user_client()
+    database_name = os.getenv("MONGODB_USER_DB")
+    if client is None or not database_name:
+        return None
+    return client[database_name][LEARNING_PROGRESS_COLLECTION]
 
 
 def get_user_profiles_collection() -> Optional[Collection]:

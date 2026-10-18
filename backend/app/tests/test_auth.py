@@ -16,7 +16,7 @@ class AuthTests(unittest.TestCase):
     def test_application_endpoints_require_authentication(self):
         client = TestClient(app)
 
-        for path in ("/", "/health", "/api/learning-modules"):
+        for path in ("/", "/health", "/api/learning-modules", "/api/learning-progress"):
             with self.subTest(path=path):
                 response = client.get(path)
                 self.assertEqual(response.status_code, 401)

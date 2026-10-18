@@ -16,6 +16,7 @@ SystemArcht is an AWS architecture planning and cost-estimation app. It combines
 - `backend/app/` contains the FastAPI routes, request/response models, and cost calculators.
 - `backend/ai/` contains the AI, retrieval, and architecture workflows.
 - Learning module content is read from the `learning_modules` collection in the database named by `MONGODB_USER_DB` on the cluster configured by `MONGODB_USER_URI`.
+- Signed-in users' learning progress is saved in the `learning_progress` collection in that same database. Progress is loaded and saved through authenticated API routes; it is not stored in browser storage.
 - `backend/pricing_data/` contains JSON pricing sources and configuration fallbacks. Keep this directory until you have verified MongoDB-only operation and no longer need local fallback or migration sources.
 - The MongoDB database stores AWS SKU data in the `pricing` collection and application service settings in the `service_config` collection.
 - User-owned designs and their separate cost snapshots are stored in the `architecture_documents` collection in `MONGODB_USER_DB`.
@@ -60,7 +61,7 @@ PRICING_SOURCE=auto
 SERVICE_CONFIG_SOURCE=auto
 ```
 
-Keep credentials private; do not commit `.env` or `firebase-service-account.json`. The Firebase service-account file belongs in `backend/` by default; alternatively set `FIREBASE_CREDENTIALS_PATH` to its path. User profiles are stored in the database named by `MONGODB_USER_DB` on the cluster configured by `MONGODB_USER_URI`.
+Keep credentials private; do not commit `.env` or `firebase-service-account.json`. The Firebase service-account file belongs in `backend/` by default; alternatively set `FIREBASE_CREDENTIALS_PATH` to its path. User profiles, learning progress, and architecture documents are stored in the database named by `MONGODB_USER_DB` on the cluster configured by `MONGODB_USER_URI`.
 
 If you want to require MongoDB rather than allow JSON fallbacks, set both source settings to `mongo`:
 

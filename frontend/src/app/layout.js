@@ -49,10 +49,11 @@ export default function RootLayout({ children }) {
       <body className="theme-transition flex min-h-full flex-col bg-background text-foreground">
         <ThemeProvider>
           <AuthProvider>
-            <LearningProgressHydration />
-            <Suspense fallback={<CustomLoader />}>
-              <AuthBoundary>{children}</AuthBoundary>
-            </Suspense>
+            <LearningProgressHydration>
+              <Suspense fallback={<CustomLoader />}>
+                <AuthBoundary>{children}</AuthBoundary>
+              </Suspense>
+            </LearningProgressHydration>
           </AuthProvider>
         </ThemeProvider>
       </body>
