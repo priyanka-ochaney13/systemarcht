@@ -20,3 +20,4 @@ watchfiles==1.1.1
 websockets==16.0
 pymongo[srv]
 firebase-admin
+boto3

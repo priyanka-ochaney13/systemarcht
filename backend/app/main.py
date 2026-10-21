@@ -22,6 +22,7 @@ from app.routers.ai_architect import router as ai_architect_router
 from app.routers.learning_modules import router as learning_modules_router
 from app.routers.learning_progress import router as learning_progress_router
 from app.routers.architecture_documents import router as architecture_documents_router
+from app.routers.aws_deployments import router as aws_deployments_router
 import logging
 from app.routers import auth
 from app.services.firebase_auth import get_current_user
@@ -67,6 +68,7 @@ app.include_router(rds_router)
 app.include_router(learning_modules_router)
 app.include_router(learning_progress_router)
 app.include_router(architecture_documents_router)
+app.include_router(aws_deployments_router)
 
 app.include_router(auth.router, prefix="/api")
 

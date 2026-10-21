@@ -36,6 +36,10 @@ import {
   deleteAIConversation,
   sendAIMessage,
   editAIMessage,
+  getAWSConnection,
+  previewTerraformDeployment,
+  approveTerraformDeployment,
+  getTerraformDeployment,
 } from '@/api/client';
 import { useArchitectureStore } from '@/store';
 import { MermaidArchitectureDiagram } from '@/components/playground/MermaidArchitectureDiagram';
@@ -91,6 +95,9 @@ export default function AIArchitectPage() {
   // Active tabs per assistant message: { [messageId]: 'explanation' | 'diagram' | 'sdk' | 'terraform' }
   const [activeTabs, setActiveTabs] = useState({});
   const [copiedState, setCopiedState] = useState({});
+  const [awsConnection, setAwsConnection] = useState(null);
+  const [deploymentByMessage, setDeploymentByMessage] = useState({});
+  const [deploymentBusy, setDeploymentBusy] = useState({});
 
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
@@ -98,7 +105,53 @@ export default function AIArchitectPage() {
   // 1. Fetch conversations on mount
   useEffect(() => {
     fetchConversations();
+    getAWSConnection().then(setAwsConnection).catch(() => setAwsConnection({ configured: false }));
   }, []);
+
+  const handleTerraformPreview = async (message) => {
+    if (!awsConnection?.status || awsConnection.status !== 'connected') {
+      router.push('/profile?returnTo=/ai-architect');
+      return;
+    }
+    setDeploymentBusy((prev) => ({ ...prev, [message.id]: true }));
+    try {
+      const deployment = await previewTerraformDeployment(
+        message.terraform_code,
+        awsConnection.region || 'ap-south-1'
+      );
+      setDeploymentByMessage((prev) => ({ ...prev, [message.id]: deployment }));
+    } catch (err) {
+      setErrorMessage(err.message || 'Could not create a deployment preview.');
+    } finally {
+      setDeploymentBusy((prev) => ({ ...prev, [message.id]: false }));
+    }
+  };
+
+  const handleTerraformApprove = async (message) => {
+    const deployment = deploymentByMessage[message.id];
+    if (!deployment) return;
+    setDeploymentBusy((prev) => ({ ...prev, [message.id]: true }));
+    try {
+      const queued = await approveTerraformDeployment(deployment.id);
+      setDeploymentByMessage((prev) => ({ ...prev, [message.id]: queued }));
+      const interval = window.setInterval(async () => {
+        try {
+          const current = await getTerraformDeployment(deployment.id);
+          setDeploymentByMessage((prev) => ({ ...prev, [message.id]: current }));
+          if (['succeeded', 'failed', 'blocked'].includes(current.status)) {
+            window.clearInterval(interval);
+            setDeploymentBusy((prev) => ({ ...prev, [message.id]: false }));
+          }
+        } catch {
+          window.clearInterval(interval);
+          setDeploymentBusy((prev) => ({ ...prev, [message.id]: false }));
+        }
+      }, 2500);
+    } catch (err) {
+      setErrorMessage(err.message || 'Could not approve deployment.');
+      setDeploymentBusy((prev) => ({ ...prev, [message.id]: false }));
+    }
+  };
 
   const fetchConversations = async (selectLatest = false) => {
     try {
@@ -746,13 +799,55 @@ export default function AIArchitectPage() {
 
                       {currentTab === 'terraform' && (
                         <div className="relative">
-                          <div className="mb-2 p-2.5 rounded-lg bg-primary/10 border border-primary/20 text-[11px] text-primary flex items-center justify-between">
-                            <span>Ready for Terraform engineering & deployment.</span>
-                            <span className="font-mono text-[10px] text-muted-foreground">main.tf</span>
-                          </div>
-                          <pre className="p-4 rounded-xl bg-background font-mono text-xs text-foreground overflow-x-auto leading-relaxed border border-border">
-                            <code>{msg.terraform_code}</code>
-                          </pre>
+                          {deploymentByMessage[msg.id] ? (
+                            <div className="space-y-4">
+                              <div className="rounded-xl border border-border bg-muted/30 p-4">
+                                <div className="flex flex-wrap items-center justify-between gap-2">
+                                  <span className="font-semibold text-foreground">Deployment preview</span>
+                                  <span className="rounded-full bg-accent px-2.5 py-1 text-[11px] font-semibold text-accent-foreground">
+                                    {deploymentByMessage[msg.id].status}
+                                  </span>
+                                </div>
+                                <p className="mt-1 text-xs text-muted-foreground">
+                                  Region: {deploymentByMessage[msg.id].region}
+                                </p>
+                                <div className="mt-4 grid gap-2 sm:grid-cols-2">
+                                  {deploymentByMessage[msg.id].resources.map((resource) => (
+                                    <div key={`${resource.type}-${resource.name}`} className="rounded-lg border border-border bg-card p-3 text-xs">
+                                      <p className="font-mono font-semibold text-foreground">{resource.type}</p>
+                                      <p className="mt-1 text-muted-foreground">{resource.name}</p>
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                              {deploymentByMessage[msg.id].warnings?.length > 0 && (
+                                <div className="rounded-lg border border-destructive/30 bg-destructive/10 p-3 text-xs text-destructive">
+                                  {deploymentByMessage[msg.id].warnings.map((warning) => <p key={warning}>{warning}</p>)}
+                                </div>
+                              )}
+                              {deploymentByMessage[msg.id].error && (
+                                <div className="whitespace-pre-wrap rounded-lg border border-destructive/30 bg-destructive/10 p-3 text-xs text-destructive">
+                                  {deploymentByMessage[msg.id].error}
+                                </div>
+                              )}
+                              {deploymentByMessage[msg.id].status === 'awaiting_approval' && (
+                                <button type="button" disabled={deploymentBusy[msg.id]} onClick={() => handleTerraformApprove(msg)} className="sa-btn-primary">
+                                  {deploymentBusy[msg.id] ? 'Launching…' : 'Approve and launch'}
+                                </button>
+                              )}
+                            </div>
+                          ) : (
+                            <div className="rounded-xl border border-primary/20 bg-primary/10 p-4">
+                              <p className="text-sm font-semibold text-foreground">Launch resources in your AWS account</p>
+                              <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
+                                Review the resources and region before approving. This is a one-time,
+                                create-only deployment; SystemArcht will not manage the resources afterward.
+                              </p>
+                              <button type="button" disabled={deploymentBusy[msg.id]} onClick={() => handleTerraformPreview(msg)} className="sa-btn-primary mt-4">
+                                {deploymentBusy[msg.id] ? 'Preparing preview…' : 'Review deployment'}
+                              </button>
+                            </div>
+                          )}
                         </div>
                       )}
                     </div>
@@ -828,4 +923,3 @@ export default function AIArchitectPage() {
     </div>
   );
 }
-

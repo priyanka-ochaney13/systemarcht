@@ -14,6 +14,8 @@ SERVICE_CONFIG_COLLECTION = "service_config"
 LEARNING_MODULES_COLLECTION = "learning_modules"
 LEARNING_PROGRESS_COLLECTION = "learning_progress"
 USER_PROFILES_COLLECTION = "users"
+AWS_CONNECTIONS_COLLECTION = "aws_connections"
+DEPLOYMENTS_COLLECTION = "terraform_deployments"
 ARCHITECTURE_DOCUMENTS_COLLECTION = "architecture_documents"
 
 
@@ -84,3 +86,19 @@ def get_architecture_documents_collection() -> Optional[Collection]:
     if client is None or not database_name:
         return None
     return client[database_name][ARCHITECTURE_DOCUMENTS_COLLECTION]
+
+
+def get_aws_connections_collection() -> Optional[Collection]:
+    client = _get_user_client()
+    database_name = os.getenv("MONGODB_USER_DB")
+    if client is None or not database_name:
+        return None
+    return client[database_name][AWS_CONNECTIONS_COLLECTION]
+
+
+def get_deployments_collection() -> Optional[Collection]:
+    client = _get_user_client()
+    database_name = os.getenv("MONGODB_USER_DB")
+    if client is None or not database_name:
+        return None
+    return client[database_name][DEPLOYMENTS_COLLECTION]

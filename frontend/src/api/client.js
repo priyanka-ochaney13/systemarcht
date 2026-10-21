@@ -269,3 +269,50 @@ export const editAIMessage = async (convId, messageId, message) => {
   const response = await apiClient.put(`/ai-architect/conversations/${convId}/messages/${messageId}`, { message });
   return response.data;
 };
+
+export const getAWSConnection = async () => {
+  const response = await apiClient.get('/aws-connection');
+  return response.data;
+};
+
+export const setupAWSConnection = async (roleArn, region = 'ap-south-1') => {
+  const response = await apiClient.post('/aws-connection/setup', {
+    role_arn: roleArn,
+    region,
+  });
+  return response.data;
+};
+
+export const verifyAWSConnection = async () => {
+  const response = await apiClient.post('/aws-connection/verify');
+  return response.data;
+};
+
+export const deleteAWSConnection = async () => {
+  await apiClient.delete('/aws-connection');
+};
+
+export const previewTerraformDeployment = async (terraformCode, region = 'ap-south-1') => {
+  const response = await apiClient.post('/deployments/preview', {
+    terraform_code: terraformCode,
+    region,
+  });
+  return response.data;
+};
+
+export const approveTerraformDeployment = async (deploymentId) => {
+  const response = await apiClient.post(`/deployments/${deploymentId}/approve`, {
+    confirmation: 'LAUNCH',
+  });
+  return response.data;
+};
+
+export const getTerraformDeployment = async (deploymentId) => {
+  const response = await apiClient.get(`/deployments/${deploymentId}`);
+  return response.data;
+};
+
+export const getTerraformDeployments = async () => {
+  const response = await apiClient.get('/deployments');
+  return response.data;
+};
